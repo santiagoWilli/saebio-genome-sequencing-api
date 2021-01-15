@@ -1,4 +1,3 @@
-import org.bson.Document;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.*;
@@ -11,7 +10,7 @@ public class Application_ {
     }
 
     @Test
-    public void given_noFiles_when_postToSequencies_then_statusCode400() {
+    public void given_noMultipartBody_when_postToSequencies_then_statusCode400() {
         when().
                 post("/sequencies").
         then().
