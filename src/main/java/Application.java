@@ -1,5 +1,4 @@
 import javax.servlet.MultipartConfigElement;
-import javax.servlet.http.Part;
 
 import static spark.Spark.*;
 
@@ -8,7 +7,7 @@ public class Application {
         post("/sequencies", (request, response) -> {
             request.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
             try {
-                Part filePart = request.raw().getPart("pair1");
+                if (request.raw().getParts().size() != 2) throw new Exception();
             } catch (Exception e) {
                 response.status(400);
                 return "";
