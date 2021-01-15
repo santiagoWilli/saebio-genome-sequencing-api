@@ -40,23 +40,28 @@
             <artifactId>spark-core</artifactId>
             <version>2.9.3</version>
         </dependency>
-
         <dependency>
-            <groupId>com.despegar</groupId>
-            <artifactId>spark-test</artifactId>
-            <version>1.1.8</version>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver</artifactId>
+            <version>3.4.3</version>
         </dependency>
+
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
             <version>4.3.3</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>5.7.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.18.1</version>
             <scope>test</scope>
         </dependency>
 
