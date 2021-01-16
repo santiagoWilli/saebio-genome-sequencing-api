@@ -49,4 +49,15 @@ public class Application_ {
         then().
                 statusCode(400);
     }
+
+    @Test
+    public void given_pairFilesAreTheSame_when_postToSequencies_then_statusCode400() {
+        given().
+                multiPart("pair1", new File("test/sequencies/Kpneu1_191120_R1.fastq.gz")).
+                multiPart("pair2", new File("test/sequencies/Kpneu1_191120_R1.fastq.gz")).
+        when().
+                post("/sequencies").
+        then().
+                statusCode(400);
+    }
 }
