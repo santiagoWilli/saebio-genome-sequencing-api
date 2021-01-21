@@ -13,16 +13,24 @@ public class Application {
         post("/sequences", (request, response) -> {
             request.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
             try {
-                if (request.raw().getParts().size() != 2) throw new Exception();
-                if (!partFilesFormASequencyPair(request)) throw new Exception();
+                if (request.raw().getParts().size() != 2) throw new Exception("");
+                for (Part part : request.raw().getParts()) {
+                    if (!part.getSubmittedFileName().matches(filenameRegex())) throw new Exception("{\"message\":\"Nombre de archivo inválido.\"}");
+                }
+                if (!partFilesFormASequencyPair(request)) throw new Exception("");
             } catch (Exception e) {
                 response.status(400);
-                return "";
+                response.type("application/json");
+                return e.getMessage();
             }
 
             response.status(201);
             return "";
         });
+    }
+
+    private static String filenameRegex() {
+        return "[a-zA-Z]+[0-9]{0,4}_((0[1-9])|([1-2][1-9])|(3[0-1]))((0[1-9])|(1[0-2]))[0-9]{2}_R(1|2).(fq|fastq).gz";
     }
 
     private static Boolean partFilesFormASequencyPair(Request request) throws IOException, ServletException {
@@ -38,3 +46,4 @@ public class Application {
         return nameFields;
     }
 }
+
