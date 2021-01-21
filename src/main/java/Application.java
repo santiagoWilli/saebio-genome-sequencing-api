@@ -1,4 +1,5 @@
 import spark.Request;
+import spark.Response;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
@@ -13,17 +14,16 @@ public class Application {
         post("/sequences", (request, response) -> {
             request.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
             try {
-                if (request.raw().getParts().size() != 2) throw new BadRequestException("La secuencia debe ser una pareja de ficheros.");
+                if (request.raw().getParts().size() != 2) throw new BadRequestException("La secuencia debe ser una pareja de ficheros");
                 for (Part part : request.raw().getParts()) {
-                    if (!part.getSubmittedFileName().matches(filenameRegex())) throw new BadRequestException("Nombre de archivo inválido.");
+                    if (!part.getSubmittedFileName().matches(filenameRegex())) throw new BadRequestException("Nombre de archivo inválido");
                 }
-                if (!partFilesFormASequencyPair(request)) throw new BadRequestException("Los ficheros no forman una pareja válida.");
+                if (!partFilesFormASequencyPair(request)) throw new BadRequestException("Los ficheros no forman una pareja válida");
+            } catch (ServletException e) {
+                return badRequest(response, "El contenido esperado es multipart/form-data");
             } catch (Exception e) {
-                response.status(400);
-                response.type("application/json");
-                return e.getMessage();
+                return badRequest(response, e.getMessage());
             }
-
             response.status(201);
             return "";
         });
@@ -46,9 +46,15 @@ public class Application {
         return nameFields;
     }
 
+    private static String badRequest(Response response, String message) {
+        response.status(400);
+        response.type("application/json");
+        return "{\"message\":\"" + message + "\"}";
+    }
+
     static class BadRequestException extends Exception {
         BadRequestException(String message) {
-            super("{\"message\":\"" + message + "\"}");
+            super(message);
         }
     }
 }

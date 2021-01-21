@@ -17,7 +17,8 @@ public class Application_ {
         when().
                 post("/sequences").
         then().
-                statusCode(400);
+                statusCode(400).
+                body("message", equalTo("El contenido esperado es multipart/form-data"));
     }
 
     @Test
@@ -28,7 +29,7 @@ public class Application_ {
                 post("/sequences").
         then().
                 statusCode(400).
-                body("message", equalTo("La secuencia debe ser una pareja de ficheros."));
+                body("message", equalTo("La secuencia debe ser una pareja de ficheros"));
     }
 
     @Test
@@ -40,7 +41,7 @@ public class Application_ {
                 post("/sequences").
         then().
                 statusCode(400).
-                body("message", equalTo("Los ficheros no forman una pareja válida."));
+                body("message", equalTo("Los ficheros no forman una pareja válida"));
     }
 
     @Test
@@ -52,7 +53,7 @@ public class Application_ {
                 post("/sequences").
         then().
                 statusCode(400).
-                body("message", equalTo("Los ficheros no forman una pareja válida."));
+                body("message", equalTo("Los ficheros no forman una pareja válida"));
     }
 
     @Test
@@ -73,7 +74,7 @@ public class Application_ {
                     post("/sequences").
             then().
                     statusCode(400).
-                    body("message", equalTo("Nombre de archivo inválido."))
+                    body("message", equalTo("Nombre de archivo inválido"))
         );
     }
 
