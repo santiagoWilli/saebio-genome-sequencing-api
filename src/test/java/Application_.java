@@ -21,24 +21,14 @@ public class Application_ {
     }
 
     @Test
-    public void given_aPairOfFiles_when_postToSequences_then_statusCode201() {
-        given().
-                multiPart("pair1", new File("test/sequences/Kpneu1_191120_R1.fastq.gz")).
-                multiPart("pair2", new File("test/sequences/Kpneu1_191120_R2.fastq.gz")).
-        when().
-                post("/sequences").
-        then().
-                statusCode(201);
-    }
-
-    @Test
     public void given_notAPair_when_postToSequences_then_statusCode400() {
         given().
                 multiPart("pair1", new File("test/sequences/Kpneu1_191120_R1.fastq.gz")).
         when().
                 post("/sequences").
         then().
-                statusCode(400);
+                statusCode(400).
+                body("message", equalTo("La secuencia debe ser una pareja de ficheros."));
     }
 
     @Test
@@ -49,7 +39,8 @@ public class Application_ {
         when().
                 post("/sequences").
         then().
-                statusCode(400);
+                statusCode(400).
+                body("message", equalTo("Los ficheros no forman una pareja válida."));
     }
 
     @Test
@@ -60,7 +51,8 @@ public class Application_ {
         when().
                 post("/sequences").
         then().
-                statusCode(400);
+                statusCode(400).
+                body("message", equalTo("Los ficheros no forman una pareja válida."));
     }
 
     @Test
@@ -83,5 +75,16 @@ public class Application_ {
                     statusCode(400).
                     body("message", equalTo("Nombre de archivo inválido."))
         );
+    }
+
+    @Test
+    public void given_aPairOfValidFiles_when_postToSequences_then_statusCode201() {
+        given().
+                multiPart("pair1", new File("test/sequences/Kpneu1_191120_R1.fastq.gz")).
+                multiPart("pair2", new File("test/sequences/Kpneu1_191120_R2.fastq.gz")).
+        when().
+                post("/sequences").
+        then().
+                statusCode(201);
     }
 }
