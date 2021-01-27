@@ -39,5 +39,9 @@ bin/
 build/
 /bin1/
 java/build/**
+
+# Test and DB folders
 /test/
+/db/
+
 /mvn-exe
