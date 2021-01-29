@@ -1,19 +1,29 @@
 package functional;
 
 import static io.restassured.RestAssured.*;
+import static org.hamcrest.Matchers.equalTo;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.io.IOException;
 
 public class Sequences_ {
     static final int PORT = 5678;
     static final int DB_PORT = 7017;
+    static final String testFolderPath = "test/resources/sequences/";
 
     @Test
-    public void test() {
-        System.out.println("Everything works just fine");
+    public void given_notAPair_when_postToSequences_then_statusCode400() {
+        given().
+                multiPart("pair1", new File(testFolderPath + "Kpneu1_191120_R1.fastq.gz")).
+        when().
+                post("/sequences").
+        then().
+                statusCode(400).
+                body("message", equalTo("La secuencia debe ser una pareja de ficheros"));
     }
 
     @BeforeAll

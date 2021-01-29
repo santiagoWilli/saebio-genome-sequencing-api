@@ -12,5 +12,7 @@ public class Application {
         port(options.port);
 
         get("/alive", (req, res) -> "I am alive!");
+
+        post("/sequences", (req, res) -> "");
     }
 }
