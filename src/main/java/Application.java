@@ -1,5 +1,7 @@
 import com.beust.jcommander.JCommander;
 import static spark.Spark.*;
+
+import handlers.Answer;
 import utils.Arguments;
 
 public class Application {
@@ -11,8 +13,13 @@ public class Application {
                 .parse(args);
         port(options.port);
 
-        get("/alive", (req, res) -> "I am alive!");
+        get("/alive", (request, response) -> "I am alive!");
 
-        post("/sequences", (req, res) -> "");
+        post("/sequences", (request, response) -> {
+            Answer answer = Answer.badRequest("La secuencia debe ser una pareja de ficheros");
+            response.status(answer.getCode());
+            response.type("application/json");
+            return answer.getBody();
+        });
     }
 }
