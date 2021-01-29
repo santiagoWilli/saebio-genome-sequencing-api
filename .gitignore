@@ -41,7 +41,8 @@ build/
 java/build/**
 
 # Test and DB folders
-/test/
+/test/resources
 /db/
 
+/log/
 /mvn-exe

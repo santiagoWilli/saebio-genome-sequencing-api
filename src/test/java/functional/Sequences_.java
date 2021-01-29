@@ -1,0 +1,62 @@
+package functional;
+
+import static io.restassured.RestAssured.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+
+public class Sequences_ {
+    static final int PORT = 5678;
+    static final int DB_PORT = 7017;
+
+    @Test
+    public void test() {
+        System.out.println("Everything works just fine");
+    }
+
+    @BeforeAll
+    static void startCleanDatabase() throws IOException {
+        ProcessBuilder process = new ProcessBuilder("test/start_db.sh", String.valueOf(DB_PORT));
+        process.start();
+    }
+
+    @BeforeAll
+    static void startApplication() throws IOException, InterruptedException {
+        port = PORT;
+        ProcessBuilder process = new ProcessBuilder(
+                "test/start_application.sh",
+                String.valueOf(PORT),
+                String.valueOf(DB_PORT));
+        process.start();
+
+        int attemptsLeft = 10;
+        while (attemptsLeft-- > 0) {
+            if (theApplicationIsRunning()) continue;
+            System.out.println("Waiting for the application... (attemps left "+attemptsLeft+")");
+            Thread.sleep(1000);
+        }
+    }
+
+    private static boolean theApplicationIsRunning() {
+        try {
+            get("/alive");
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @AfterAll
+    static void stopApplication() throws IOException {
+        ProcessBuilder process = new ProcessBuilder("test/stop_application.sh");
+        process.start();
+    }
+
+    @AfterAll
+    static void cleanAndStopDatabase() throws IOException {
+        ProcessBuilder process = new ProcessBuilder("test/stop_db.sh", String.valueOf(DB_PORT));
+        process.start();
+    }
+}
