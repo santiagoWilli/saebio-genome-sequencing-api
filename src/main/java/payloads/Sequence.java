@@ -12,7 +12,15 @@ public class Sequence implements Validable {
 
     @Override
     public boolean isValid() {
-        return fileParts.size() >= 2;
+        if (fileParts.size() < 2) return false;
+        for (Part part : fileParts) {
+            if (!part.getSubmittedFileName().matches(filenameRegex())) return false;
+        }
+        return true;
+    }
+
+    private static String filenameRegex() {
+        return "[a-zA-Z]+[0-9]{0,4}_((0[1-9])|([1-2][1-9])|(3[0-1]))((0[1-9])|(1[0-2]))[0-9]{2}_R(1|2).(fq|fastq).gz";
     }
 }
 
