@@ -43,7 +43,6 @@ public class Sequences_ {
 
         ObjectNode node = new ObjectMapper().readValue(response, ObjectNode.class);
         String id = String.valueOf(node.get("id").asText());
-        System.out.println(id);
         assertThat(db.get("sequences", id)).isNotNull();
     }
 

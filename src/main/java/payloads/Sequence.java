@@ -12,7 +12,7 @@ public class Sequence implements Validable {
 
     @Override
     public boolean isValid() {
-        return false;
+        return fileParts.size() >= 2;
     }
 }
 
