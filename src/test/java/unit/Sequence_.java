@@ -52,6 +52,12 @@ public class Sequence_ {
         iterateThroughPairs(INVALID_PAIRS, false);
     }
 
+    @Test
+    public void invalid_if_pairFilesAreTheSame() {
+        String[][] sameFiles = {{VALID_PAIRS[0][0], VALID_PAIRS[0][0]}};
+        iterateThroughPairs(sameFiles, false);
+    }
+
     private void iterateThroughPairs(String[][] pairs, boolean expected) {
         for (String[] pair : pairs) {
             Collection<Part> onePartCollection = new ArrayList<>();

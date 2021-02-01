@@ -16,7 +16,14 @@ public class Sequence implements Validable {
         for (Part part : fileParts) {
             if (!part.getSubmittedFileName().matches(filenameRegex())) return false;
         }
-        return true;
+        return partFilesAreNotTheSame();
+    }
+
+    private boolean partFilesAreNotTheSame() {
+        int i = 0;
+        Part[] pair = new Part[2];
+        for (Part part : fileParts) pair[i++] = part;
+        return !pair[0].getSubmittedFileName().equals(pair[1].getSubmittedFileName());
     }
 
     private static String filenameRegex() {
