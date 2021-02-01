@@ -4,10 +4,13 @@ import org.junit.jupiter.api.Test;
 import payloads.Sequence;
 
 import javax.servlet.http.Part;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.*;
 
 public class Sequence_ {
@@ -27,11 +30,15 @@ public class Sequence_ {
             {"050121_Kpneu1_R1.fastq.gz", "050121_Kpneu1_R2.fastq.gz"}};
 
     @Test
-    public void invalid_if_onlyOnePart() {
+    public void invalid_if_notTwoParts() {
         Part part = mock(Part.class);
-        Collection<Part> onePartCollection = new ArrayList<>();
-        onePartCollection.add(part);
-        Sequence sequence = new Sequence(onePartCollection);
+        Collection<Part> partCollection = new ArrayList<>();
+        partCollection.add(part);
+        Sequence sequence = new Sequence(partCollection);
+        assertThat(sequence.isValid()).isEqualTo(false);
+
+        for (int i = 0; i < 2; i++) partCollection.add(part);
+        sequence = new Sequence(partCollection);
         assertThat(sequence.isValid()).isEqualTo(false);
     }
 

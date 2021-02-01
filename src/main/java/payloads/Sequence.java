@@ -12,7 +12,7 @@ public class Sequence implements Validable {
 
     @Override
     public boolean isValid() {
-        if (fileParts.size() < 2) return false;
+        if (fileParts.size() != 2) return false;
         for (Part part : fileParts) {
             if (!part.getSubmittedFileName().matches(filenameRegex())) return false;
         }
