@@ -1,5 +1,7 @@
 package handlers;
 
+import java.util.Objects;
+
 public class Answer {
     private final int code;
     private final String body;
@@ -19,5 +21,15 @@ public class Answer {
 
     public String getBody() {
         return body;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+
+        Answer answer = (Answer) object;
+        if (code != answer.code) return false;
+        return Objects.equals(body, answer.body);
     }
 }

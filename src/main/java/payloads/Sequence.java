@@ -22,12 +22,12 @@ public class Sequence implements Validable {
     private boolean partFilesFormASequence() {
         int i = 0;
         String[][] pair = new String[2][];
-        for (Part part : fileParts) pair[i++] = getFilenameFieldsOfPart(part);
+        for (Part part : fileParts) pair[i++] = getFilenameFieldsOf(part);
         if (!pair[0][0].equals(pair[1][0]) || !pair[0][1].equals(pair[1][1])) return false;
         return !pair[0][2].equals(pair[1][2]);
     }
 
-    private static String[] getFilenameFieldsOfPart(Part part) {
+    private static String[] getFilenameFieldsOf(Part part) {
         String[] nameFields = part.getSubmittedFileName().split("_");
         nameFields[2] = nameFields[2].substring(0, nameFields[2].indexOf("."));
         return nameFields;
