@@ -28,6 +28,9 @@ public class Sequence_ {
             {"R1_050121_Kpneu1.fastq.gz", "R2_050121_Kpneu1.fastq.gz"},
             {"060121_R1_Kp1.fastq.gz", "060121_R2_Kp1.fastq.gz"},
             {"050121_Kpneu1_R1.fastq.gz", "050121_Kpneu1_R2.fastq.gz"}};
+    static final String[][] NOT_SEQUENCES = {
+            {"Kp1_231120_R1.fastq.gz", "Kp1_231221_R2.fastq.gz"},
+            {"Kp1_231120_R1.fq.gz", "Kp3_231120_R2.fq.gz"}};
 
     @Test
     public void invalid_if_notTwoParts() {
@@ -56,6 +59,11 @@ public class Sequence_ {
     public void invalid_if_pairFilesAreTheSame() {
         String[][] sameFiles = {{VALID_PAIRS[0][0], VALID_PAIRS[0][0]}};
         iterateThroughPairs(sameFiles, false);
+    }
+
+    @Test
+    public void invalid_if_pairDoesNotFormASequence() {
+        iterateThroughPairs(NOT_SEQUENCES, false);
     }
 
     private void iterateThroughPairs(String[][] pairs, boolean expected) {
