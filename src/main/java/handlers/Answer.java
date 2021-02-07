@@ -20,7 +20,7 @@ public class Answer {
     }
 
     public static Answer badGateway() {
-        return new Answer(1, null);
+        return new Answer(502, json("Genome reporter tool encountered an internal error"));
     }
 
     public int getCode() {

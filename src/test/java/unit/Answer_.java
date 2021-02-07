@@ -19,4 +19,10 @@ public class Answer_ {
         assertThat(Answer.serviceUnavailable().getCode()).isEqualTo(503);
         assertThat(Answer.serviceUnavailable().getBody()).isEqualTo("{\"message\":\"Genome reporter tool is down\"}");
     }
+
+    @Test
+    public void badGateway_returns_code502() {
+        assertThat(Answer.badGateway().getCode()).isEqualTo(502);
+        assertThat(Answer.badGateway().getBody()).isEqualTo("{\"message\":\"Genome reporter tool encountered an internal error\"}");
+    }
 }
