@@ -19,6 +19,10 @@ public class Answer {
         return new Answer(503, null);
     }
 
+    public static Answer badGateway() {
+        return new Answer(1, null);
+    }
+
     public int getCode() {
         return code;
     }

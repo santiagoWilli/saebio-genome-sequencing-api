@@ -3,6 +3,7 @@ package unit;
 import genome.GenomeTool;
 import handlers.Answer;
 import handlers.SequencesPostHandler;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import payloads.Sequence;
 
@@ -10,14 +11,27 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 public class SequencesPostHandler_ {
-    @Test
-    public void serviceUnavailable_if_nullarborAPIisDown() {
-        Sequence sequence = mock(Sequence.class);
-        when(sequence.isValid()).thenReturn(true);
-        GenomeTool genomeTool = mock(GenomeTool.class);
-        when(genomeTool.trim()).thenReturn(404);
+    private Sequence sequence;
+    private GenomeTool genomeTool;
+    private SequencesPostHandler handler;
 
-        SequencesPostHandler handler = new SequencesPostHandler(genomeTool);
+    @BeforeEach
+    public void setUp() {
+        sequence = mock(Sequence.class);
+        when(sequence.isValid()).thenReturn(true);
+        genomeTool = mock(GenomeTool.class);
+        handler = new SequencesPostHandler(genomeTool);
+    }
+
+    @Test
+    public void serviceUnavailable_if_genomeToolApiIsDown() {
+        when(genomeTool.trim()).thenReturn(404);
         assertThat(handler.process(sequence)).isEqualTo(Answer.serviceUnavailable());
+    }
+
+    @Test
+    public void badGateway_if_genomeToolApiEncountersAnInternalError() {
+        when(genomeTool.trim()).thenReturn(500);
+        assertThat(handler.process(sequence)).isEqualTo(Answer.badGateway());
     }
 }
