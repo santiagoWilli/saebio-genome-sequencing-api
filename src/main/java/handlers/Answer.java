@@ -15,6 +15,10 @@ public class Answer {
         return new Answer(400, "{\"message\":\"" + message + "\"}");
     }
 
+    public static Answer serviceUnavailable() {
+        return new Answer(1, null);
+    }
+
     public int getCode() {
         return code;
     }
