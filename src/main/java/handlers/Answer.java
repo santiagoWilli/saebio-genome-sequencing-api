@@ -12,11 +12,11 @@ public class Answer {
     }
 
     public static Answer badRequest(String message) {
-        return new Answer(400, "{\"message\":\"" + message + "\"}");
+        return new Answer(400, json(message));
     }
 
     public static Answer serviceUnavailable() {
-        return new Answer(503, null);
+        return new Answer(503, json("Genome reporter tool is down"));
     }
 
     public static Answer badGateway() {
@@ -29,6 +29,10 @@ public class Answer {
 
     public String getBody() {
         return body;
+    }
+
+    private static String json(String message) {
+        return "{\"message\":\"" + message + "\"}";
     }
 
     @Override
