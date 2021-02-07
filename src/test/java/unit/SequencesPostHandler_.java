@@ -26,12 +26,12 @@ public class SequencesPostHandler_ {
     @Test
     public void serviceUnavailable_if_genomeToolApiIsDown() {
         when(genomeTool.trim()).thenReturn(404);
-        assertThat(handler.process(sequence)).isEqualTo(Answer.serviceUnavailable());
+        assertThat(handler.process(sequence)).isEqualTo(Answer.serviceUnavailable("Genome reporter tool is down"));
     }
 
     @Test
     public void badGateway_if_genomeToolApiEncountersAnInternalError() {
         when(genomeTool.trim()).thenReturn(500);
-        assertThat(handler.process(sequence)).isEqualTo(Answer.badGateway());
+        assertThat(handler.process(sequence)).isEqualTo(Answer.badGateway("Genome reporter tool encountered an internal error"));
     }
 }

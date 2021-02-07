@@ -12,15 +12,15 @@ public class Answer {
     }
 
     public static Answer badRequest(String message) {
-        return new Answer(400, json(message));
+        return new Answer(400, errorJson(message));
     }
 
-    public static Answer serviceUnavailable() {
-        return new Answer(503, json("Genome reporter tool is down"));
+    public static Answer serviceUnavailable(String message) {
+        return new Answer(503, errorJson(message));
     }
 
-    public static Answer badGateway() {
-        return new Answer(502, json("Genome reporter tool encountered an internal error"));
+    public static Answer badGateway(String message) {
+        return new Answer(502, errorJson(message));
     }
 
     public int getCode() {
@@ -31,7 +31,7 @@ public class Answer {
         return body;
     }
 
-    private static String json(String message) {
+    private static String errorJson(String message) {
         return "{\"message\":\"" + message + "\"}";
     }
 

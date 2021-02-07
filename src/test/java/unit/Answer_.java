@@ -8,21 +8,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class Answer_ {
     @Test
     public void badRequest_returns_code400() {
-        Answer answer = Answer.badRequest("The request is invalid");
-        assertThat(answer.getCode()).isEqualTo(400);
-        assertThat(answer.getBody()).isEqualTo("{\"message\":\"The request is invalid\"}");
+        String message = "The request is invalid";
+        assertThat(Answer.badRequest(message).getCode()).isEqualTo(400);
+        assertThat(Answer.badRequest(message).getBody()).isEqualTo("{\"message\":\"" + message + "\"}");
 
     }
 
     @Test
     public void serviceUnavailable_returns_code503() {
-        assertThat(Answer.serviceUnavailable().getCode()).isEqualTo(503);
-        assertThat(Answer.serviceUnavailable().getBody()).isEqualTo("{\"message\":\"Genome reporter tool is down\"}");
+        String message = "Genome reporter tool is down";
+        assertThat(Answer.serviceUnavailable(message).getCode()).isEqualTo(503);
+        assertThat(Answer.serviceUnavailable(message).getBody()).isEqualTo("{\"message\":\"" + message + "\"}");
     }
 
     @Test
     public void badGateway_returns_code502() {
-        assertThat(Answer.badGateway().getCode()).isEqualTo(502);
-        assertThat(Answer.badGateway().getBody()).isEqualTo("{\"message\":\"Genome reporter tool encountered an internal error\"}");
+        String message = "Genome reporter tool encountered an internal error";
+        assertThat(Answer.badGateway(message).getCode()).isEqualTo(502);
+        assertThat(Answer.badGateway(message).getBody()).isEqualTo("{\"message\":\"" + message + "\"}");
     }
 }
