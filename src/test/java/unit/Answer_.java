@@ -15,4 +15,9 @@ public class Answer_ {
     public void badRequest_returns_MessageAsJson() {
         assertThat(Answer.badRequest("The request is invalid").getBody()).isEqualTo("{\"message\":\"The request is invalid\"}");
     }
+
+    @Test
+    public void serviceUnavailable_returns_code503() {
+        assertThat(Answer.serviceUnavailable().getCode()).isEqualTo(503);
+    }
 }

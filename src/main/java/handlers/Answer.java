@@ -16,7 +16,7 @@ public class Answer {
     }
 
     public static Answer serviceUnavailable() {
-        return new Answer(1, null);
+        return new Answer(503, null);
     }
 
     public int getCode() {
