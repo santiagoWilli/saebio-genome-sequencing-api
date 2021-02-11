@@ -1,6 +1,6 @@
 package unit;
 
-import handlers.Answer;
+import utils.Answer;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

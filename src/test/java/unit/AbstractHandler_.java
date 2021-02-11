@@ -1,7 +1,7 @@
 package unit;
 
 import handlers.AbstractHandler;
-import handlers.Answer;
+import utils.Answer;
 import org.junit.jupiter.api.Test;
 import payloads.Validable;
 
@@ -13,7 +13,7 @@ public class AbstractHandler_ {
         Validable payload = () -> false;
         AbstractHandler<Validable> handler = new AbstractHandler<>() {
             @Override
-            protected Answer processRequest() {
+            protected Answer processRequest(Validable payload) {
                 return null;
             }
         };

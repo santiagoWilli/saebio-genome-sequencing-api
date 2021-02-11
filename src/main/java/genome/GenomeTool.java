@@ -1,5 +1,7 @@
 package genome;
 
+import utils.Answer;
+
 public interface GenomeTool {
-    int trim();
+    Answer requestTrim();
 }
