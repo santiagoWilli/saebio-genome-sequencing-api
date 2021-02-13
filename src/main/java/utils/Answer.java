@@ -49,4 +49,9 @@ public class Answer {
         if (code != answer.code) return false;
         return Objects.equals(body, answer.body);
     }
+
+    @Override
+    public String toString() {
+        return "Answer (code=" + code + ", body=" + body + ")";
+    }
 }

@@ -5,6 +5,7 @@ import genome.GenomeTool;
 import genome.NullarborClient;
 import org.junit.jupiter.api.*;
 import payloads.Sequence;
+import utils.Answer;
 
 import javax.servlet.http.Part;
 
@@ -56,13 +57,22 @@ public class NullarborClient_ {
         verify(exactly(1), postRequestedFor(urlEqualTo("/trim")));
     }
 
-    private void mockCollectionOfParts() throws IOException {
-        InputStream inputStream = mock(InputStream.class);
-        for (int i = 0; i < 2; i++) {
-            Part part = mock(Part.class);
-            when(part.getInputStream()).thenReturn(inputStream);
-            parts.add(part);
-        }
+    @Test
+    public void httpAccepted_returns_okCode_and_nullarborToken() throws IOException {
+        mockCollectionOfParts();
+        String token = "123e4567-e89b-12d3-a456-556642440000";
+
+        stubFor(post(urlEqualTo("/trim"))
+                .willReturn(aResponse()
+                        .withStatus(202)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{\"token\":\"" + token + "\"}")));
+        Answer clientAnswer = client.requestTrim(sequence);
+        assertThat(clientAnswer).isEqualTo(new Answer(GenomeTool.Response.OK.code(), token));
+        verify(exactly(1), postRequestedFor(urlEqualTo("/trim"))
+                .withHeader("Content-Type", containing("multipart/form-data"))
+                .withRequestBodyPart(aMultipart().withName("pair1").build())
+                .withRequestBodyPart(aMultipart().withName("pair2").build()));
     }
 
     @BeforeEach
@@ -84,5 +94,16 @@ public class NullarborClient_ {
     @AfterEach
     public void stopWireMockServer() {
         mockServer.stop();
+    }
+
+    private void mockCollectionOfParts() throws IOException {
+        for (int i = 0; i < 2; i++) addPartToCollectionOfParts();
+    }
+
+    private void addPartToCollectionOfParts() throws IOException {
+        InputStream inputStream = new FileInputStream("test/resources/sequences/Kpneu1_191120_R1.fastq.gz");
+        Part part = mock(Part.class);
+        when(part.getInputStream()).thenReturn(inputStream);
+        parts.add(part);
     }
 }

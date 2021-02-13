@@ -7,6 +7,7 @@ public interface GenomeTool {
     Answer requestTrim(Sequence sequence);
 
     enum Response {
+        OK(1),
         API_DOWN(4),
         SERVER_ERROR(5),
         EXCEPTION_ENCOUNTERED(6);
