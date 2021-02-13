@@ -17,8 +17,8 @@ public class SequencesPostHandler extends AbstractHandler<Sequence> {
     @Override
     protected Answer processRequest(Sequence sequence) {
         Answer toolAnswer = genomeTool.requestTrim(sequence);
-        if (toolAnswer.getCode() == 404 || toolAnswer.getCode() == 500) {
-            return toolAnswer.getCode() == 404 ?
+        if (toolAnswer.getCode() != GenomeTool.Response.OK.code()) {
+            return toolAnswer.getCode() == GenomeTool.Response.API_DOWN.code() ?
                     Answer.serviceUnavailable("Genome reporter tool is down") :
                     Answer.badGateway("Genome reporter tool encountered an internal error");
         }
