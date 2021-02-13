@@ -30,21 +30,21 @@ public class SequencesPostHandler_ {
 
     @Test
     public void serviceUnavailable_if_genomeToolIsDown() {
-        when(genomeTool.requestTrim()).thenReturn(toolAnswer);
+        when(genomeTool.requestTrim(sequence)).thenReturn(toolAnswer);
         when(toolAnswer.getCode()).thenReturn(404);
         assertThat(handler.process(sequence)).isEqualTo(Answer.serviceUnavailable("Genome reporter tool is down"));
     }
 
     @Test
     public void badGateway_if_genomeToolEncountersAnInternalError() {
-        when(genomeTool.requestTrim()).thenReturn(toolAnswer);
+        when(genomeTool.requestTrim(sequence)).thenReturn(toolAnswer);
         when(toolAnswer.getCode()).thenReturn(500);
         assertThat(handler.process(sequence)).isEqualTo(Answer.badGateway("Genome reporter tool encountered an internal error"));
     }
 
     @Test
     public void accepted_if_genomeToolResponsesWithStatusCode200() {
-        when(genomeTool.requestTrim()).thenReturn(toolAnswer);
+        when(genomeTool.requestTrim(sequence)).thenReturn(toolAnswer);
         when(toolAnswer.getCode()).thenReturn(200);
         String id = "507f1f77bcf86cd799439011";
         when(dataAccess.createSequence(sequence)).thenReturn(id);

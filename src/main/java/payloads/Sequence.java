@@ -19,6 +19,10 @@ public class Sequence implements Validable {
         return partFilesFormASequence();
     }
 
+    public Collection<Part> getFileParts() {
+        return fileParts;
+    }
+
     private boolean partFilesFormASequence() {
         int i = 0;
         String[][] pair = new String[2][];
