@@ -8,7 +8,8 @@ public interface GenomeTool {
 
     enum Response {
         API_DOWN(4),
-        EXCEPTION_ENCOUNTERED(5);
+        SERVER_ERROR(5),
+        EXCEPTION_ENCOUNTERED(6);
 
         private final int code;
         Response(int code) {

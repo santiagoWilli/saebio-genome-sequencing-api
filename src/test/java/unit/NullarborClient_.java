@@ -23,7 +23,7 @@ public class NullarborClient_ {
     private NullarborClient client;
 
     @Test
-    public void exceptionBeforeApiCall_doesNotCallTheApi() throws IOException {
+    public void exceptionBeforeApiCall_doesNotCallTheApi_and_returns_exceptionEncounteredCode() throws IOException {
         for (int i = 0; i < 2; i++) {
             Part part = mock(Part.class);
             when(part.getInputStream()).thenThrow(IOException.class);
@@ -36,18 +36,33 @@ public class NullarborClient_ {
 
     @Test
     public void httpNotFound_returns_apiDownCode() throws IOException {
-        InputStream inputStream = mock(InputStream.class);
-        for (int i = 0; i < 2; i++) {
-            Part part = mock(Part.class);
-            when(part.getInputStream()).thenReturn(inputStream);
-            parts.add(part);
-        }
+        mockCollectionOfParts();
 
         stubFor(post(urlEqualTo("/trim"))
                 .willReturn(aResponse()
                         .withStatus(404)));
         assertThat(client.requestTrim(sequence).getCode()).isEqualTo(GenomeTool.Response.API_DOWN.code());
         verify(exactly(1), postRequestedFor(urlEqualTo("/trim")));
+    }
+
+    @Test
+    public void httpInternalServerError_returns_externalApiErrorCode() throws IOException {
+        mockCollectionOfParts();
+
+        stubFor(post(urlEqualTo("/trim"))
+                .willReturn(aResponse()
+                        .withStatus(500)));
+        assertThat(client.requestTrim(sequence).getCode()).isEqualTo(GenomeTool.Response.SERVER_ERROR.code());
+        verify(exactly(1), postRequestedFor(urlEqualTo("/trim")));
+    }
+
+    private void mockCollectionOfParts() throws IOException {
+        InputStream inputStream = mock(InputStream.class);
+        for (int i = 0; i < 2; i++) {
+            Part part = mock(Part.class);
+            when(part.getInputStream()).thenReturn(inputStream);
+            parts.add(part);
+        }
     }
 
     @BeforeEach
