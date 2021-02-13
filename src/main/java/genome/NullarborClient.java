@@ -4,7 +4,6 @@ import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
 import payloads.Sequence;
-import utils.Answer;
 
 import javax.servlet.http.Part;
 import java.io.IOException;
@@ -22,7 +21,7 @@ public class NullarborClient implements GenomeTool {
     }
 
     @Override
-    public Answer requestTrim(Sequence sequence) {
+    public GenomeToolAnswer requestTrim(Sequence sequence) {
         Part[] parts = new Part[2]; int i = 0;
         for (Part part : sequence.getFileParts()) parts[i++] = part;
 
@@ -32,13 +31,13 @@ public class NullarborClient implements GenomeTool {
                     .field("pair2", inputStream2, parts[1].getSubmittedFileName())
                     .asJson();
             if (response.getStatus() == 202) {
-                return new Answer(
-                        Response.OK.code(),
+                return new GenomeToolAnswer(
+                        GenomeToolAnswer.Status.OK,
                         response.getBody().getObject().get("token").toString());
             }
-            return new Answer(response.getStatus() == 404 ? Response.API_DOWN.code() : Response.SERVER_ERROR.code());
+            return new GenomeToolAnswer(response.getStatus() == 404 ? GenomeToolAnswer.Status.API_DOWN : GenomeToolAnswer.Status.SERVER_ERROR);
         } catch (IOException e) {
-            return new Answer(Response.EXCEPTION_ENCOUNTERED.code());
+            return new GenomeToolAnswer(GenomeToolAnswer.Status.EXCEPTION_ENCOUNTERED);
         }
     }
 }

@@ -2,6 +2,7 @@ package handlers;
 
 import dataaccess.DataAccess;
 import genome.GenomeTool;
+import genome.GenomeToolAnswer;
 import payloads.Sequence;
 import utils.Answer;
 
@@ -16,13 +17,13 @@ public class SequencesPostHandler extends AbstractHandler<Sequence> {
 
     @Override
     protected Answer processRequest(Sequence sequence) {
-        Answer toolAnswer = genomeTool.requestTrim(sequence);
-        if (toolAnswer.getCode() != GenomeTool.Response.OK.code()) {
-            return toolAnswer.getCode() == GenomeTool.Response.API_DOWN.code() ?
-                    Answer.serviceUnavailable("Genome reporter tool is down") :
-                    Answer.badGateway("Genome reporter tool encountered an internal error");
-        }
-        return new Answer(202, jsonOf(dataAccess.createSequence(sequence)));
+        GenomeToolAnswer toolAnswer = genomeTool.requestTrim(sequence);
+        return switch (toolAnswer.getStatus()) {
+            case OK -> new Answer(202, jsonOf(dataAccess.createSequence(sequence)));
+            case API_DOWN -> Answer.serviceUnavailable("Genome reporter tool is down");
+            case SERVER_ERROR -> Answer.badGateway("Genome reporter tool encountered an internal error");
+            case EXCEPTION_ENCOUNTERED -> Answer.serverError(toolAnswer.getMessage());
+        };
     }
 
     private static String jsonOf(String id) {

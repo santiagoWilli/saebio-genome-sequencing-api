@@ -1,11 +1,10 @@
 package unit;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
-import genome.GenomeTool;
+import genome.GenomeToolAnswer;
 import genome.NullarborClient;
 import org.junit.jupiter.api.*;
 import payloads.Sequence;
-import utils.Answer;
 
 import javax.servlet.http.Part;
 
@@ -31,7 +30,7 @@ public class NullarborClient_ {
             parts.add(part);
         }
 
-        assertThat(client.requestTrim(sequence).getCode()).isEqualTo(GenomeTool.Response.EXCEPTION_ENCOUNTERED.code());
+        assertThat(client.requestTrim(sequence).getStatus()).isEqualTo(GenomeToolAnswer.Status.EXCEPTION_ENCOUNTERED);
         verify(exactly(0), postRequestedFor(urlEqualTo("/trim")));
     }
 
@@ -42,7 +41,7 @@ public class NullarborClient_ {
         stubFor(post(urlEqualTo("/trim"))
                 .willReturn(aResponse()
                         .withStatus(404)));
-        assertThat(client.requestTrim(sequence).getCode()).isEqualTo(GenomeTool.Response.API_DOWN.code());
+        assertThat(client.requestTrim(sequence).getStatus()).isEqualTo(GenomeToolAnswer.Status.API_DOWN);
         verify(exactly(1), postRequestedFor(urlEqualTo("/trim")));
     }
 
@@ -53,7 +52,7 @@ public class NullarborClient_ {
         stubFor(post(urlEqualTo("/trim"))
                 .willReturn(aResponse()
                         .withStatus(500)));
-        assertThat(client.requestTrim(sequence).getCode()).isEqualTo(GenomeTool.Response.SERVER_ERROR.code());
+        assertThat(client.requestTrim(sequence).getStatus()).isEqualTo(GenomeToolAnswer.Status.SERVER_ERROR);
         verify(exactly(1), postRequestedFor(urlEqualTo("/trim")));
     }
 
@@ -67,8 +66,8 @@ public class NullarborClient_ {
                         .withStatus(202)
                         .withHeader("Content-Type", "application/json")
                         .withBody("{\"token\":\"" + token + "\"}")));
-        Answer clientAnswer = client.requestTrim(sequence);
-        assertThat(clientAnswer).isEqualTo(new Answer(GenomeTool.Response.OK.code(), token));
+        GenomeToolAnswer clientAnswer = client.requestTrim(sequence);
+        assertThat(clientAnswer).isEqualTo(new GenomeToolAnswer(GenomeToolAnswer.Status.OK, token));
         verify(exactly(1), postRequestedFor(urlEqualTo("/trim"))
                 .withHeader("Content-Type", containing("multipart/form-data"))
                 .withRequestBodyPart(aMultipart().withName("pair1").build())

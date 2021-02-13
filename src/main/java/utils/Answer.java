@@ -28,6 +28,10 @@ public class Answer {
         return new Answer(502, errorJson(message));
     }
 
+    public static Answer serverError(String message) {
+        return new Answer(500, errorJson(message));
+    }
+
     public int getCode() {
         return code;
     }
