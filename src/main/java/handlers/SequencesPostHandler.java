@@ -19,7 +19,7 @@ public class SequencesPostHandler extends AbstractHandler<Sequence> {
     protected Answer processRequest(Sequence sequence) {
         GenomeToolAnswer toolAnswer = genomeTool.requestTrim(sequence);
         return switch (toolAnswer.getStatus()) {
-            case OK -> new Answer(202, jsonOf(dataAccess.createSequence(sequence)));
+            case OK -> new Answer(202, jsonOf(dataAccess.createSequence(sequence, toolAnswer.getMessage())));
             case API_DOWN -> Answer.serviceUnavailable("Genome reporter tool is down");
             case SERVER_ERROR -> Answer.badGateway("Genome reporter tool encountered an internal error");
             case EXCEPTION_ENCOUNTERED -> Answer.serverError(toolAnswer.getMessage());
