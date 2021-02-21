@@ -1,21 +1,28 @@
 package functional;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 import static io.restassured.RestAssured.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import io.restassured.RestAssured;
 import org.junit.jupiter.api.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class Sequences_ {
-    static final int PORT = 5678;
-    static final int DB_PORT = 7017;
-    static final String testFolderPath = "test/resources/sequences/";
-    static Database db;
+    private static final int PORT = 5678;
+    private static final int DB_PORT = 7017;
+    private static final String testFolderPath = "test/resources/sequences/";
+    private static Database db;
+    private WireMockServer mockServer;
 
     @Test
     public void given_notAPair_when_postToSequences_then_statusCode400() {
@@ -25,11 +32,18 @@ public class Sequences_ {
                 post("/sequences").
         then().
                 statusCode(400).
-                body("message", equalTo("La secuencia debe ser una pareja de ficheros"));
+                body("message", equalTo("Cuerpo de la petición no válido"));
     }
 
     @Test
-    public void given_aPairOfValidFiles_when_postToSequences_then_statusCode202() throws IOException {
+    public void given_aPairOfValidFiles_when_postToSequences_then_statusCode202_and_sequenceCreated() throws IOException {
+        final String token = "123e4567-e89b-12d3-a456-556642440000";
+        stubFor(post(urlEqualTo("/trim"))
+                .willReturn(aResponse()
+                        .withStatus(202)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{\"token\":\"" + token + "\"}")));
+
         String response =
         given().
                 multiPart("pair1", new File(testFolderPath + "Kpneu1_191120_R1.fastq.gz")).
@@ -41,16 +55,32 @@ public class Sequences_ {
                 extract().
                 asString();
 
+        verify(exactly(1), postRequestedFor(urlEqualTo("/trim")));
+
         ObjectNode node = new ObjectMapper().readValue(response, ObjectNode.class);
         String id = String.valueOf(node.get("id").asText());
-        assertThat(db.get("sequences", id)).isNotNull();
+        Map<String, Object> sequence = db.get("sequences", id);
+
+        assertThat(sequence.get("strain")).isEqualTo("Klebsiella pneumoniae");
+        assertThat(sequence.get("originalFilenames")).isEqualTo(Arrays.asList("Kpneu1_191120_R1.fastq.gz", "Kpneu1_191120_R2.fastq.gz"));
+        assertThat(sequence.get("genomeToolToken")).isEqualTo(token);
+        assertThat(sequence.get("sequenceDate").toString())
+                .isEqualTo(dateFormat(date(19, 11, 2020), "yyyy-MM-dd"));
+        assertThat(sequence.get("trimRequestDate").toString())
+                .startsWith(dateFormat(Calendar.getInstance().getTime(), "yyyy-MM-dd HH:mm"));
+        assertThat(sequence.get("trimmedPair")).isNull();
     }
 
-    @BeforeAll
-    static void startCleanDatabase() throws IOException {
-        ProcessBuilder process = new ProcessBuilder("test/start_db.sh", String.valueOf(DB_PORT));
-        process.start();
-        db = new MongoDB(DB_PORT);
+    private Date date(int day, int month, int year) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month-1, day);
+        return calendar.getTime();
+    }
+
+    private String dateFormat(Date date, String format) {
+        SimpleDateFormat formattedDate = new SimpleDateFormat(format);
+        formattedDate.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return formattedDate.format(date);
     }
 
     @BeforeAll
@@ -70,9 +100,16 @@ public class Sequences_ {
         }
     }
 
+    @BeforeAll
+    static void startCleanDatabase() throws IOException {
+        ProcessBuilder process = new ProcessBuilder("test/start_db.sh", String.valueOf(DB_PORT));
+        process.start();
+        db = new MongoDB(DB_PORT);
+    }
+
     private static boolean theApplicationIsRunning() {
         try {
-            get("/alive");
+            RestAssured.get("/alive");
             return true;
         } catch (Exception e) {
             return false;
@@ -89,5 +126,18 @@ public class Sequences_ {
     static void cleanAndStopDatabase() throws IOException {
         ProcessBuilder process = new ProcessBuilder("test/stop_db.sh", String.valueOf(DB_PORT));
         process.start();
+    }
+
+    @BeforeEach
+    public void startWireMockServer() {
+        mockServer = new WireMockServer(options()
+                .port(7717));
+        mockServer.start();
+        configureFor(mockServer.port());
+    }
+
+    @AfterEach
+    public void stopWireMockServer() {
+        mockServer.stop();
     }
 }

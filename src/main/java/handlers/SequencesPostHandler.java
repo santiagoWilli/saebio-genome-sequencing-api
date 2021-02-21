@@ -11,6 +11,7 @@ public class SequencesPostHandler extends AbstractHandler<Sequence> {
     private final DataAccess dataAccess;
 
     public SequencesPostHandler(GenomeTool genomeTool, DataAccess dataAccess) {
+        super(Sequence.class);
         this.genomeTool = genomeTool;
         this.dataAccess = dataAccess;
     }

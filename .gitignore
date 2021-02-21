@@ -42,6 +42,7 @@ java/build/**
 
 # Test and DB folders
 /test/resources
+/test/.app_pid
 /db/
 
 /log/

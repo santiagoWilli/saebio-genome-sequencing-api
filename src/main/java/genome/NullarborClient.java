@@ -10,14 +10,10 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class NullarborClient implements GenomeTool {
-    private final String ENDPOINT;
-
-    public NullarborClient() {
-        ENDPOINT = "needstobechanged.tft.saebio.org";
-    }
+    private final String endpoint;
 
     public NullarborClient(String endpoint) {
-        ENDPOINT = endpoint;
+        this.endpoint = endpoint;
     }
 
     @Override
@@ -26,7 +22,7 @@ public class NullarborClient implements GenomeTool {
         for (Part part : sequence.getFileParts()) parts[i++] = part;
 
         try (InputStream inputStream1 = parts[0].getInputStream(); InputStream inputStream2 = parts[1].getInputStream()) {
-            HttpResponse<JsonNode> response = Unirest.post(ENDPOINT + "/trim")
+            HttpResponse<JsonNode> response = Unirest.post(endpoint + "/trim")
                     .field("pair1", inputStream1, parts[0].getSubmittedFileName())
                     .field("pair2", inputStream2, parts[1].getSubmittedFileName())
                     .asJson();

@@ -1,13 +1,33 @@
 package payloads;
 
+import utils.StrainMap;
+
 import javax.servlet.http.Part;
+import java.time.LocalDate;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
-public class Sequence implements Validable {
-    Collection<Part> fileParts;
-
+public class Sequence extends Multipart implements Validable {
     public Sequence(Collection<Part> fileParts) {
-        this.fileParts = fileParts;
+        super(fileParts);
+    }
+
+    public LocalDate getDate() {
+        FilenameDate filenameDate = new FilenameDate();
+        return LocalDate.of(
+                Integer.parseInt("20" + filenameDate.year),
+                filenameDate.month,
+                filenameDate.day
+        );
+    }
+
+    public String getStrain() {
+        return StrainMap.get(strainKey());
+    }
+
+    public List<String> getOriginalFilenames() {
+        return fileParts.stream().map(Part::getSubmittedFileName).collect(Collectors.toList());
     }
 
     @Override
@@ -17,10 +37,6 @@ public class Sequence implements Validable {
             if (!part.getSubmittedFileName().matches(filenameRegex())) return false;
         }
         return partFilesFormASequence();
-    }
-
-    public Collection<Part> getFileParts() {
-        return fileParts;
     }
 
     private boolean partFilesFormASequence() {
@@ -39,6 +55,26 @@ public class Sequence implements Validable {
 
     private static String filenameRegex() {
         return "[a-zA-Z]+[0-9]{0,4}_((0[1-9])|([1-2][1-9])|(3[0-1]))((0[1-9])|(1[0-2]))[0-9]{2}_R(1|2).(fq|fastq).gz";
+    }
+
+    private final class FilenameDate {
+        final int day, month, year;
+
+        FilenameDate() {
+            String filename = fileParts.iterator().next().getSubmittedFileName();
+            String date = filename.split("_")[1];
+            day = Integer.parseInt(date.substring(0, 2));
+            month = Integer.parseInt(date.substring(2, 4));
+            year = Integer.parseInt(date.substring(4, 6));
+        }
+    }
+
+    private String strainKey() {
+        return fileParts.iterator().next()
+                .getSubmittedFileName()
+                .split("_")[0]
+                .split("[0-9]")[0]
+                .toLowerCase();
     }
 }
 

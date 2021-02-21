@@ -5,7 +5,9 @@ import payloads.Sequence;
 
 import javax.servlet.http.Part;
 import java.io.File;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 import static io.restassured.RestAssured.given;
@@ -66,16 +68,38 @@ public class Sequence_ {
         iterateThroughPairs(NOT_SEQUENCES, false);
     }
 
-    private void iterateThroughPairs(String[][] pairs, boolean expected) {
+    @Test
+    public void getDate_shouldReturn_aDateBasedOnPairFilenames() {
+        Sequence sequence = getSequenceFrom(VALID_PAIRS[0]);
+        assertThat(sequence.getDate()).isEqualTo(LocalDate.of(2020, 11, 23));
+    }
+
+    @Test
+    public void getStrain_shouldReturn_theValueFromTheKeyInTheFilename() {
+        Sequence sequence = getSequenceFrom(VALID_PAIRS[0]);
+        assertThat(sequence.getStrain()).isEqualTo("Klebsiella pneumoniae");
+    }
+
+    @Test
+    public void getOriginalFilenames_shouldReturn_pairFilenames() {
+        Sequence sequence = getSequenceFrom(VALID_PAIRS[0]);
+        assertThat(sequence.getOriginalFilenames()).isEqualTo(Arrays.asList("Kp1_231120_R1.fastq.gz", "Kp1_231120_R2.fastq.gz"));
+    }
+
+    private static void iterateThroughPairs(String[][] pairs, boolean expected) {
         for (String[] pair : pairs) {
-            Collection<Part> onePartCollection = new ArrayList<>();
-            for (String filename : pair) {
-                Part part = mock(Part.class);
-                when(part.getSubmittedFileName()).thenReturn(filename);
-                onePartCollection.add(part);
-            }
-            Sequence sequence = new Sequence(onePartCollection);
+            Sequence sequence = getSequenceFrom(pair);
             assertThat(sequence.isValid()).isEqualTo(expected);
         }
+    }
+
+    private static Sequence getSequenceFrom(String[] pair) {
+        Collection<Part> partCollection = new ArrayList<>();
+        for (String filename : pair) {
+            Part part = mock(Part.class);
+            when(part.getSubmittedFileName()).thenReturn(filename);
+            partCollection.add(part);
+        }
+        return new Sequence(partCollection);
     }
 }

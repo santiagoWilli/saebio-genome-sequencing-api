@@ -11,7 +11,7 @@ public class AbstractHandler_ {
     @Test
     public void invalidPayload_returns_badRequest() {
         Validable payload = () -> false;
-        AbstractHandler<Validable> handler = new AbstractHandler<>() {
+        AbstractHandler<Validable> handler = new AbstractHandler<>(Validable.class) {
             @Override
             protected Answer processRequest(Validable payload) {
                 return null;

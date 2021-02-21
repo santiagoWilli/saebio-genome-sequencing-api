@@ -1,7 +1,10 @@
 import com.beust.jcommander.JCommander;
 import static spark.Spark.*;
 
-import utils.Answer;
+import dataaccess.Database;
+import dataaccess.MongoDataAccess;
+import genome.NullarborClient;
+import handlers.SequencesPostHandler;
 import utils.Arguments;
 
 public class Application {
@@ -12,14 +15,14 @@ public class Application {
                 .build()
                 .parse(args);
         port(options.port);
+        Database.setPort(options.dbPort);
+        Database.setDatabaseName(options.database);
+        final String externalApiUri = options.database.contains("test") ?
+                "http://localhost:7717" :
+                "";
 
         get("/alive", (request, response) -> "I am alive!");
 
-        post("/sequences", (request, response) -> {
-            Answer answer = Answer.badRequest("La secuencia debe ser una pareja de ficheros");
-            response.status(answer.getCode());
-            response.type("application/json");
-            return answer.getBody();
-        });
+        post("/sequences", new SequencesPostHandler(new NullarborClient(externalApiUri), new MongoDataAccess()));
     }
 }
