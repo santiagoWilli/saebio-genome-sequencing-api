@@ -71,6 +71,43 @@ public class Sequences_ {
         assertThat(sequence.get("trimmedPair")).isNull();
     }
 
+    @Test
+    public void given_aRequestWithoutRequiredFields_when_postToSequencesTrimmed_then_badRequest() {
+        given().
+                param("status", 5).
+                param("message", "Internal error encountered.").
+        when().
+                post("/sequences/trimmed").
+        then().
+                statusCode(404);
+
+        given().
+                param("status", 2).
+                param("token", "123e4567-e89b-12d3-a456-556642440000").
+        when().
+                post("/sequences/trimmed").
+        then().
+                statusCode(404);
+
+        given().
+                param("status", 2).
+                multiPart("pair1", new File(testFolderPath + "Kpneu1_191120_R1.fastq.gz")).
+                multiPart("pair2", new File(testFolderPath + "Kpneu1_191120_R1.fastq.gz")).
+        when().
+                post("/sequences/trimmed").
+        then().
+                statusCode(404);
+
+        given().
+                param("token", "123e4567-e89b-12d3-a456-556642440000").
+                multiPart("pair1", new File(testFolderPath + "Kpneu1_191120_R1.fastq.gz")).
+                multiPart("pair2", new File(testFolderPath + "Kpneu1_191120_R1.fastq.gz")).
+        when().
+                post("/sequences/trimmed").
+        then().
+                statusCode(404);
+    }
+
     private Date date(int day, int month, int year) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(year, month-1, day);
