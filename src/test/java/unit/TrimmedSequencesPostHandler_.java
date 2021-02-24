@@ -22,16 +22,26 @@ public class TrimmedSequencesPostHandler_ {
         when(trimResult.isValid()).thenReturn(true);
         dataAccess = mock(DataAccess.class);
         handler = new TrimmedSequencesPostHandler(dataAccess);
+        when(trimResult.getSequenceToken()).thenReturn("123e4567-e89b-12d3-a456-556642440000");
     }
 
     @Test
     public void if_sequenceDoesNotExists_return_httpNotFound() {
-        when(trimResult.getSequenceToken()).thenReturn("123e4567-e89b-12d3-a456-556642440000");
-        when(dataAccess.uploadTrimmedFile(trimResult, trimResult.getSequenceToken())).thenReturn(UploadCode.NOT_FOUND);
+        when(dataAccess.uploadTrimmedFile(trimResult)).thenReturn(UploadCode.NOT_FOUND);
         assertThat(handler.process(trimResult)).isEqualTo(new Answer(404, notFoundJson(trimResult.getSequenceToken())));
+    }
+
+    @Test
+    public void if_trimmedSequenceIsSuccessfullyUploaded_return_httpOk() {
+        when(dataAccess.uploadTrimmedFile(trimResult)).thenReturn(UploadCode.OK);
+        assertThat(handler.process(trimResult)).isEqualTo(new Answer(200, okJson()));
     }
 
     private String notFoundJson(String token) {
         return "{\"message\":\"Could not find the sequence with token " + token + "\"}";
+    }
+
+    private String okJson() {
+        return "{\"message\":\"Trimmed sequence uploaded\"}";
     }
 }

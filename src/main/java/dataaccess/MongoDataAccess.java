@@ -31,7 +31,7 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
-    public UploadCode uploadTrimmedFile(TrimRequestResult trimResult, String SequenceToken) {
+    public UploadCode uploadTrimmedFile(TrimRequestResult trimResult) {
         return null;
     }
 

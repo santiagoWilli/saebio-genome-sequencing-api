@@ -1,6 +1,7 @@
 package handlers;
 
 import dataaccess.DataAccess;
+import dataaccess.UploadCode;
 import payloads.TrimRequestResult;
 import utils.Answer;
 
@@ -14,10 +15,16 @@ public class TrimmedSequencesPostHandler extends AbstractHandler<TrimRequestResu
 
     @Override
     protected Answer processRequest(TrimRequestResult result) {
-        return new Answer(404, notFoundJson(result.getSequenceToken()));
+        return dataAccess.uploadTrimmedFile(result) == UploadCode.NOT_FOUND ?
+                new Answer(404, notFoundJson(result.getSequenceToken())) :
+                new Answer(200, okJson());
     }
 
     private String notFoundJson(String token) {
         return "{\"message\":\"Could not find the sequence with token " + token + "\"}";
+    }
+
+    private String okJson() {
+        return "{\"message\":\"Trimmed sequence uploaded\"}";
     }
 }

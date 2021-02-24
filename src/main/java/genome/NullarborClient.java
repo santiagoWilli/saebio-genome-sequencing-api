@@ -31,7 +31,6 @@ public class NullarborClient implements GenomeTool {
                         GenomeToolAnswer.Status.OK,
                         response.getBody().getObject().get("token").toString());
             }
-            System.out.println("STATUS: " + parts[0].getInputStream().read());
             return new GenomeToolAnswer(response.getStatus() == 404 ? GenomeToolAnswer.Status.API_DOWN : GenomeToolAnswer.Status.SERVER_ERROR);
         } catch (IOException e) {
             return new GenomeToolAnswer(GenomeToolAnswer.Status.EXCEPTION_ENCOUNTERED);
