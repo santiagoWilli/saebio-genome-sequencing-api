@@ -49,6 +49,25 @@ public class TrimRequestResult_ {
         assertThat(result.isValid()).isEqualTo(true);
     }
 
+    @Test
+    public void invalid_if_multipartWithoutStatusOrTokenFields() {
+        result = new TrimRequestResult(multipartWithoutToken());
+        assertThat(result.isValid()).isEqualTo(false);
+        result = new TrimRequestResult(multipartWithoutStatus());
+        assertThat(result.isValid()).isEqualTo(false);
+    }
+
+    private Collection<Part> multipartWithoutToken() {
+        Collection<Part> multipart = new ArrayList<>();
+        multipart.add(mockedPartWithName("status"));
+        return multipart;
+    }
+
+    private Collection<Part> multipartWithoutStatus() {
+        multipart.add(mockedPartWithName("token"));
+        return multipart;
+    }
+
     private String token() {
         return "123e4567-e89b-12d3-a456-556642440000";
     }

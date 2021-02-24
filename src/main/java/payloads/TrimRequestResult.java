@@ -23,11 +23,12 @@ public class TrimRequestResult extends Multipart implements Validable {
         return fileParts
                 .stream()
                 .filter(p -> p.getName().equals(name))
-                .collect(Collectors.toList()).get(0);
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
     public boolean isValid() {
-        return true;
+        return partWithName("status") != null && partWithName("token") != null;
     }
 }
