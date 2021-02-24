@@ -27,7 +27,7 @@ public class Sequences_ {
     @Test
     public void given_notAPair_when_postToSequences_then_statusCode400() {
         given().
-                multiPart("pair1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
+                multiPart("file1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
         when().
                 post("/sequences").
         then().
@@ -46,8 +46,8 @@ public class Sequences_ {
 
         String response =
         given().
-                multiPart("pair1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
-                multiPart("pair2", new File(testFolderPath + "Kp1_231120_R2.fastq.gz")).
+                multiPart("file1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
+                multiPart("file2", new File(testFolderPath + "Kp1_231120_R2.fastq.gz")).
         when().
                 post("/sequences").
         then().
@@ -92,8 +92,8 @@ public class Sequences_ {
 
         given().
                 param("status", 2).
-                multiPart("pair1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
-                multiPart("pair2", new File(testFolderPath + "Kp1_231120_R2.fastq.gz")).
+                multiPart("file1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
+                multiPart("file2", new File(testFolderPath + "Kp1_231120_R2.fastq.gz")).
         when().
                 post("/sequences/trimmed").
         then().
@@ -101,8 +101,8 @@ public class Sequences_ {
 
         given().
                 param("token", "123e4567-e89b-12d3-a456-556642440000").
-                multiPart("pair1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
-                multiPart("pair2", new File(testFolderPath + "Kp1_231120_R2.fastq.gz")).
+                multiPart("file1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
+                multiPart("file2", new File(testFolderPath + "Kp1_231120_R2.fastq.gz")).
         when().
                 post("/sequences/trimmed").
         then().

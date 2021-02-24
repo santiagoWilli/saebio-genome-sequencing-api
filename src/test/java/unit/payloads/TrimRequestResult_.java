@@ -5,11 +5,11 @@ import org.junit.jupiter.api.Test;
 import payloads.TrimRequestResult;
 
 import javax.servlet.http.Part;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -54,6 +54,20 @@ public class TrimRequestResult_ {
         result = new TrimRequestResult(multipartWithoutToken());
         assertThat(result.isValid()).isEqualTo(false);
         result = new TrimRequestResult(multipartWithoutStatus());
+        assertThat(result.isValid()).isEqualTo(false);
+    }
+
+    @Test
+    public void invalid_if_successStatus_and_hasAMissingTrimmedFile() throws IOException {
+        InputStream inputStream = new ByteArrayInputStream("2".getBytes());
+        Part part;
+        part = mockedPartWithName("status");
+        when(part.getInputStream()).thenReturn(inputStream);
+        multipart.add(part);
+        multipart.add(mockedPartWithName("token"));
+        multipart.add(mockedPartWithName("file1"));
+
+        result = new TrimRequestResult(multipart);
         assertThat(result.isValid()).isEqualTo(false);
     }
 

@@ -29,6 +29,18 @@ public class TrimRequestResult extends Multipart implements Validable {
 
     @Override
     public boolean isValid() {
-        return partWithName("status") != null && partWithName("token") != null;
+        if (partWithName("status") == null || partWithName("token") == null) return false;
+        try {
+            return getStatusCode() != 2;
+        } catch (Exception e) {
+            e.getStackTrace();
+            return false;
+        }
+    }
+
+    public int getStatusCode() throws IOException {
+        return Integer.parseInt(new BufferedReader(new InputStreamReader(partWithName("status").getInputStream(), StandardCharsets.UTF_8))
+                .lines()
+                .collect(Collectors.joining("\n")));
     }
 }
