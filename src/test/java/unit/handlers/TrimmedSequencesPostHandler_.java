@@ -1,4 +1,4 @@
-package unit;
+package unit.handlers;
 
 import dataaccess.DataAccess;
 import dataaccess.UploadCode;
@@ -7,6 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import payloads.TrimRequestResult;
 import utils.Answer;
+
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -17,7 +19,7 @@ public class TrimmedSequencesPostHandler_ {
     private DataAccess dataAccess;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws IOException {
         trimResult = mock(TrimRequestResult.class);
         when(trimResult.isValid()).thenReturn(true);
         dataAccess = mock(DataAccess.class);
@@ -26,7 +28,7 @@ public class TrimmedSequencesPostHandler_ {
     }
 
     @Test
-    public void if_sequenceDoesNotExists_return_httpNotFound() {
+    public void if_sequenceDoesNotExists_return_httpNotFound() throws IOException {
         when(dataAccess.uploadTrimmedFile(trimResult)).thenReturn(UploadCode.NOT_FOUND);
         assertThat(handler.process(trimResult)).isEqualTo(new Answer(404, notFoundJson(trimResult.getSequenceToken())));
     }

@@ -6,11 +6,6 @@ public class Answer {
     private final int code;
     private final String body;
 
-    public Answer(int code) {
-        this.code = code;
-        this.body = null;
-    }
-
     public Answer(int code, String body){
         this.code = code;
         this.body = body;

@@ -1,4 +1,4 @@
-package unit;
+package unit.payloads;
 
 import org.junit.jupiter.api.Test;
 import payloads.Sequence;
