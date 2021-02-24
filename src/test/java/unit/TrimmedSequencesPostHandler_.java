@@ -37,11 +37,21 @@ public class TrimmedSequencesPostHandler_ {
         assertThat(handler.process(trimResult)).isEqualTo(new Answer(200, okJson()));
     }
 
+    @Test
+    public void if_writeExceptionWhenUploadingTheTrimmedSequence_return_httpServerError() {
+        when(dataAccess.uploadTrimmedFile(trimResult)).thenReturn(UploadCode.WRITE_FAILED);
+        assertThat(handler.process(trimResult)).isEqualTo(new Answer(500, errorJson()));
+    }
+
     private String notFoundJson(String token) {
         return "{\"message\":\"Could not find the sequence with token " + token + "\"}";
     }
 
     private String okJson() {
         return "{\"message\":\"Trimmed sequence uploaded\"}";
+    }
+
+    private String errorJson() {
+        return "{\"message\":\"The upload encountered a fatal error\"}";
     }
 }
