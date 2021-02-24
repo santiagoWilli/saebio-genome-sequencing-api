@@ -9,6 +9,7 @@ import com.mongodb.client.*;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,5 +35,26 @@ public class MongoDB implements Database {
         Document doc = collection.find(eq("_id", new ObjectId(id))).first();
 
         return doc == null ? null : new ObjectMapper().readValue(doc.toJson(), new TypeReference<HashMap<String,Object>>(){});
+    }
+
+    @Override
+    public Map<String, Object> get(String collectionName, String field, String value) throws IOException {
+        MongoCollection<Document> collection = database.getCollection(collectionName);
+
+        Document doc = collection.find(eq(field, value)).first();
+
+        return doc == null ? null : new ObjectMapper().readValue(doc.toJson(), new TypeReference<HashMap<String,Object>>(){});
+    }
+
+    @Override
+    public void delete(String collectionName, String field, String value) {
+        MongoCollection<Document> collection = database.getCollection(collectionName);
+        collection.deleteOne(eq(field, value));
+    }
+
+    @Override
+    public void insertFakeSequence(String token) {
+        MongoCollection<Document> collection = database.getCollection("sequences");
+        collection.insertOne(new Document("genomeToolToken", token));
     }
 }

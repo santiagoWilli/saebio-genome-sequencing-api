@@ -4,6 +4,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import payloads.Sequence;
+import payloads.TrimRequestResult;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,6 +28,11 @@ public class MongoDataAccess implements DataAccess {
                 .append("trimRequestDate", formatDate(LocalDateTime.now(ZoneOffset.UTC)));
         collection.insertOne(document);
         return document.getObjectId("_id").toString();
+    }
+
+    @Override
+    public UploadCode uploadTrimmedFile(TrimRequestResult trimResult, String SequenceToken) {
+        return null;
     }
 
     private static String formatDate(LocalDate date) {

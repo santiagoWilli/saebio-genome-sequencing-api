@@ -27,7 +27,7 @@ public class Sequences_ {
     @Test
     public void given_notAPair_when_postToSequences_then_statusCode400() {
         given().
-                multiPart("pair1", new File(testFolderPath + "Kpneu1_191120_R1.fastq.gz")).
+                multiPart("pair1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
         when().
                 post("/sequences").
         then().
@@ -46,8 +46,8 @@ public class Sequences_ {
 
         String response =
         given().
-                multiPart("pair1", new File(testFolderPath + "Kpneu1_191120_R1.fastq.gz")).
-                multiPart("pair2", new File(testFolderPath + "Kpneu1_191120_R2.fastq.gz")).
+                multiPart("pair1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
+                multiPart("pair2", new File(testFolderPath + "Kp1_231120_R2.fastq.gz")).
         when().
                 post("/sequences").
         then().
@@ -62,10 +62,10 @@ public class Sequences_ {
         Map<String, Object> sequence = db.get("sequences", id);
 
         assertThat(sequence.get("strain")).isEqualTo("Klebsiella pneumoniae");
-        assertThat(sequence.get("originalFilenames")).isEqualTo(Arrays.asList("Kpneu1_191120_R1.fastq.gz", "Kpneu1_191120_R2.fastq.gz"));
+        assertThat(sequence.get("originalFilenames")).isEqualTo(Arrays.asList("Kp1_231120_R1.fastq.gz", "Kp1_231120_R2.fastq.gz"));
         assertThat(sequence.get("genomeToolToken")).isEqualTo(token);
         assertThat(sequence.get("sequenceDate").toString())
-                .isEqualTo(dateFormat(date(19, 11, 2020), "yyyy-MM-dd"));
+                .isEqualTo(dateFormat(date(23, 11, 2020), "yyyy-MM-dd"));
         assertThat(sequence.get("trimRequestDate").toString())
                 .startsWith(dateFormat(Calendar.getInstance().getTime(), "yyyy-MM-dd HH:mm"));
         assertThat(sequence.get("trimmedPair")).isNull();
@@ -79,7 +79,8 @@ public class Sequences_ {
         when().
                 post("/sequences/trimmed").
         then().
-                statusCode(404);
+                statusCode(400);
+
 
         given().
                 param("status", 2).
@@ -87,25 +88,44 @@ public class Sequences_ {
         when().
                 post("/sequences/trimmed").
         then().
-                statusCode(404);
+                statusCode(400);
 
         given().
                 param("status", 2).
-                multiPart("pair1", new File(testFolderPath + "Kpneu1_191120_R1.fastq.gz")).
-                multiPart("pair2", new File(testFolderPath + "Kpneu1_191120_R1.fastq.gz")).
+                multiPart("pair1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
+                multiPart("pair2", new File(testFolderPath + "Kp1_231120_R2.fastq.gz")).
         when().
                 post("/sequences/trimmed").
         then().
-                statusCode(404);
+                statusCode(400);
 
         given().
                 param("token", "123e4567-e89b-12d3-a456-556642440000").
-                multiPart("pair1", new File(testFolderPath + "Kpneu1_191120_R1.fastq.gz")).
-                multiPart("pair2", new File(testFolderPath + "Kpneu1_191120_R1.fastq.gz")).
+                multiPart("pair1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
+                multiPart("pair2", new File(testFolderPath + "Kp1_231120_R2.fastq.gz")).
         when().
                 post("/sequences/trimmed").
         then().
-                statusCode(404);
+                statusCode(400);
+    }
+
+    @Test
+    public void given_anErrorMessage_when_postToSequencesTrimmed_then_setTrimmedPairFieldToFalse() throws IOException {
+        String token = "123e4567-e89b-12d3-a456-556642440021";
+        db.insertFakeSequence(token);
+
+        given().
+                param("status", 5).
+                param("message", "Internal error encountered.").
+                param("token", token).
+        when().
+                post("/sequences/trimmed").
+        then().
+                statusCode(200);
+
+        Map<String, Object> sequence = db.get("sequences", "genomeToolToken", token);
+        assertThat(sequence.get("trimmedPair")).isEqualTo(false);
+        db.delete("sequences", "genomeToolToken", token);
     }
 
     private Date date(int day, int month, int year) {

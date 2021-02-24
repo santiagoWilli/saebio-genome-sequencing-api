@@ -7,15 +7,6 @@ import genome.NullarborClient;
 import handlers.SequencesPostHandler;
 import utils.Arguments;
 
-import javax.servlet.MultipartConfigElement;
-import javax.servlet.http.Part;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.stream.Collectors;
-
 public class Application {
     public static void main(String[] args) {
         Arguments options = new Arguments();
@@ -35,7 +26,7 @@ public class Application {
         post("/sequences", new SequencesPostHandler(new NullarborClient(externalApiUri), new MongoDataAccess()));
 
         post("/sequences/trimmed", ((request, response) -> {
-            response.status(404);
+            response.status(400);
             return "";
         }));
     }
