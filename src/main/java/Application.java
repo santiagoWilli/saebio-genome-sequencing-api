@@ -5,6 +5,7 @@ import dataaccess.Database;
 import dataaccess.MongoDataAccess;
 import genome.NullarborClient;
 import handlers.SequencesPostHandler;
+import handlers.TrimmedSequencesPostHandler;
 import utils.Arguments;
 
 public class Application {
@@ -25,9 +26,6 @@ public class Application {
 
         post("/sequences", new SequencesPostHandler(new NullarborClient(externalApiUri), new MongoDataAccess()));
 
-        post("/sequences/trimmed", ((request, response) -> {
-            response.status(400);
-            return "";
-        }));
+        post("/sequences/trimmed", (new TrimmedSequencesPostHandler(new MongoDataAccess())));
     }
 }

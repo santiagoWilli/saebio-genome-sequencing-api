@@ -74,24 +74,23 @@ public class Sequences_ {
     @Test
     public void given_aRequestWithoutRequiredFields_when_postToSequencesTrimmed_then_badRequest() {
         given().
-                param("status", 5).
-                param("message", "Internal error encountered.").
-        when().
-                post("/sequences/trimmed").
-        then().
-                statusCode(400);
-
-
-        given().
-                param("status", 2).
-                param("token", "123e4567-e89b-12d3-a456-556642440000").
+                multiPart("status", 5).
+                multiPart("message", "Internal error encountered.").
         when().
                 post("/sequences/trimmed").
         then().
                 statusCode(400);
 
         given().
-                param("status", 2).
+                multiPart("status", 2).
+                multiPart("token", "123e4567-e89b-12d3-a456-556642440000").
+        when().
+                post("/sequences/trimmed").
+        then().
+                statusCode(400);
+
+        given().
+                multiPart("status", 2).
                 multiPart("file1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
                 multiPart("file2", new File(testFolderPath + "Kp1_231120_R2.fastq.gz")).
         when().
@@ -100,7 +99,7 @@ public class Sequences_ {
                 statusCode(400);
 
         given().
-                param("token", "123e4567-e89b-12d3-a456-556642440000").
+                multiPart("token", "123e4567-e89b-12d3-a456-556642440000").
                 multiPart("file1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
                 multiPart("file2", new File(testFolderPath + "Kp1_231120_R2.fastq.gz")).
         when().

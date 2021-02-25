@@ -27,7 +27,7 @@ public class Sequence extends Multipart implements Validable {
     }
 
     public List<String> getOriginalFilenames() {
-        return fileParts.stream().map(Part::getSubmittedFileName).collect(Collectors.toList());
+        return fileParts.stream().map(Part::getSubmittedFileName).sorted().collect(Collectors.toList());
     }
 
     @Override
