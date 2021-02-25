@@ -31,7 +31,10 @@ public class TrimRequestResult extends Multipart implements Validable {
     public boolean isValid() {
         if (partWithName("status") == null || partWithName("token") == null) return false;
         try {
-            return getStatusCode() != 2;
+            if (getStatusCode() == 2) {
+                return partWithName("file1") != null && partWithName("file2") != null;
+            }
+            return true;
         } catch (Exception e) {
             e.getStackTrace();
             return false;

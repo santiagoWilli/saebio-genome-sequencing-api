@@ -6,10 +6,8 @@ import payloads.TrimRequestResult;
 
 import javax.servlet.http.Part;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -38,11 +36,7 @@ public class TrimRequestResult_ {
 
     @Test
     public void valid_if_failureStatus_and_hasTokenField() throws IOException {
-        InputStream inputStream = new ByteArrayInputStream("5".getBytes());
-        Part part;
-        part = mockedPartWithName("status");
-        when(part.getInputStream()).thenReturn(inputStream);
-        multipart.add(part);
+        multipart.add(statusPart("5"));
         multipart.add(mockedPartWithName("token"));
 
         result = new TrimRequestResult(multipart);
@@ -59,16 +53,30 @@ public class TrimRequestResult_ {
 
     @Test
     public void invalid_if_successStatus_and_hasAMissingTrimmedFile() throws IOException {
-        InputStream inputStream = new ByteArrayInputStream("2".getBytes());
-        Part part;
-        part = mockedPartWithName("status");
-        when(part.getInputStream()).thenReturn(inputStream);
-        multipart.add(part);
+        multipart.add(statusPart("2"));
         multipart.add(mockedPartWithName("token"));
         multipart.add(mockedPartWithName("file1"));
 
         result = new TrimRequestResult(multipart);
         assertThat(result.isValid()).isEqualTo(false);
+    }
+
+    @Test
+    public void valid_if_successStatus_and_hasTheTwoTrimmedFiles() throws IOException {
+        multipart.add(statusPart("2"));
+        multipart.add(mockedPartWithName("token"));
+        multipart.add(mockedPartWithName("file1"));
+        multipart.add(mockedPartWithName("file2"));
+
+        result = new TrimRequestResult(multipart);
+        assertThat(result.isValid()).isEqualTo(true);
+    }
+
+    private Part statusPart(String s) throws IOException {
+        InputStream inputStream = new ByteArrayInputStream(s.getBytes());
+        Part part = mockedPartWithName("status");
+        when(part.getInputStream()).thenReturn(inputStream);
+        return part;
     }
 
     private Collection<Part> multipartWithoutToken() {
