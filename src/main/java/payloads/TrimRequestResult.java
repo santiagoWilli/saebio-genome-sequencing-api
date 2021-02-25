@@ -36,10 +36,11 @@ public class TrimRequestResult extends Multipart implements Validable {
                 Part filePartOne = partWithName("file1");
                 Part filePartTwo = partWithName("file2");
                 if (filePartOne == null || filePartTwo == null) return false;
-                return fileIsFastq(filePartOne) && fileIsFastq(filePartTwo);
+                return fileIsFastq(filePartOne) && fileIsFastq(filePartTwo)
+                        && !filePartOne.getSubmittedFileName().equals(filePartTwo.getSubmittedFileName());
             }
             return true;
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.getStackTrace();
             return false;
         }

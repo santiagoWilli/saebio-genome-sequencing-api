@@ -83,6 +83,17 @@ public class TrimRequestResult_ {
         assertThat(result.isValid()).isEqualTo(false);
     }
 
+    @Test
+    public void invalid_if_successStatus_and_hasTheTwoTrimmedFilesWithSameName() throws IOException {
+        multipart.add(statusPart("2"));
+        multipart.add(mockedPartWithName("token"));
+        multipart.add(mockedFilePart("file1", "trimmed1.fq.gz"));
+        multipart.add(mockedFilePart("file2", "trimmed1.fq.gz"));
+
+        result = new TrimRequestResult(multipart);
+        assertThat(result.isValid()).isEqualTo(false);
+    }
+
     private Part mockedFilePart(String partName, String filename) {
         Part part = mockedPartWithName(partName);
         when(part.getSubmittedFileName()).thenReturn(filename);
