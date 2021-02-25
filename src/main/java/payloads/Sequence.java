@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Sequence extends Multipart implements Validable {
-    public Sequence(Collection<Part> fileParts) {
-        super(fileParts);
+    public Sequence(Collection<Part> parts) {
+        super(parts);
     }
 
     public LocalDate getDate() {
@@ -27,13 +27,13 @@ public class Sequence extends Multipart implements Validable {
     }
 
     public List<String> getOriginalFilenames() {
-        return fileParts.stream().map(Part::getSubmittedFileName).sorted().collect(Collectors.toList());
+        return parts.stream().map(Part::getSubmittedFileName).sorted().collect(Collectors.toList());
     }
 
     @Override
     public boolean isValid() {
-        if (fileParts.size() != 2) return false;
-        for (Part part : fileParts) {
+        if (parts.size() != 2) return false;
+        for (Part part : parts) {
             if (!part.getSubmittedFileName().matches(filenameRegex())) return false;
         }
         return partFilesFormASequence();
@@ -42,7 +42,7 @@ public class Sequence extends Multipart implements Validable {
     private boolean partFilesFormASequence() {
         int i = 0;
         String[][] pair = new String[2][];
-        for (Part part : fileParts) pair[i++] = getFilenameFieldsOf(part);
+        for (Part part : parts) pair[i++] = getFilenameFieldsOf(part);
         if (!pair[0][0].equals(pair[1][0]) || !pair[0][1].equals(pair[1][1])) return false;
         return !pair[0][2].equals(pair[1][2]);
     }
@@ -61,7 +61,7 @@ public class Sequence extends Multipart implements Validable {
         final int day, month, year;
 
         FilenameDate() {
-            String filename = fileParts.iterator().next().getSubmittedFileName();
+            String filename = parts.iterator().next().getSubmittedFileName();
             String date = filename.split("_")[1];
             day = Integer.parseInt(date.substring(0, 2));
             month = Integer.parseInt(date.substring(2, 4));
@@ -70,7 +70,7 @@ public class Sequence extends Multipart implements Validable {
     }
 
     private String strainKey() {
-        return fileParts.iterator().next()
+        return parts.iterator().next()
                 .getSubmittedFileName()
                 .split("_")[0]
                 .split("[0-9]")[0]

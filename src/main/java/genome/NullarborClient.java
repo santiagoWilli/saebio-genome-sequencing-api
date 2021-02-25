@@ -19,7 +19,7 @@ public class NullarborClient implements GenomeTool {
     @Override
     public GenomeToolAnswer requestTrim(Sequence sequence) {
         Part[] parts = new Part[2]; int i = 0;
-        for (Part part : sequence.getFileParts()) parts[i++] = part;
+        for (Part part : sequence.getParts()) parts[i++] = part;
 
         try (InputStream inputStream1 = parts[0].getInputStream(); InputStream inputStream2 = parts[1].getInputStream()) {
             HttpResponse<JsonNode> response = Unirest.post(endpoint + "/trim")

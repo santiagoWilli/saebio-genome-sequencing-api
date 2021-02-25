@@ -78,7 +78,7 @@ public class NullarborClient_ {
     public void objectsSetUp() {
         parts = new ArrayList<>();
         sequence = mock(Sequence.class);
-        when(sequence.getFileParts()).thenReturn(parts);
+        when(sequence.getParts()).thenReturn(parts);
     }
 
     @BeforeEach

@@ -94,6 +94,15 @@ public class TrimRequestResult_ {
         assertThat(result.isValid()).isEqualTo(false);
     }
 
+    @Test
+    public void getFileParts_returns_theMultipartRelatedFiles() {
+        multipart.add(mockedPartWithName("file1"));
+        multipart.add(mockedPartWithName("file2"));
+
+        result = new TrimRequestResult(multipart);
+        assertThat(result.getFileParts()).isEqualTo(multipart);
+    }
+
     private Part mockedFilePart(String partName, String filename) {
         Part part = mockedPartWithName(partName);
         when(part.getSubmittedFileName()).thenReturn(filename);

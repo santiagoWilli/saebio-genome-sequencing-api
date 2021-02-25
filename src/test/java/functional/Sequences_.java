@@ -114,9 +114,9 @@ public class Sequences_ {
         db.insertFakeSequence(token);
 
         given().
-                param("status", 5).
-                param("message", "Internal error encountered.").
-                param("token", token).
+                multiPart("status", 5).
+                multiPart("message", "Internal error encountered.").
+                multiPart("token", token).
         when().
                 post("/sequences/trimmed").
         then().
@@ -125,18 +125,6 @@ public class Sequences_ {
         Map<String, Object> sequence = db.get("sequences", "genomeToolToken", token);
         assertThat(sequence.get("trimmedPair")).isEqualTo(false);
         db.delete("sequences", "genomeToolToken", token);
-    }
-
-    private Date date(int day, int month, int year) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month-1, day);
-        return calendar.getTime();
-    }
-
-    private String dateFormat(Date date, String format) {
-        SimpleDateFormat formattedDate = new SimpleDateFormat(format);
-        formattedDate.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return formattedDate.format(date);
     }
 
     @BeforeAll
@@ -195,5 +183,17 @@ public class Sequences_ {
     @AfterEach
     public void stopWireMockServer() {
         mockServer.stop();
+    }
+
+    private Date date(int day, int month, int year) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(year, month-1, day);
+        return calendar.getTime();
+    }
+
+    private String dateFormat(Date date, String format) {
+        SimpleDateFormat formattedDate = new SimpleDateFormat(format);
+        formattedDate.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return formattedDate.format(date);
     }
 }

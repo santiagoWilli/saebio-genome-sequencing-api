@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class TrimRequestResult extends Multipart implements Validable {
@@ -20,12 +21,8 @@ public class TrimRequestResult extends Multipart implements Validable {
                 .collect(Collectors.joining("\n"));
     }
 
-    private Part partWithName(String name) {
-        return fileParts
-                .stream()
-                .filter(p -> p.getName().equals(name))
-                .findFirst()
-                .orElse(null);
+    public List<Part> getFileParts() {
+        return Arrays.asList(partWithName("file1"), partWithName("file2"));
     }
 
     @Override
@@ -46,7 +43,15 @@ public class TrimRequestResult extends Multipart implements Validable {
         }
     }
 
-    public int getStatusCode() throws IOException {
+    private Part partWithName(String name) {
+        return parts
+                .stream()
+                .filter(p -> p.getName().equals(name))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private int getStatusCode() throws IOException {
         return Integer.parseInt(new BufferedReader(new InputStreamReader(partWithName("status").getInputStream(), StandardCharsets.UTF_8))
                 .lines()
                 .collect(Collectors.joining("\n")));
