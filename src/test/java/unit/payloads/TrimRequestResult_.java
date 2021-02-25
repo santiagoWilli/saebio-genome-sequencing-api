@@ -62,14 +62,31 @@ public class TrimRequestResult_ {
     }
 
     @Test
-    public void valid_if_successStatus_and_hasTheTwoTrimmedFiles() throws IOException {
+    public void valid_if_successStatus_and_hasTheTwoTrimmedFiles_and_fileTypeIsFastq() throws IOException {
         multipart.add(statusPart("2"));
         multipart.add(mockedPartWithName("token"));
-        multipart.add(mockedPartWithName("file1"));
-        multipart.add(mockedPartWithName("file2"));
+        multipart.add(mockedFilePart("file1", "trimmed1.fq.gz"));
+        multipart.add(mockedFilePart("file2", "trimmed2.fq.gz"));
 
         result = new TrimRequestResult(multipart);
         assertThat(result.isValid()).isEqualTo(true);
+    }
+
+    @Test
+    public void invalid_if_successStatus_and_hasTheTwoTrimmedFiles_and_fileTypeDifferentFromFastq() throws IOException {
+        multipart.add(statusPart("2"));
+        multipart.add(mockedPartWithName("token"));
+        multipart.add(mockedFilePart("file1", "trimmed1.pdf"));
+        multipart.add(mockedFilePart("file2", "trimmed2.fa.gz"));
+
+        result = new TrimRequestResult(multipart);
+        assertThat(result.isValid()).isEqualTo(false);
+    }
+
+    private Part mockedFilePart(String partName, String filename) {
+        Part part = mockedPartWithName(partName);
+        when(part.getSubmittedFileName()).thenReturn(filename);
+        return part;
     }
 
     private Part statusPart(String s) throws IOException {
