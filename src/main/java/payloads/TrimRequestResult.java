@@ -15,8 +15,8 @@ public class TrimRequestResult extends Multipart implements Validable {
         super(fileParts);
     }
 
-    public String getSequenceToken() throws IOException {
-        return new BufferedReader(new InputStreamReader(partWithName("token").getInputStream(), StandardCharsets.UTF_8))
+    public String getSequenceToken() {
+        return new BufferedReader(streamReaderFromPartWithName("token"))
                 .lines()
                 .collect(Collectors.joining("\n"));
     }
@@ -25,22 +25,23 @@ public class TrimRequestResult extends Multipart implements Validable {
         return Arrays.asList(partWithName("file1"), partWithName("file2"));
     }
 
+    public int getStatusCode() {
+        return Integer.parseInt(new BufferedReader(streamReaderFromPartWithName("status"))
+                .lines()
+                .collect(Collectors.joining("\n")));
+    }
+
     @Override
     public boolean isValid() {
         if (partWithName("status") == null || partWithName("token") == null) return false;
-        try {
-            if (getStatusCode() == 2) {
-                Part filePartOne = partWithName("file1");
-                Part filePartTwo = partWithName("file2");
-                if (filePartOne == null || filePartTwo == null) return false;
-                return fileIsFastq(filePartOne) && fileIsFastq(filePartTwo)
-                        && !filePartOne.getSubmittedFileName().equals(filePartTwo.getSubmittedFileName());
-            }
-            return true;
-        } catch (IOException e) {
-            e.getStackTrace();
-            return false;
+        if (getStatusCode() == 2) {
+            Part filePartOne = partWithName("file1");
+            Part filePartTwo = partWithName("file2");
+            if (filePartOne == null || filePartTwo == null) return false;
+            return fileIsFastq(filePartOne) && fileIsFastq(filePartTwo)
+                    && !filePartOne.getSubmittedFileName().equals(filePartTwo.getSubmittedFileName());
         }
+        return true;
     }
 
     private Part partWithName(String name) {
@@ -51,15 +52,18 @@ public class TrimRequestResult extends Multipart implements Validable {
                 .orElse(null);
     }
 
-    private int getStatusCode() throws IOException {
-        return Integer.parseInt(new BufferedReader(new InputStreamReader(partWithName("status").getInputStream(), StandardCharsets.UTF_8))
-                .lines()
-                .collect(Collectors.joining("\n")));
-    }
-
     private boolean fileIsFastq(Part part) {
         String[] extensions = new String[] {".fq.gz", ".fastq.gz", ".fq", ".fastq"};
         return Arrays.stream(extensions)
                 .anyMatch(e -> part.getSubmittedFileName().endsWith(e));
+    }
+
+    private InputStreamReader streamReaderFromPartWithName(String name) {
+        try {
+            return new InputStreamReader(partWithName(name).getInputStream(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            e.getStackTrace();
+            throw new RuntimeException();
+        }
     }
 }

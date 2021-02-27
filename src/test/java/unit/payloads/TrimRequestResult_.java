@@ -103,6 +103,14 @@ public class TrimRequestResult_ {
         assertThat(result.getFileParts()).isEqualTo(multipart);
     }
 
+    @Test
+    public void getStatusCode_returns_statusCodeAsInt() throws IOException {
+        multipart.add(statusPart("5"));
+
+        result = new TrimRequestResult(multipart);
+        assertThat(result.getStatusCode()).isEqualTo(5);
+    }
+
     private Part mockedFilePart(String partName, String filename) {
         Part part = mockedPartWithName(partName);
         when(part.getSubmittedFileName()).thenReturn(filename);
