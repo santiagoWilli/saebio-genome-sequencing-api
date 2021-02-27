@@ -6,6 +6,7 @@ import org.bson.Document;
 import payloads.Sequence;
 import payloads.TrimRequestResult;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -35,6 +36,10 @@ public class MongoDataAccess implements DataAccess {
 
     @Override
     public UploadCode uploadTrimmedFile(TrimRequestResult trimResult) {
+        MongoCollection<Document> collection = database.getCollection("sequences");
+        if (collection.countDocuments(eq("genomeToolToken", trimResult.getSequenceToken())) < 1) {
+            return UploadCode.NOT_FOUND;
+        }
         return null;
     }
 

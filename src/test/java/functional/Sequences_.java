@@ -127,6 +127,21 @@ public class Sequences_ {
         db.delete("sequences", "genomeToolToken", token);
     }
 
+    @Test
+    public void given_aSuccessfulStatus_and_tokenThatDoesNotExist_when_postToSequencesTrimmed_then_notFound() {
+        String token = "123e4567-e89b-12d3-a456-556642440021";
+
+        given().
+                multiPart("status", 2).
+                multiPart("token", token).
+                multiPart("file1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
+                multiPart("file2", new File(testFolderPath + "Kp1_231120_R2.fastq.gz")).
+        when().
+                post("/sequences/trimmed").
+        then().
+                statusCode(404);
+    }
+
     @BeforeAll
     static void startApplication() throws IOException, InterruptedException {
         port = PORT;
