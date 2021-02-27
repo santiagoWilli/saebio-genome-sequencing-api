@@ -28,7 +28,7 @@ public class TrimmedSequencesPostHandler_ {
     }
 
     @Test
-    public void if_sequenceDoesNotExists_return_httpNotFound() throws IOException {
+    public void if_sequenceDoesNotExists_return_httpNotFound() {
         when(dataAccess.uploadTrimmedFile(trimResult)).thenReturn(UploadCode.NOT_FOUND);
         assertThat(handler.process(trimResult)).isEqualTo(new Answer(404, notFoundJson(trimResult.getSequenceToken())));
     }

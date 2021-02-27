@@ -11,6 +11,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.*;
+
 public class MongoDataAccess implements DataAccess {
     private final MongoDatabase database;
 
@@ -33,6 +36,14 @@ public class MongoDataAccess implements DataAccess {
     @Override
     public UploadCode uploadTrimmedFile(TrimRequestResult trimResult) {
         return null;
+    }
+
+    @Override
+    public boolean setSequenceTrimToFalse(String token) {
+        MongoCollection<Document> collection = database.getCollection("sequences");
+        if (collection.countDocuments(eq("genomeToolToken", token)) < 1) return false;
+        collection.updateOne(eq("genomeToolToken", token), set("trimmedPair", false));
+        return true;
     }
 
     private static String formatDate(LocalDate date) {
