@@ -1,8 +1,11 @@
 package handlers;
 
 import dataaccess.DataAccess;
+import dataaccess.UploadCode;
 import payloads.TrimRequestResult;
 import utils.Answer;
+
+import java.io.IOException;
 
 public class TrimmedSequencesPostHandler extends AbstractHandler<TrimRequestResult> {
     private final DataAccess dataAccess;
@@ -20,11 +23,15 @@ public class TrimmedSequencesPostHandler extends AbstractHandler<TrimRequestResu
             }
             return new Answer(404, "Could not find the sequence with the given token");
         }
-        return switch (dataAccess.uploadTrimmedFile(result)) {
-            case OK -> new Answer(200, okJson());
-            case NOT_FOUND -> new Answer(404, errorJson("Could not find the sequence with the given token"));
-            case WRITE_FAILED -> new Answer(500, errorJson("The upload encountered a fatal error"));
-        };
+        try {
+            return switch (dataAccess.uploadTrimmedFile(result)) {
+                case OK -> new Answer(200, okJson());
+                case NOT_FOUND -> new Answer(404, errorJson("Could not find the sequence with the given token"));
+                case WRITE_FAILED -> new Answer(500, errorJson("The upload encountered a fatal error"));
+            };
+        } catch (IOException e) {
+            return new Answer(500, e.getMessage());
+        }
     }
 
     private String okJson() {

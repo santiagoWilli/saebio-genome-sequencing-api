@@ -2,15 +2,22 @@ package dataaccess;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.gridfs.GridFSBuckets;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import payloads.Sequence;
 import payloads.TrimRequestResult;
 
+import javax.servlet.http.Part;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.*;
@@ -35,12 +42,27 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
-    public UploadCode uploadTrimmedFile(TrimRequestResult trimResult) {
+    public UploadCode uploadTrimmedFile(TrimRequestResult trimResult) throws IOException {
         MongoCollection<Document> collection = database.getCollection("sequences");
         if (collection.countDocuments(eq("genomeToolToken", trimResult.getSequenceToken())) < 1) {
             return UploadCode.NOT_FOUND;
         }
-        return null;
+
+        GridFSBucket gridFSBucket = GridFSBuckets.create(database);
+        List<Part> fileParts = trimResult.getFileParts();
+        List<ObjectId> trimmedIds = new ArrayList<>();
+
+        for (Part filePart : fileParts) {
+            try (InputStream stream = filePart.getInputStream()) {
+                ObjectId id = gridFSBucket.uploadFromStream(filePart.getSubmittedFileName(), stream);
+                trimmedIds.add(id);
+            } catch (IOException e) {
+                e.getStackTrace();
+                return UploadCode.WRITE_FAILED;
+            }
+        }
+        collection.updateOne(eq("genomeToolToken", trimResult.getSequenceToken()), set("trimmedPair", trimmedIds));
+        return UploadCode.OK;
     }
 
     @Override

@@ -28,19 +28,19 @@ public class TrimmedSequencesPostHandler_ {
     }
 
     @Test
-    public void if_sequenceDoesNotExists_return_httpNotFound() {
+    public void if_sequenceDoesNotExists_return_httpNotFound() throws IOException {
         when(dataAccess.uploadTrimmedFile(trimResult)).thenReturn(UploadCode.NOT_FOUND);
         assertThat(handler.process(trimResult)).isEqualTo(new Answer(404, notFoundJson(trimResult.getSequenceToken())));
     }
 
     @Test
-    public void if_trimmedSequenceIsSuccessfullyUploaded_return_httpOk() {
+    public void if_trimmedSequenceIsSuccessfullyUploaded_return_httpOk() throws IOException {
         when(dataAccess.uploadTrimmedFile(trimResult)).thenReturn(UploadCode.OK);
         assertThat(handler.process(trimResult)).isEqualTo(new Answer(200, okJson()));
     }
 
     @Test
-    public void if_writeExceptionWhenUploadingTheTrimmedSequence_return_httpServerError() {
+    public void if_writeExceptionWhenUploadingTheTrimmedSequence_return_httpServerError() throws IOException {
         when(dataAccess.uploadTrimmedFile(trimResult)).thenReturn(UploadCode.WRITE_FAILED);
         assertThat(handler.process(trimResult)).isEqualTo(new Answer(500, errorJson()));
     }

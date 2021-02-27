@@ -37,7 +37,7 @@ public class Sequences_ {
 
     @Test
     public void given_aPairOfValidFiles_when_postToSequences_then_statusCode202_and_sequenceCreated() throws IOException {
-        final String token = "123e4567-e89b-12d3-a456-556642440000";
+        final String token = token();
         stubFor(post(urlEqualTo("/trim"))
                 .willReturn(aResponse()
                         .withStatus(202)
@@ -110,7 +110,7 @@ public class Sequences_ {
 
     @Test
     public void given_anErrorMessage_when_postToSequencesTrimmed_then_setTrimmedPairFieldToFalse() throws IOException {
-        String token = "123e4567-e89b-12d3-a456-556642440021";
+        String token = token();
         db.insertFakeSequence(token);
 
         given().
@@ -129,7 +129,7 @@ public class Sequences_ {
 
     @Test
     public void given_aSuccessfulStatus_and_tokenThatDoesNotExist_when_postToSequencesTrimmed_then_notFound() {
-        String token = "123e4567-e89b-12d3-a456-556642440021";
+        String token = token();
 
         given().
                 multiPart("status", 2).
@@ -140,6 +140,33 @@ public class Sequences_ {
                 post("/sequences/trimmed").
         then().
                 statusCode(404);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void given_aSuccessfulStatus_when_postToSequencesTrimmed_then_uploadTrimmedFiles_and_associateThemToItsSequence() throws IOException {
+        String token = token();
+        db.insertFakeSequence(token);
+
+        given().
+                multiPart("status", 2).
+                multiPart("token", token).
+                multiPart("file1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
+                multiPart("file2", new File(testFolderPath + "Kp1_231120_R2.fastq.gz")).
+        when().
+                post("/sequences/trimmed").
+        then().
+                statusCode(200);
+
+        Map<String, Object> sequence = db.get("sequences", "genomeToolToken", token);
+        assertThat(sequence.get("trimmedPair")).isNotNull();
+        assertThat(sequence.get("trimmedPair")).isNotEqualTo(false);
+        assertThat(sequence.get("trimmedPair")).isOfAnyClassIn(ArrayList.class);
+
+        ArrayList<Map<String, String>> trimmedPair = (ArrayList<Map<String, String>>) sequence.get("trimmedPair");
+        assertThat(trimmedPair.size()).isEqualTo(2);
+        for (Map<String, String> trimmedFile : trimmedPair) assertThat(trimmedFile.containsKey("$oid"));
+        db.delete("sequences", "genomeToolToken", token);
     }
 
     @BeforeAll
@@ -210,5 +237,9 @@ public class Sequences_ {
         SimpleDateFormat formattedDate = new SimpleDateFormat(format);
         formattedDate.setTimeZone(TimeZone.getTimeZone("UTC"));
         return formattedDate.format(date);
+    }
+
+    private String token() {
+        return UUID.randomUUID().toString();
     }
 }
