@@ -26,9 +26,14 @@ public class Application {
 
         get("/alive", (request, response) -> "I am alive!");
 
-        post("/sequences", new SequencesPostHandler(new NullarborClient(options.genomeToolUrl), new MongoDataAccess()));
-
-        post("/sequences/trimmed", (new TrimmedSequencesPostHandler(new MongoDataAccess())));
+        path("/sequences", () -> {
+            get("", (request, response) -> {
+                response.status(501);
+                return "";
+            });
+            post("", new SequencesPostHandler(new NullarborClient(options.genomeToolUrl), new MongoDataAccess()));
+            post("/trimmed", (new TrimmedSequencesPostHandler(new MongoDataAccess())));
+        });
     }
 
     private static void printHelp() {

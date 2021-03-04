@@ -47,14 +47,14 @@ public class MongoDB implements Database {
     }
 
     @Override
-    public void delete(String collectionName, String field, String value) {
-        MongoCollection<Document> collection = database.getCollection(collectionName);
-        collection.deleteOne(eq(field, value));
-    }
-
-    @Override
     public void insertFakeSequence(String token) {
         MongoCollection<Document> collection = database.getCollection("sequences");
         collection.insertOne(new Document("genomeToolToken", token));
+    }
+
+    @Override
+    public void empty(String collectionName) {
+        MongoCollection<Document> collection = database.getCollection(collectionName);
+        collection.deleteMany(new Document());
     }
 }

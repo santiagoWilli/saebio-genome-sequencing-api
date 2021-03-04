@@ -6,6 +6,7 @@ import static io.restassured.RestAssured.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -125,7 +126,6 @@ public class Sequences_ {
 
         Map<String, Object> sequence = db.get("sequences", "genomeToolToken", token);
         assertThat(sequence.get("trimmedPair")).isEqualTo(false);
-        db.delete("sequences", "genomeToolToken", token);
     }
 
     @Test
@@ -167,7 +167,18 @@ public class Sequences_ {
         ArrayList<Map<String, String>> trimmedPair = (ArrayList<Map<String, String>>) sequence.get("trimmedPair");
         assertThat(trimmedPair.size()).isEqualTo(2);
         for (Map<String, String> trimmedFile : trimmedPair) assertThat(trimmedFile.containsKey("$oid"));
-        db.delete("sequences", "genomeToolToken", token);
+    }
+
+
+    @Test
+    public void when_getToSequences_then_returnAJsonOfAllSequences() throws IOException {
+        int amount = 5;
+        insertFakeSequences(amount);
+
+        when().
+                get("/sequences").
+        then().
+                statusCode(200);
     }
 
     @BeforeAll
@@ -216,6 +227,11 @@ public class Sequences_ {
         process.start();
     }
 
+    @AfterEach
+    public void cleanDatabase() {
+        db.empty("sequences");
+    }
+
     @BeforeEach
     public void startWireMockServer() {
         mockServer = new WireMockServer(options()
@@ -243,5 +259,9 @@ public class Sequences_ {
 
     private String token() {
         return UUID.randomUUID().toString();
+    }
+
+    private void insertFakeSequences(int amount) {
+        for (int i = 0; i < amount; i++) db.insertFakeSequence(token());
     }
 }
