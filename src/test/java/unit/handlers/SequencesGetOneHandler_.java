@@ -28,8 +28,14 @@ public class SequencesGetOneHandler_ {
     }
 
     @Test
-    public void ifSequenceNotFount_returnHttpNotFound() {
+    public void ifSequenceNotFound_returnHttpNotFound() {
         when(dataAccess.getSequence(PARAMS.get("id"))).thenReturn("");
         assertThat(handler.process(new EmptyPayload(), PARAMS)).isEqualTo(Answer.notFound());
+    }
+
+    @Test
+    public void ifSequenceFound_returnHttpOk_and_sequenceJson() {
+        when(dataAccess.getSequence(PARAMS.get("id"))).thenReturn("abc");
+        assertThat(handler.process(new EmptyPayload(), PARAMS)).isEqualTo(new Answer(200, "abc"));
     }
 }

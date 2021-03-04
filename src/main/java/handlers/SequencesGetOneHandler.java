@@ -16,6 +16,8 @@ public class SequencesGetOneHandler extends AbstractHandler<EmptyPayload> {
 
     @Override
     protected Answer processRequest(EmptyPayload payload, Map<String, String> requestParams) {
-        return Answer.notFound();
+        String sequenceJson = dataAccess.getSequence(requestParams.get("id"));
+        if (sequenceJson.isEmpty()) return Answer.notFound();
+        return new Answer(200, sequenceJson);
     }
 }
