@@ -9,23 +9,38 @@ import handlers.TrimmedSequencesPostHandler;
 import utils.Arguments;
 
 public class Application {
+    private static JCommander jCommander;
     public static void main(String[] args) {
         Arguments options = new Arguments();
-        JCommander.newBuilder()
+        jCommander = JCommander.newBuilder()
                 .addObject(options)
-                .build()
-                .parse(args);
+                .build();
+        jCommander.parse(args);
+
+        if (options.help) printHelp();
+        if (options.genomeToolUrl == null) abnormalExit();
+
         port(options.port);
         Database.setPort(options.dbPort);
         Database.setDatabaseName(options.database);
-        final String externalApiUri = options.database.contains("test") ?
-                "http://localhost:7717" :
-                "";
 
         get("/alive", (request, response) -> "I am alive!");
 
-        post("/sequences", new SequencesPostHandler(new NullarborClient(externalApiUri), new MongoDataAccess()));
+        post("/sequences", new SequencesPostHandler(new NullarborClient(options.genomeToolUrl), new MongoDataAccess()));
 
         post("/sequences/trimmed", (new TrimmedSequencesPostHandler(new MongoDataAccess())));
+    }
+
+    private static void printHelp() {
+        jCommander.usage();
+        stop();
+        System.exit(0);
+    }
+
+    private static void abnormalExit() {
+        System.out.println("Debes proporcionar el dominio de la herramienta de secuenciación del genoma.\n" +
+                " --help para obtener ayuda.");
+        stop();
+        System.exit(1);
     }
 }

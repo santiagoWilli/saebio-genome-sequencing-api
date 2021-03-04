@@ -20,6 +20,7 @@ import java.util.*;
 public class Sequences_ {
     private static final int PORT = 5678;
     private static final int DB_PORT = 7017;
+    private static final int WIREMOCK_PORT = 7717;
     private static final String testFolderPath = "test/resources/sequences/";
     private static Database db;
     private WireMockServer mockServer;
@@ -175,7 +176,8 @@ public class Sequences_ {
         ProcessBuilder process = new ProcessBuilder(
                 "test/start_application.sh",
                 String.valueOf(PORT),
-                String.valueOf(DB_PORT));
+                String.valueOf(DB_PORT),
+                "http://localhost:" + String.valueOf(WIREMOCK_PORT));
         process.start();
 
         int attemptsLeft = 10;
@@ -217,7 +219,7 @@ public class Sequences_ {
     @BeforeEach
     public void startWireMockServer() {
         mockServer = new WireMockServer(options()
-                .port(7717));
+                .port(WIREMOCK_PORT));
         mockServer.start();
         configureFor(mockServer.port());
     }
