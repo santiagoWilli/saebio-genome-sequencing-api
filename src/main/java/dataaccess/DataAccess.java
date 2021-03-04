@@ -10,4 +10,5 @@ public interface DataAccess {
     UploadCode uploadTrimmedFile(TrimRequestResult trimResult) throws IOException;
     boolean setSequenceTrimToFalse(String token);
     String getAllSequences();
+    String getSequence(String id);
 }
