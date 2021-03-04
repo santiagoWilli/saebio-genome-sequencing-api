@@ -1,8 +1,6 @@
 package dataaccess;
 
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
-import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.*;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
 import org.bson.Document;
@@ -13,9 +11,7 @@ import payloads.TrimRequestResult;
 import javax.servlet.http.Part;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,6 +80,13 @@ public class MongoDataAccess implements DataAccess {
             }
         }
         return "[" + String.join(", ", files) + "]";
+    }
+
+    @Override
+    public String getSequence(String id) {
+        MongoCollection<Document> collection = database.getCollection("sequences");
+        final Document sequence = collection.find(eq("_id", new ObjectId(id))).first();
+        return sequence == null ? "" : sequence.toJson();
     }
 
     private static String formatDate(LocalDate date) {

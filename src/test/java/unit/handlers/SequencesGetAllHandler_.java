@@ -10,12 +10,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class SequencesGetHandler_ {
+public class SequencesGetAllHandler_ {
     @Test
     public void alwaysReturnHttp200() {
         final DataAccess dataAccess = mock(DataAccess.class);
         when(dataAccess.getAllSequences()).thenReturn("abc");
-        assertThat(new SequencesGetAllHandler(dataAccess).process(new EmptyPayload()))
+        assertThat(new SequencesGetAllHandler(dataAccess).process(new EmptyPayload(), null))
                 .isEqualTo(new Answer(200, "abc"));
     }
 }

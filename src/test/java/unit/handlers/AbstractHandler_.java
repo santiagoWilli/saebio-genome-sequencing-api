@@ -5,6 +5,8 @@ import utils.Answer;
 import org.junit.jupiter.api.Test;
 import payloads.Validable;
 
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class AbstractHandler_ {
@@ -13,10 +15,10 @@ public class AbstractHandler_ {
         Validable payload = () -> false;
         AbstractHandler<Validable> handler = new AbstractHandler<>(Validable.class) {
             @Override
-            protected Answer processRequest(Validable payload) {
+            protected Answer processRequest(Validable payload, Map<String, String> requestParams) {
                 return null;
             }
         };
-        assertThat(handler.process(payload)).isEqualTo(Answer.badRequest("Cuerpo de la petición no válido"));
+        assertThat(handler.process(payload, null)).isEqualTo(Answer.badRequest("Cuerpo de la petición no válido"));
     }
 }

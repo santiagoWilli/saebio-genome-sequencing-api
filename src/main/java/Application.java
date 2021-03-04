@@ -4,9 +4,7 @@ import static spark.Spark.*;
 import dataaccess.Database;
 import dataaccess.MongoDataAccess;
 import genome.NullarborClient;
-import handlers.SequencesGetAllHandler;
-import handlers.SequencesPostHandler;
-import handlers.TrimmedSequencesPostHandler;
+import handlers.*;
 import utils.Arguments;
 
 public class Application {
@@ -29,6 +27,7 @@ public class Application {
 
         path("/sequences", () -> {
             get("", new SequencesGetAllHandler(new MongoDataAccess()));
+            get("/:id", new SequencesGetOneHandler(new MongoDataAccess()));
             post("", new SequencesPostHandler(new NullarborClient(options.genomeToolUrl), new MongoDataAccess()));
             post("/trimmed", (new TrimmedSequencesPostHandler(new MongoDataAccess())));
         });

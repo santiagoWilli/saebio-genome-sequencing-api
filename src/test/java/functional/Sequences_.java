@@ -6,7 +6,7 @@ import static io.restassured.RestAssured.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -47,15 +47,15 @@ public class Sequences_ {
                         .withBody("{\"token\":\"" + token + "\"}")));
 
         String response =
-        given().
-                multiPart("file1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
-                multiPart("file2", new File(testFolderPath + "Kp1_231120_R2.fastq.gz")).
-        when().
-                post("/sequences").
-        then().
-                statusCode(202).
-                extract().
-                asString();
+            given().
+                    multiPart("file1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
+                    multiPart("file2", new File(testFolderPath + "Kp1_231120_R2.fastq.gz")).
+            when().
+                    post("/sequences").
+            then().
+                    statusCode(202).
+                    extract().
+                    asString();
 
         verify(exactly(1), postRequestedFor(urlEqualTo("/trim")));
 
@@ -169,7 +169,6 @@ public class Sequences_ {
         for (Map<String, String> trimmedFile : trimmedPair) assertThat(trimmedFile.containsKey("$oid"));
     }
 
-
     @Test
     public void when_getToSequences_then_returnAJsonOfAllSequences() throws IOException {
         int amount = 5;
@@ -184,6 +183,27 @@ public class Sequences_ {
 
         List<Object> sequences = Arrays.asList(new ObjectMapper().readValue(response, Object[].class));
         assertThat(sequences.size()).isEqualTo(amount);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void when_getToSequencesId_then_returnSequenceWithGivenIdAsJson () throws IOException {
+        String token = token();
+        db.insertFakeSequence(token);
+        Map<String, Object> sequence = db.get("sequences", "genomeToolToken", token);
+        String id = ((Map<String, String>) sequence.get("_id")).get("$oid");
+
+        String response =
+                when().
+                        get("/sequences/" + id).
+                then().
+                        statusCode(200).
+                        extract().asString();
+
+        Map<String, Object> sequenceJson = new ObjectMapper().readValue(response, new TypeReference<HashMap<String,Object>>(){});
+        assertThat(((Map<String, String>) sequenceJson.get("_id")).get("$oid"))
+                .isEqualTo(id);
+        assertThat(sequenceJson.get("genomeToolToken")).isEqualTo(token);
     }
 
     @BeforeAll

@@ -32,14 +32,14 @@ public class SequencesPostHandler_ {
     @Test
     public void serviceUnavailable_if_genomeToolAnswerIsApiDown() {
         when(toolAnswer.getStatus()).thenReturn(GenomeToolAnswer.Status.API_DOWN);
-        assertThat(handler.process(sequence)).isEqualTo(Answer.serviceUnavailable("Genome reporter tool is down"));
+        assertThat(handler.process(sequence, null)).isEqualTo(Answer.serviceUnavailable("Genome reporter tool is down"));
         verifyNoInteractions(dataAccess);
     }
 
     @Test
     public void badGateway_if_genomeToolAnswerIsServerError() {
         when(toolAnswer.getStatus()).thenReturn(GenomeToolAnswer.Status.SERVER_ERROR);
-        assertThat(handler.process(sequence)).isEqualTo(Answer.badGateway("Genome reporter tool encountered an internal error"));
+        assertThat(handler.process(sequence, null)).isEqualTo(Answer.badGateway("Genome reporter tool encountered an internal error"));
         verifyNoInteractions(dataAccess);
     }
 
@@ -50,7 +50,7 @@ public class SequencesPostHandler_ {
         when(toolAnswer.getStatus()).thenReturn(GenomeToolAnswer.Status.OK);
         when(toolAnswer.getMessage()).thenReturn(token);
         when(dataAccess.createSequence(sequence, token)).thenReturn(id);
-        assertThat(handler.process(sequence)).isEqualTo(new Answer(202, acceptedBodyJson(id)));
+        assertThat(handler.process(sequence, null)).isEqualTo(new Answer(202, acceptedBodyJson(id)));
         verify(dataAccess, times(1)).createSequence(sequence, token);
     }
 
@@ -59,7 +59,7 @@ public class SequencesPostHandler_ {
         String exception = "Error";
         when(toolAnswer.getStatus()).thenReturn(GenomeToolAnswer.Status.EXCEPTION_ENCOUNTERED);
         when(toolAnswer.getMessage()).thenReturn(exception);
-        assertThat(handler.process(sequence)).isEqualTo(Answer.serverError(exception));
+        assertThat(handler.process(sequence, null)).isEqualTo(Answer.serverError(exception));
         verifyNoInteractions(dataAccess);
     }
 

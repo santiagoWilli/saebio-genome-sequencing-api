@@ -6,6 +6,8 @@ import genome.GenomeToolAnswer;
 import payloads.Sequence;
 import utils.Answer;
 
+import java.util.Map;
+
 public class SequencesPostHandler extends AbstractHandler<Sequence> {
     private final GenomeTool genomeTool;
     private final DataAccess dataAccess;
@@ -17,7 +19,7 @@ public class SequencesPostHandler extends AbstractHandler<Sequence> {
     }
 
     @Override
-    protected Answer processRequest(Sequence sequence) {
+    protected Answer processRequest(Sequence sequence, Map<String, String> requestParams) {
         GenomeToolAnswer toolAnswer = genomeTool.requestTrim(sequence);
         return switch (toolAnswer.getStatus()) {
             case OK -> new Answer(202, jsonOf(dataAccess.createSequence(sequence, toolAnswer.getMessage())));

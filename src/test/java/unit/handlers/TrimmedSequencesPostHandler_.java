@@ -19,7 +19,7 @@ public class TrimmedSequencesPostHandler_ {
     private DataAccess dataAccess;
 
     @BeforeEach
-    public void setUp() throws IOException {
+    public void setUp() {
         trimResult = mock(TrimRequestResult.class);
         when(trimResult.isValid()).thenReturn(true);
         dataAccess = mock(DataAccess.class);
@@ -30,19 +30,19 @@ public class TrimmedSequencesPostHandler_ {
     @Test
     public void if_sequenceDoesNotExists_return_httpNotFound() throws IOException {
         when(dataAccess.uploadTrimmedFile(trimResult)).thenReturn(UploadCode.NOT_FOUND);
-        assertThat(handler.process(trimResult)).isEqualTo(new Answer(404, notFoundJson(trimResult.getSequenceToken())));
+        assertThat(handler.process(trimResult, null)).isEqualTo(new Answer(404, notFoundJson(trimResult.getSequenceToken())));
     }
 
     @Test
     public void if_trimmedSequenceIsSuccessfullyUploaded_return_httpOk() throws IOException {
         when(dataAccess.uploadTrimmedFile(trimResult)).thenReturn(UploadCode.OK);
-        assertThat(handler.process(trimResult)).isEqualTo(new Answer(200, okJson()));
+        assertThat(handler.process(trimResult, null)).isEqualTo(new Answer(200, okJson()));
     }
 
     @Test
     public void if_writeExceptionWhenUploadingTheTrimmedSequence_return_httpServerError() throws IOException {
         when(dataAccess.uploadTrimmedFile(trimResult)).thenReturn(UploadCode.WRITE_FAILED);
-        assertThat(handler.process(trimResult)).isEqualTo(new Answer(500, errorJson()));
+        assertThat(handler.process(trimResult, null)).isEqualTo(new Answer(500, errorJson()));
     }
 
     private String notFoundJson(String token) {
