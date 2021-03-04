@@ -9,4 +9,5 @@ public interface DataAccess {
     String createSequence(Sequence sequence, String genomeToolToken);
     UploadCode uploadTrimmedFile(TrimRequestResult trimResult) throws IOException;
     boolean setSequenceTrimToFalse(String token);
+    String getAllSequences();
 }
