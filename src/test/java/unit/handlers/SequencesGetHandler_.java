@@ -1,7 +1,7 @@
 package unit.handlers;
 
 import dataaccess.DataAccess;
-import handlers.SequencesGetHandler;
+import handlers.SequencesGetAllHandler;
 import org.junit.jupiter.api.Test;
 import payloads.EmptyPayload;
 import utils.Answer;
@@ -15,7 +15,7 @@ public class SequencesGetHandler_ {
     public void alwaysReturnHttp200() {
         final DataAccess dataAccess = mock(DataAccess.class);
         when(dataAccess.getAllSequences()).thenReturn("abc");
-        assertThat(new SequencesGetHandler(dataAccess).process(new EmptyPayload()))
+        assertThat(new SequencesGetAllHandler(dataAccess).process(new EmptyPayload()))
                 .isEqualTo(new Answer(200, "abc"));
     }
 }

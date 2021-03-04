@@ -1,6 +1,7 @@
 package dataaccess;
 
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
@@ -42,7 +43,7 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
-    public UploadCode uploadTrimmedFile(TrimRequestResult trimResult) throws IOException {
+    public UploadCode uploadTrimmedFile(TrimRequestResult trimResult) {
         MongoCollection<Document> collection = database.getCollection("sequences");
         if (collection.countDocuments(eq("genomeToolToken", trimResult.getSequenceToken())) < 1) {
             return UploadCode.NOT_FOUND;
@@ -71,6 +72,18 @@ public class MongoDataAccess implements DataAccess {
         if (collection.countDocuments(eq("genomeToolToken", token)) < 1) return false;
         collection.updateOne(eq("genomeToolToken", token), set("trimmedPair", false));
         return true;
+    }
+
+    @Override
+    public String getAllSequences() {
+        MongoCollection<Document> collection = database.getCollection("sequences");
+        List<String> files = new ArrayList<>();
+        try (MongoCursor<Document> cursor = collection.find().iterator()) {
+            while (cursor.hasNext()) {
+                files.add(cursor.next().toJson());
+            }
+        }
+        return "[" + String.join(", ", files) + "]";
     }
 
     private static String formatDate(LocalDate date) {

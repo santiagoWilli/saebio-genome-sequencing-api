@@ -4,6 +4,7 @@ import static spark.Spark.*;
 import dataaccess.Database;
 import dataaccess.MongoDataAccess;
 import genome.NullarborClient;
+import handlers.SequencesGetAllHandler;
 import handlers.SequencesPostHandler;
 import handlers.TrimmedSequencesPostHandler;
 import utils.Arguments;
@@ -27,10 +28,7 @@ public class Application {
         get("/alive", (request, response) -> "I am alive!");
 
         path("/sequences", () -> {
-            get("", (request, response) -> {
-                response.status(501);
-                return "";
-            });
+            get("", new SequencesGetAllHandler(new MongoDataAccess()));
             post("", new SequencesPostHandler(new NullarborClient(options.genomeToolUrl), new MongoDataAccess()));
             post("/trimmed", (new TrimmedSequencesPostHandler(new MongoDataAccess())));
         });

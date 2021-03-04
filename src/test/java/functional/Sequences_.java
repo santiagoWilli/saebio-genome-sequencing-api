@@ -175,10 +175,15 @@ public class Sequences_ {
         int amount = 5;
         insertFakeSequences(amount);
 
-        when().
-                get("/sequences").
-        then().
-                statusCode(200);
+        String response =
+            when().
+                    get("/sequences").
+            then().
+                    statusCode(200).
+                    extract().asString();
+
+        List<Object> sequences = Arrays.asList(new ObjectMapper().readValue(response, Object[].class));
+        assertThat(sequences.size()).isEqualTo(amount);
     }
 
     @BeforeAll
@@ -188,7 +193,7 @@ public class Sequences_ {
                 "test/start_application.sh",
                 String.valueOf(PORT),
                 String.valueOf(DB_PORT),
-                "http://localhost:" + String.valueOf(WIREMOCK_PORT));
+                "http://localhost:" + WIREMOCK_PORT);
         process.start();
 
         int attemptsLeft = 10;
