@@ -27,6 +27,10 @@ public class Answer {
         return new Answer(500, errorJson(message));
     }
 
+    public static Answer notFound() {
+        return new Answer(404, "The specified resource could not be found");
+    }
+
     public int getCode() {
         return code;
     }

@@ -27,4 +27,9 @@ public class Answer_ {
         assertThat(Answer.badGateway(message).getCode()).isEqualTo(502);
         assertThat(Answer.badGateway(message).getBody()).isEqualTo("{\"message\":\"" + message + "\"}");
     }
+
+    @Test
+    public void notFount_returns_code404() {
+        assertThat(Answer.notFound().getCode()).isEqualTo(404);
+    }
 }
