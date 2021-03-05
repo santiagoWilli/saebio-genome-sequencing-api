@@ -21,12 +21,18 @@ public class SequencesPostHandler extends AbstractHandler<Sequence> {
     @Override
     protected Answer processRequest(Sequence sequence, Map<String, String> requestParams) {
         GenomeToolAnswer toolAnswer = genomeTool.requestTrim(sequence);
-        return switch (toolAnswer.getStatus()) {
-            case OK -> new Answer(202, jsonOf(dataAccess.createSequence(sequence, toolAnswer.getMessage())));
-            case API_DOWN -> Answer.serviceUnavailable("Genome reporter tool is down");
-            case SERVER_ERROR -> Answer.badGateway("Genome reporter tool encountered an internal error");
-            case EXCEPTION_ENCOUNTERED -> Answer.serverError(toolAnswer.getMessage());
-        };
+        switch (toolAnswer.getStatus()) {
+            case OK:
+                return new Answer(202, jsonOf(dataAccess.createSequence(sequence, toolAnswer.getMessage())));
+            case API_DOWN:
+                return Answer.serviceUnavailable("Genome reporter tool is down");
+            case SERVER_ERROR:
+                return Answer.badGateway("Genome reporter tool encountered an internal error");
+            case EXCEPTION_ENCOUNTERED:
+                return Answer.serverError(toolAnswer.getMessage());
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     private static String jsonOf(String id) {

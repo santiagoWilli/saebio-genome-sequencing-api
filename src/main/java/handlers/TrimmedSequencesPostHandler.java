@@ -24,11 +24,16 @@ public class TrimmedSequencesPostHandler extends AbstractHandler<TrimRequestResu
             return new Answer(404, "Could not find the sequence with the given token");
         }
         try {
-            return switch (dataAccess.uploadTrimmedFile(result)) {
-                case OK -> new Answer(200, okJson());
-                case NOT_FOUND -> new Answer(404, errorJson("Could not find the sequence with the given token"));
-                case WRITE_FAILED -> new Answer(500, errorJson("The upload encountered a fatal error"));
-            };
+            switch (dataAccess.uploadTrimmedFile(result)) {
+                case OK:
+                    return new Answer(200, okJson());
+                case NOT_FOUND:
+                    return new Answer(404, errorJson("Could not find the sequence with the given token"));
+                case WRITE_FAILED:
+                    return new Answer(500, errorJson("The upload encountered a fatal error"));
+                default:
+                    throw new IllegalArgumentException();
+            }
         } catch (IOException e) {
             return new Answer(500, e.getMessage());
         }
