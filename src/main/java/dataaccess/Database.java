@@ -9,6 +9,7 @@ import com.mongodb.client.MongoDatabase;
 import java.util.List;
 
 public class Database {
+    private static String host;
     private static String databaseName;
     private static int port;
 
@@ -16,7 +17,7 @@ public class Database {
         public static MongoClient client = MongoClients.create(
                 MongoClientSettings.builder()
                         .applyToClusterSettings(builder ->
-                                builder.hosts(List.of(new ServerAddress("localhost", port))))
+                                builder.hosts(List.of(new ServerAddress(host, port))))
                         .build());
     }
 
@@ -32,5 +33,9 @@ public class Database {
 
     public static void setDatabaseName(String databaseName) {
         Database.databaseName = databaseName;
+    }
+
+    public static void setHost(String hostName) {
+        Database.host = hostName;
     }
 }

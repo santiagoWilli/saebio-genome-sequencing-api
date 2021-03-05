@@ -22,6 +22,7 @@ public class Application {
         port(options.port);
         Database.setPort(options.dbPort);
         Database.setDatabaseName(options.database);
+        Database.setHost(options.dbHost);
 
         get("/alive", (request, response) -> "I am alive!");
 
