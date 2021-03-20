@@ -31,8 +31,6 @@ public abstract class AbstractHandler<V extends Validable> implements RequestHan
 
     @Override
     public Object handle(Request request, Response response) throws Exception {
-        request.params();
-
         request.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
         V payload = null;
         if (payloadClass != EmptyPayload.class) {
