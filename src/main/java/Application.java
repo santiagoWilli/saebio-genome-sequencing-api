@@ -24,13 +24,15 @@ public class Application {
         Database.setDatabaseName(options.database);
         Database.setHost(options.dbHost);
 
-        get("/alive", (request, response) -> "I am alive!");
+        path("/api", () -> {
+            get("/alive", (request, response) -> "I am alive!");
 
-        path("/sequences", () -> {
-            get("", new SequencesGetAllHandler(new MongoDataAccess()));
-            get("/:id", new SequencesGetOneHandler(new MongoDataAccess()));
-            post("", new SequencesPostHandler(new NullarborClient(options.genomeToolUrl), new MongoDataAccess()));
-            post("/trimmed", (new TrimmedSequencesPostHandler(new MongoDataAccess())));
+            path("/sequences", () -> {
+                get("", new SequencesGetAllHandler(new MongoDataAccess()));
+                get("/:id", new SequencesGetOneHandler(new MongoDataAccess()));
+                post("", new SequencesPostHandler(new NullarborClient(options.genomeToolUrl), new MongoDataAccess()));
+                post("/trimmed", (new TrimmedSequencesPostHandler(new MongoDataAccess())));
+            });
         });
     }
 
