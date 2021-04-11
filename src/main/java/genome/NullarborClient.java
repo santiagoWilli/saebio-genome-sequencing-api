@@ -5,7 +5,7 @@ import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
 import payloads.Sequence;
 
-import javax.servlet.http.Part;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -18,13 +18,14 @@ public class NullarborClient implements GenomeTool {
 
     @Override
     public GenomeToolAnswer requestTrim(Sequence sequence) {
-        Part[] parts = new Part[2]; int i = 0;
-        for (Part part : sequence.getParts()) parts[i++] = part;
+        String[] fileNames = new String[2]; int i = 0;
+        for (String fileName : sequence.getFiles().keySet()) fileNames[i++] = fileName;
 
-        try (InputStream inputStream1 = parts[0].getInputStream(); InputStream inputStream2 = parts[1].getInputStream()) {
+        try (InputStream inputStream1 = new FileInputStream(sequence.getFiles().get(fileNames[0]));
+             InputStream inputStream2 = new FileInputStream(sequence.getFiles().get(fileNames[1]))) {
             HttpResponse<JsonNode> response = Unirest.post(endpoint + "/trim")
-                    .field("pair1", inputStream1, parts[0].getSubmittedFileName())
-                    .field("pair2", inputStream2, parts[1].getSubmittedFileName())
+                    .field("pair1", inputStream1, fileNames[0])
+                    .field("pair2", inputStream2, fileNames[1])
                     .asJson();
             if (response.getStatus() == 202) {
                 return new GenomeToolAnswer(

@@ -3,16 +3,11 @@ package unit.payloads;
 import org.junit.jupiter.api.Test;
 import payloads.Sequence;
 
-import javax.servlet.http.Part;
 import java.io.File;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.*;
 
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.*;
 
 public class Sequence_ {
@@ -35,25 +30,25 @@ public class Sequence_ {
             {"Kp1_231120_R1.fq.gz", "Kp3_231120_R2.fq.gz"}};
 
     @Test
-    public void invalid_if_notTwoParts() {
-        Part part = mock(Part.class);
-        Collection<Part> partCollection = new ArrayList<>();
-        partCollection.add(part);
-        Sequence sequence = new Sequence(partCollection);
+    public void invalid_if_notTwoFiles() {
+        File file = mock(File.class);
+        Map<String, File> fileMap = new HashMap<>();
+        fileMap.put("1", file);
+        Sequence sequence = new Sequence(null, fileMap);
         assertThat(sequence.isValid()).isEqualTo(false);
 
-        for (int i = 0; i < 2; i++) partCollection.add(part);
-        sequence = new Sequence(partCollection);
+        for (int i = 0; i < 2; i++) fileMap.put(Integer.toString(i+2), file);
+        sequence = new Sequence(null, fileMap);
         assertThat(sequence.isValid()).isEqualTo(false);
     }
 
     @Test
-    public void valid_if_partFilenamesAreCorrect() {
+    public void valid_if_fileNamesAreCorrect() {
         iterateThroughPairs(VALID_PAIRS, true);
     }
 
     @Test
-    public void invalid_if_partFilenamesAreIncorrect() {
+    public void invalid_if_fileNamesAreIncorrect() {
         iterateThroughPairs(INVALID_PAIRS, false);
     }
 
@@ -69,7 +64,7 @@ public class Sequence_ {
     }
 
     @Test
-    public void getDate_shouldReturn_aDateBasedOnPairFilenames() {
+    public void getDate_shouldReturn_aDateBasedOnPairFileNames() {
         Sequence sequence = getSequenceFrom(VALID_PAIRS[0]);
         assertThat(sequence.getDate()).isEqualTo(LocalDate.of(2020, 11, 23));
     }
@@ -83,7 +78,7 @@ public class Sequence_ {
     @Test
     public void getOriginalFilenames_shouldReturn_pairFilenames() {
         Sequence sequence = getSequenceFrom(VALID_PAIRS[0]);
-        assertThat(sequence.getOriginalFilenames()).isEqualTo(Arrays.asList("Kp1_231120_R1.fastq.gz", "Kp1_231120_R2.fastq.gz"));
+        assertThat(sequence.getOriginalFileNames()).isEqualTo(Arrays.asList("Kp1_231120_R1.fastq.gz", "Kp1_231120_R2.fastq.gz"));
     }
 
     private static void iterateThroughPairs(String[][] pairs, boolean expected) {
@@ -94,12 +89,11 @@ public class Sequence_ {
     }
 
     private static Sequence getSequenceFrom(String[] pair) {
-        Collection<Part> partCollection = new ArrayList<>();
-        for (String filename : pair) {
-            Part part = mock(Part.class);
-            when(part.getSubmittedFileName()).thenReturn(filename);
-            partCollection.add(part);
+        Map<String, File> fileMap = new HashMap<>();
+        for (String fileName : pair) {
+            File file = mock(File.class);
+            fileMap.put(fileName, file);
         }
-        return new Sequence(partCollection);
+        return new Sequence(null, fileMap);
     }
 }

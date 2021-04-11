@@ -6,8 +6,6 @@ import genome.NullarborClient;
 import org.junit.jupiter.api.*;
 import payloads.Sequence;
 
-import javax.servlet.http.Part;
-
 import java.io.*;
 import java.util.*;
 
@@ -19,24 +17,12 @@ import static org.mockito.Mockito.*;
 public class NullarborClient_ {
     private WireMockServer mockServer;
     private Sequence sequence;
-    private Collection<Part> parts;
+    private Map<String, File> files;
     private NullarborClient client;
 
     @Test
-    public void exceptionBeforeApiCall_doesNotCallTheApi_and_returns_exceptionEncounteredCode() throws IOException {
-        for (int i = 0; i < 2; i++) {
-            Part part = mock(Part.class);
-            when(part.getInputStream()).thenThrow(IOException.class);
-            parts.add(part);
-        }
-
-        assertThat(client.requestTrim(sequence).getStatus()).isEqualTo(GenomeToolAnswer.Status.EXCEPTION_ENCOUNTERED);
-        verify(exactly(0), postRequestedFor(urlEqualTo("/trim")));
-    }
-
-    @Test
-    public void httpNotFound_returns_apiDownCode() throws IOException {
-        mockCollectionOfParts();
+    public void httpNotFound_returns_apiDownCode() {
+        mockFileMap();
 
         stubFor(post(urlEqualTo("/trim"))
                 .willReturn(aResponse()
@@ -46,8 +32,8 @@ public class NullarborClient_ {
     }
 
     @Test
-    public void httpInternalServerError_returns_externalApiErrorCode() throws IOException {
-        mockCollectionOfParts();
+    public void httpInternalServerError_returns_externalApiErrorCode() {
+        mockFileMap();
 
         stubFor(post(urlEqualTo("/trim"))
                 .willReturn(aResponse()
@@ -57,8 +43,8 @@ public class NullarborClient_ {
     }
 
     @Test
-    public void httpAccepted_returns_okCode_and_nullarborToken() throws IOException {
-        mockCollectionOfParts();
+    public void httpAccepted_returns_okCode_and_nullarborToken() {
+        mockFileMap();
         String token = "123e4567-e89b-12d3-a456-556642440000";
 
         stubFor(post(urlEqualTo("/trim"))
@@ -76,9 +62,9 @@ public class NullarborClient_ {
 
     @BeforeEach
     public void objectsSetUp() {
-        parts = new ArrayList<>();
+        files = new HashMap<>();
         sequence = mock(Sequence.class);
-        when(sequence.getParts()).thenReturn(parts);
+        when(sequence.getFiles()).thenReturn(files);
     }
 
     @BeforeEach
@@ -95,14 +81,11 @@ public class NullarborClient_ {
         mockServer.stop();
     }
 
-    private void mockCollectionOfParts() throws IOException {
-        for (int i = 0; i < 2; i++) addPartToCollectionOfParts();
+    private void mockFileMap() {
+        for (int i = 0; i < 2; i++) addMockedEntryToFileMap(i);
     }
 
-    private void addPartToCollectionOfParts() throws IOException {
-        InputStream inputStream = new FileInputStream("test/resources/sequences/Kpneu1_191120_R1.fastq.gz");
-        Part part = mock(Part.class);
-        when(part.getInputStream()).thenReturn(inputStream);
-        parts.add(part);
+    private void addMockedEntryToFileMap(int i) {
+        files.put(Integer.toString(i), new File("test/resources/sequences/Kpneu1_191120_R1.fastq.gz"));
     }
 }

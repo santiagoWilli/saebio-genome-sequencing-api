@@ -2,23 +2,23 @@ package payloads;
 
 import utils.StrainMap;
 
-import javax.servlet.http.Part;
+import java.io.File;
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Sequence extends Multipart implements Validable {
-    public Sequence(Collection<Part> parts) {
-        super(parts);
+    public Sequence(Map<String, String> fields, Map<String, File> files) {
+        super(fields, files);
     }
 
     public LocalDate getDate() {
-        FilenameDate filenameDate = new FilenameDate();
+        FileNameDate fileNameDate = new FileNameDate();
         return LocalDate.of(
-                Integer.parseInt("20" + filenameDate.year),
-                filenameDate.month,
-                filenameDate.day
+                Integer.parseInt("20" + fileNameDate.year),
+                fileNameDate.month,
+                fileNameDate.day
         );
     }
 
@@ -26,43 +26,43 @@ public class Sequence extends Multipart implements Validable {
         return StrainMap.get(strainKey());
     }
 
-    public List<String> getOriginalFilenames() {
-        return parts.stream().map(Part::getSubmittedFileName).sorted().collect(Collectors.toList());
+    public List<String> getOriginalFileNames() {
+        return files.keySet().stream().sorted().collect(Collectors.toList());
     }
 
     @Override
     public boolean isValid() {
-        if (parts.size() != 2) return false;
-        for (Part part : parts) {
-            if (!part.getSubmittedFileName().matches(filenameRegex())) return false;
+        if (files.size() != 2) return false;
+        for (String fileName : files.keySet()) {
+            if (!fileName.matches(fileNameRegex())) return false;
         }
-        return partFilesFormASequence();
+        return filesFormASequence();
     }
 
-    private boolean partFilesFormASequence() {
+    private boolean filesFormASequence() {
         int i = 0;
         String[][] pair = new String[2][];
-        for (Part part : parts) pair[i++] = getFilenameFieldsOf(part);
+        for (String fileName : files.keySet()) pair[i++] = getFileNameFieldsOf(fileName);
         if (!pair[0][0].equals(pair[1][0]) || !pair[0][1].equals(pair[1][1])) return false;
         return !pair[0][2].equals(pair[1][2]);
     }
 
-    private static String[] getFilenameFieldsOf(Part part) {
-        String[] nameFields = part.getSubmittedFileName().split("_");
+    private static String[] getFileNameFieldsOf(String name) {
+        String[] nameFields = name.split("_");
         nameFields[2] = nameFields[2].substring(0, nameFields[2].indexOf("."));
         return nameFields;
     }
 
-    private static String filenameRegex() {
+    private static String fileNameRegex() {
         return "[a-zA-Z]+[0-9]{0,4}_((0[1-9])|([1-2][1-9])|(3[0-1]))((0[1-9])|(1[0-2]))[0-9]{2}_R(1|2).(fq|fastq).gz";
     }
 
-    private final class FilenameDate {
+    private final class FileNameDate {
         final int day, month, year;
 
-        FilenameDate() {
-            String filename = parts.iterator().next().getSubmittedFileName();
-            String date = filename.split("_")[1];
+        FileNameDate() {
+            String fileName = files.keySet().iterator().next();
+            String date = fileName.split("_")[1];
             day = Integer.parseInt(date.substring(0, 2));
             month = Integer.parseInt(date.substring(2, 4));
             year = Integer.parseInt(date.substring(4, 6));
@@ -70,8 +70,7 @@ public class Sequence extends Multipart implements Validable {
     }
 
     private String strainKey() {
-        return parts.iterator().next()
-                .getSubmittedFileName()
+        return files.keySet().iterator().next()
                 .split("_")[0]
                 .split("[0-9]")[0]
                 .toLowerCase();

@@ -45,5 +45,6 @@ java/build/**
 /test/.app_pid
 /db/
 
+/temp/
 /log/
 /mvn-exe

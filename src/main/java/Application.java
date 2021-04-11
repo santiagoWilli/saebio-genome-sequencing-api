@@ -9,6 +9,7 @@ import utils.Arguments;
 
 public class Application {
     private static JCommander jCommander;
+
     public static void main(String[] args) {
         Arguments options = new Arguments();
         jCommander = JCommander.newBuilder()
@@ -34,6 +35,8 @@ public class Application {
                 post("/trimmed", (new TrimmedSequencesPostHandler(new MongoDataAccess())));
             });
         });
+
+        exception(Exception.class, (exception, request, response) -> exception.printStackTrace());
     }
 
     private static void printHelp() {

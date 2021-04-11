@@ -8,13 +8,15 @@ import org.bson.types.ObjectId;
 import payloads.Sequence;
 import payloads.TrimRequestResult;
 
-import javax.servlet.http.Part;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.*;
@@ -31,7 +33,7 @@ public class MongoDataAccess implements DataAccess {
         MongoCollection<Document> collection = database.getCollection("sequences");
         Document document = new Document("sequenceDate", formatDate(sequence.getDate()))
                 .append("strain", sequence.getStrain())
-                .append("originalFilenames", sequence.getOriginalFilenames())
+                .append("originalFilenames", sequence.getOriginalFileNames())
                 .append("genomeToolToken", genomeToolToken)
                 .append("trimRequestDate", formatDate(LocalDateTime.now(ZoneOffset.UTC)));
         collection.insertOne(document);
@@ -46,12 +48,11 @@ public class MongoDataAccess implements DataAccess {
         }
 
         GridFSBucket gridFSBucket = GridFSBuckets.create(database);
-        List<Part> fileParts = trimResult.getFileParts();
         List<ObjectId> trimmedIds = new ArrayList<>();
 
-        for (Part filePart : fileParts) {
-            try (InputStream stream = filePart.getInputStream()) {
-                ObjectId id = gridFSBucket.uploadFromStream(filePart.getSubmittedFileName(), stream);
+        for (Map.Entry<String, File> entry : trimResult.getFiles().entrySet()) {
+            try (InputStream stream = new FileInputStream(entry.getValue())) {
+                ObjectId id = gridFSBucket.uploadFromStream(entry.getKey(), stream);
                 trimmedIds.add(id);
             } catch (IOException e) {
                 e.getStackTrace();

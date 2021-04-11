@@ -1,16 +1,18 @@
 package payloads;
 
-import javax.servlet.http.Part;
-import java.util.Collection;
+import java.io.File;
+import java.util.Map;
 
 public abstract class Multipart {
-    protected final Collection<Part> parts;
+    protected final Map<String, String> fields;
+    protected final Map<String, File> files;
 
-    protected Multipart(Collection<Part> parts) {
-        this.parts = parts;
+    protected Multipart(Map<String, String> fields, Map<String, File> files) {
+        this.fields = fields;
+        this.files = files;
     }
 
-    public Collection<Part> getParts() {
-        return parts;
+    public Map<String, File> getFiles() {
+        return files;
     }
 }

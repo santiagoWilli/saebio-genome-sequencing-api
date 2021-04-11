@@ -31,7 +31,7 @@ public class Sequences_ {
         given().
                 multiPart("file1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
         when().
-                post("/sequences").
+                post("/api/sequences").
         then().
                 statusCode(400).
                 body("message", equalTo("Cuerpo de la petición no válido"));
@@ -51,7 +51,7 @@ public class Sequences_ {
                     multiPart("file1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
                     multiPart("file2", new File(testFolderPath + "Kp1_231120_R2.fastq.gz")).
             when().
-                    post("/sequences").
+                    post("/api/sequences").
             then().
                     statusCode(202).
                     extract().
@@ -79,7 +79,7 @@ public class Sequences_ {
                 multiPart("status", 5).
                 multiPart("message", "Internal error encountered.").
         when().
-                post("/sequences/trimmed").
+                post("/api/sequences/trimmed").
         then().
                 statusCode(400);
 
@@ -87,7 +87,7 @@ public class Sequences_ {
                 multiPart("status", 2).
                 multiPart("token", "123e4567-e89b-12d3-a456-556642440000").
         when().
-                post("/sequences/trimmed").
+                post("/api/sequences/trimmed").
         then().
                 statusCode(400);
 
@@ -96,7 +96,7 @@ public class Sequences_ {
                 multiPart("file1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
                 multiPart("file2", new File(testFolderPath + "Kp1_231120_R2.fastq.gz")).
         when().
-                post("/sequences/trimmed").
+                post("/api/sequences/trimmed").
         then().
                 statusCode(400);
 
@@ -105,7 +105,7 @@ public class Sequences_ {
                 multiPart("file1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
                 multiPart("file2", new File(testFolderPath + "Kp1_231120_R2.fastq.gz")).
         when().
-                post("/sequences/trimmed").
+                post("/api/sequences/trimmed").
         then().
                 statusCode(400);
     }
@@ -120,7 +120,7 @@ public class Sequences_ {
                 multiPart("message", "Internal error encountered.").
                 multiPart("token", token).
         when().
-                post("/sequences/trimmed").
+                post("/api/sequences/trimmed").
         then().
                 statusCode(200);
 
@@ -138,7 +138,7 @@ public class Sequences_ {
                 multiPart("file1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
                 multiPart("file2", new File(testFolderPath + "Kp1_231120_R2.fastq.gz")).
         when().
-                post("/sequences/trimmed").
+                post("/api/sequences/trimmed").
         then().
                 statusCode(404);
     }
@@ -155,7 +155,7 @@ public class Sequences_ {
                 multiPart("file1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
                 multiPart("file2", new File(testFolderPath + "Kp1_231120_R2.fastq.gz")).
         when().
-                post("/sequences/trimmed").
+                post("/api/sequences/trimmed").
         then().
                 statusCode(200);
 
@@ -176,7 +176,7 @@ public class Sequences_ {
 
         String response =
             when().
-                    get("/sequences").
+                    get("/api/sequences").
             then().
                     statusCode(200).
                     extract().asString();
@@ -195,7 +195,7 @@ public class Sequences_ {
 
         String response =
                 when().
-                        get("/sequences/" + id).
+                        get("/api/sequences/" + id).
                 then().
                         statusCode(200).
                         extract().asString();
@@ -233,7 +233,7 @@ public class Sequences_ {
 
     private static boolean theApplicationIsRunning() {
         try {
-            RestAssured.get("/alive");
+            RestAssured.get("/api/alive");
             return true;
         } catch (Exception e) {
             return false;
