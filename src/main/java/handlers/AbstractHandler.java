@@ -38,12 +38,13 @@ public abstract class AbstractHandler<V extends Validable> implements RequestHan
     @Override
     public Object handle(Request request, Response response) throws Exception {
         V payload = null;
+        String uuid = null;
         if (payloadClass != EmptyPayload.class) {
             request.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
             Map<String, String> fields = new HashMap<>();
             Map<String, File> files = new HashMap<>();
 
-            String uuid = UUID.randomUUID().toString();
+            uuid = UUID.randomUUID().toString();
             for (Part part : request.raw().getParts()) {
                 if (part.getName().matches("^file[1-2]$")) {
                     File file = new File("temp/" + uuid + "/" + part.getName());
@@ -62,6 +63,9 @@ public abstract class AbstractHandler<V extends Validable> implements RequestHan
         }
 
         Answer answer = process(payload, request.params());
+
+        if (payloadClass != EmptyPayload.class) FileUtils.deleteDirectory(new File("temp/" + uuid));
+
         response.status(answer.getCode());
         response.type("application/json");
         return answer.getBody();
