@@ -7,6 +7,10 @@ import genome.NullarborClient;
 import handlers.*;
 import utils.Arguments;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+
 public class Application {
     private static JCommander jCommander;
 
@@ -18,7 +22,12 @@ public class Application {
         jCommander.parse(args);
 
         if (options.help) printHelp();
-        if (options.genomeToolUrl == null) abnormalExit();
+        if (options.genomeToolUrl == null) abnormalExit("Debes proporcionar el dominio de la herramienta de secuenciación del genoma.");
+        try {
+            new URL(options.genomeToolUrl).toURI();
+        } catch (MalformedURLException | URISyntaxException e) {
+            abnormalExit("El dominio de la herramienta de secuenciación proporcionado no es válido.");
+        }
 
         port(options.port);
         Database.setPort(options.dbPort);
@@ -36,7 +45,7 @@ public class Application {
             });
         });
 
-        exception(Exception.class, (exception, request, response) -> exception.printStackTrace());
+        exception(Exception.class, (exception, request, response) -> System.out.println(" -ERROR: " + exception.getMessage()));
     }
 
     private static void printHelp() {
@@ -45,9 +54,8 @@ public class Application {
         System.exit(0);
     }
 
-    private static void abnormalExit() {
-        System.out.println("Debes proporcionar el dominio de la herramienta de secuenciación del genoma.\n" +
-                " --help para obtener ayuda.");
+    private static void abnormalExit(String message) {
+        System.out.println(message + "\n" + " --help para obtener ayuda.");
         stop();
         System.exit(1);
     }
