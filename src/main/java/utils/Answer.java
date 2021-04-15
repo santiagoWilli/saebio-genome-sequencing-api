@@ -1,14 +1,23 @@
 package utils;
 
+import java.io.InputStream;
 import java.util.Objects;
 
 public class Answer {
     private final int code;
     private final String body;
+    private final AnswerFile file;
 
     public Answer(int code, String body){
         this.code = code;
         this.body = body;
+        this.file = null;
+    }
+
+    private Answer(AnswerFile file) {
+        this.code = 200;
+        this.body = null;
+        this.file = file;
     }
 
     public static Answer badRequest(String message) {
@@ -31,12 +40,24 @@ public class Answer {
         return new Answer(404, "The specified resource could not be found");
     }
 
+    public static Answer withFile(InputStream file, String mimeType) {
+        return new Answer(new AnswerFile(file, mimeType));
+    }
+
     public int getCode() {
         return code;
     }
 
     public String getBody() {
         return body;
+    }
+
+    public AnswerFile getFile() {
+        return file;
+    }
+
+    public boolean hasFile() {
+        return file != null;
     }
 
     private static String errorJson(String message) {
