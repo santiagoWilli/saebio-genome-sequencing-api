@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 
 public class SequencesGetOneHandler_ {
     private static final Map<String, String> PARAMS = Map.ofEntries(
-            new AbstractMap.SimpleEntry<>("id", "1"));
+            new AbstractMap.SimpleEntry<>(":id", "1"));
 
     private SequencesGetOneHandler handler;
     private DataAccess dataAccess;
@@ -29,13 +29,13 @@ public class SequencesGetOneHandler_ {
 
     @Test
     public void ifSequenceNotFound_returnHttpNotFound() {
-        when(dataAccess.getSequence(PARAMS.get("id"))).thenReturn("");
+        when(dataAccess.getSequence(PARAMS.get(":id"))).thenReturn("");
         assertThat(handler.process(new EmptyPayload(), PARAMS)).isEqualTo(Answer.notFound());
     }
 
     @Test
     public void ifSequenceFound_returnHttpOk_and_sequenceJson() {
-        when(dataAccess.getSequence(PARAMS.get("id"))).thenReturn("abc");
+        when(dataAccess.getSequence(PARAMS.get(":id"))).thenReturn("abc");
         assertThat(handler.process(new EmptyPayload(), PARAMS)).isEqualTo(new Answer(200, "abc"));
     }
 }

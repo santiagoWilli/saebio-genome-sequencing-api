@@ -90,6 +90,17 @@ public class MongoDataAccess implements DataAccess {
         return sequence == null ? "" : sequence.toJson();
     }
 
+    @Override
+    public String getTrimmedFileName(String id) {
+        return null;
+    }
+
+    @Override
+    public InputStream getTrimmedFileStream(String id) {
+        return null;
+    }
+
+
     private static String formatDate(LocalDate date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return date.format(formatter);

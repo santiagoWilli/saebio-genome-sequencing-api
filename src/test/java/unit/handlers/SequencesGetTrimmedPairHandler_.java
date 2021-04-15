@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import payloads.EmptyPayload;
 import utils.Answer;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.AbstractMap;
 import java.util.Map;
 
@@ -16,7 +18,7 @@ import static org.mockito.Mockito.when;
 
 public class SequencesGetTrimmedPairHandler_ {
     private static final Map<String, String> PARAMS = Map.ofEntries(
-            new AbstractMap.SimpleEntry<>("id", "1"));
+            new AbstractMap.SimpleEntry<>(":id", "1"));
 
     private SequencesGetTrimmedPairHandler handler;
     private DataAccess dataAccess;
@@ -29,7 +31,23 @@ public class SequencesGetTrimmedPairHandler_ {
 
     @Test
     public void ifSequenceNotFound_returnHttpNotFound() {
-        when(dataAccess.getSequence(PARAMS.get("id"))).thenReturn("");
+        when(dataAccess.getSequence(PARAMS.get(":id"))).thenReturn("");
         assertThat(handler.process(new EmptyPayload(), PARAMS)).isEqualTo(Answer.notFound());
+    }
+
+    @Test
+    public void ifSequenceFound_and_hasItsTrimmedPair_returnHttpOk_and_file() throws FileNotFoundException {
+        String trimmedId1 = "6075d6a71a62381d13c70a6f";
+        String trimmedId2 = "6075d6aa1a62381d13c70c9b";
+        when(dataAccess.getSequence(PARAMS.get(":id"))).thenReturn("{\"_id\": {\"$oid\": \"1\"}, \"trimmedPair\": [{\"$oid\": \""+trimmedId1+"\"}, {\"$oid\": \""+trimmedId2+"\"}]}");
+        when(dataAccess.getTrimmedFileName(trimmedId1)).thenReturn("Kp1_R1_trimmed.fq.gz");
+        when(dataAccess.getTrimmedFileName(trimmedId2)).thenReturn("Kp1_R2_trimmed.fq.gz");
+        when(dataAccess.getTrimmedFileStream(trimmedId1)).thenReturn(new FileInputStream("test/resources/sequences/Kp1_231120_R1.fastq.gz"));
+        when(dataAccess.getTrimmedFileStream(trimmedId2)).thenReturn(new FileInputStream("test/resources/sequences/Kp1_231120_R1.fastq.gz"));
+
+        Answer answer = handler.process(new EmptyPayload(), PARAMS);
+        assertThat(answer.getCode()).isEqualTo(200);
+        assertThat(answer.hasFile()).isTrue();
+        assertThat(answer.getFile().getMimeType()).isEqualTo("application/zip");
     }
 }
