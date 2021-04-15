@@ -50,4 +50,14 @@ public class SequencesGetTrimmedPairHandler_ {
         assertThat(answer.hasFile()).isTrue();
         assertThat(answer.getFile().getMimeType()).isEqualTo("application/zip");
     }
+
+    @Test
+    public void ifSequenceFound_and_doesNotHaveItsTrimmedPairYet_returnHttpOk_and_notice() throws FileNotFoundException {
+        when(dataAccess.getSequence(PARAMS.get(":id"))).thenReturn("{\"_id\": {\"$oid\": \"1\"}}");
+
+        Answer answer = handler.process(new EmptyPayload(), PARAMS);
+        assertThat(answer.getCode()).isEqualTo(200);
+        assertThat(answer.hasFile()).isFalse();
+        assertThat(answer.getBody()).contains("The sequence does not have its trimmed pair yet");
+    }
 }
