@@ -52,12 +52,22 @@ public class SequencesGetTrimmedPairHandler_ {
     }
 
     @Test
-    public void ifSequenceFound_and_doesNotHaveItsTrimmedPairYet_returnHttpOk_and_notice() throws FileNotFoundException {
+    public void ifSequenceFound_and_doesNotHaveItsTrimmedPairYet_returnHttp210_and_notice() {
         when(dataAccess.getSequence(PARAMS.get(":id"))).thenReturn("{\"_id\": {\"$oid\": \"1\"}}");
 
         Answer answer = handler.process(new EmptyPayload(), PARAMS);
-        assertThat(answer.getCode()).isEqualTo(200);
+        assertThat(answer.getCode()).isEqualTo(210);
         assertThat(answer.hasFile()).isFalse();
         assertThat(answer.getBody()).contains("The sequence does not have its trimmed pair yet");
+    }
+
+    @Test
+    public void ifSequenceFound_and_trimmedPairIsSetToFalse_returnHttp211_and_notice() {
+        when(dataAccess.getSequence(PARAMS.get(":id"))).thenReturn("{\"_id\": {\"$oid\": \"1\"}, \"trimmedPair\": false}");
+
+        Answer answer = handler.process(new EmptyPayload(), PARAMS);
+        assertThat(answer.getCode()).isEqualTo(211);
+        assertThat(answer.hasFile()).isFalse();
+        assertThat(answer.getBody()).contains("The sequence does not have a trimmed pair due to an internal error");
     }
 }

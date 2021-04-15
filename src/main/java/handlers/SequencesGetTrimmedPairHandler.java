@@ -27,9 +27,12 @@ public class SequencesGetTrimmedPairHandler extends AbstractHandler<EmptyPayload
         Map<String, Object> sequence;
         try {
             sequence = new ObjectMapper().readValue(sequenceJson, new TypeReference<HashMap<String,Object>>(){});
+
+            if (sequence.get("trimmedPair") instanceof Boolean) return new Answer(211, "The sequence does not have a trimmed pair due to an internal error");
+
             ArrayList<Map<String, String>> trimmedPair = (ArrayList<Map<String, String>>) sequence.get("trimmedPair");
 
-            if (trimmedPair == null) return new Answer(200, "The sequence does not have its trimmed pair yet");
+            if (trimmedPair == null) return new Answer(210, "The sequence does not have its trimmed pair yet");
 
             File zipFile = new File("temp/trimmed" + UUID.randomUUID().toString() + ".zip");
             FileOutputStream fileOutputStream = new FileOutputStream(zipFile);
