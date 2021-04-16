@@ -11,12 +11,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import io.restassured.RestAssured;
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 public class Sequences_ {
     private static final int PORT = 5678;
@@ -112,7 +115,7 @@ public class Sequences_ {
 
     @Test
     public void given_anErrorMessage_when_postToSequencesTrimmed_then_setTrimmedPairFieldToFalse() throws IOException {
-        String token = token();
+        final String token = token();
         db.insertFakeSequence(token);
 
         given().
@@ -130,7 +133,7 @@ public class Sequences_ {
 
     @Test
     public void given_aSuccessfulStatus_and_tokenThatDoesNotExist_when_postToSequencesTrimmed_then_notFound() {
-        String token = token();
+        final String token = token();
 
         given().
                 multiPart("status", 2).
@@ -146,7 +149,7 @@ public class Sequences_ {
     @SuppressWarnings("unchecked")
     @Test
     public void given_aSuccessfulStatus_when_postToSequencesTrimmed_then_uploadTrimmedFiles_and_associateThemToItsSequence() throws IOException {
-        String token = token();
+        final String token = token();
         db.insertFakeSequence(token);
 
         given().
@@ -188,7 +191,7 @@ public class Sequences_ {
     @SuppressWarnings("unchecked")
     @Test
     public void when_getToSequencesId_then_returnSequenceWithGivenIdAsJson () throws IOException {
-        String token = token();
+        final String token = token();
         db.insertFakeSequence(token);
         Map<String, Object> sequence = db.get("sequences", "genomeToolToken", token);
         String id = ((Map<String, String>) sequence.get("_id")).get("$oid");
@@ -204,6 +207,44 @@ public class Sequences_ {
         assertThat(((Map<String, String>) sequenceJson.get("_id")).get("$oid"))
                 .isEqualTo(id);
         assertThat(sequenceJson.get("genomeToolToken")).isEqualTo(token);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void when_getToSequencesIdTrimmed_then_returnTrimmedPairAsZip () throws IOException {
+        final String token = token();
+        Collection<File> files = new ArrayList<>();
+        files.add(new File(testFolderPath + "ngs/Kp4_R1_001_trimmed.fq.gz"));
+        files.add(new File(testFolderPath + "ngs/Kp4_R2_001_trimmed.fq.gz"));
+        db.insertFakeSequenceWithTrimmedFiles(token, files);
+        Map<String, Object> sequence = db.get("sequences", "genomeToolToken", token);
+        String id = ((Map<String, String>) sequence.get("_id")).get("$oid");
+
+        byte[] response =
+                when().
+                        get("/api/sequences/" + id + "/trimmed").
+                then().
+                        statusCode(200).
+                        contentType("application/zip").
+                        extract().asByteArray();
+
+        File file = new File("temp/trimmed_test.zip");
+        FileUtils.writeByteArrayToFile(file, response);
+        ZipFile zip = new ZipFile(file);
+        assertThat(zip.size()).isEqualTo(2);
+
+        final Enumeration<? extends ZipEntry> entries = zip.entries();
+        int i = 0;
+        String[] entryName = new String[2];
+        while (entries.hasMoreElements()) {
+            String name = entries.nextElement().getName();
+            entryName[i++] = name;
+            assertThat(name).endsWith("trimmed.fq.gz");
+        }
+        if (entryName[0].contains("R1")) assertThat(entryName[1]).contains("R2");
+        else assertThat(entryName[1]).contains("R1");
+
+        file.delete();
     }
 
     @BeforeAll

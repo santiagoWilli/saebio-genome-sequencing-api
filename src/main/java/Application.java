@@ -40,6 +40,7 @@ public class Application {
             path("/sequences", () -> {
                 get("", new SequencesGetAllHandler(new MongoDataAccess()));
                 get("/:id", new SequencesGetOneHandler(new MongoDataAccess()));
+                get("/:id/trimmed", new SequencesGetTrimmedPairHandler(new MongoDataAccess()));
                 post("", new SequencesPostHandler(new NullarborClient(options.genomeToolUrl), new MongoDataAccess()));
                 post("/trimmed", (new TrimmedSequencesPostHandler(new MongoDataAccess())));
             });

@@ -3,15 +3,13 @@ package dataaccess;
 import com.mongodb.client.*;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
+import com.mongodb.client.gridfs.model.GridFSFile;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import payloads.Sequence;
 import payloads.TrimRequestResult;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -92,12 +90,17 @@ public class MongoDataAccess implements DataAccess {
 
     @Override
     public String getTrimmedFileName(String id) {
-        return null;
+        GridFSBucket gridFSBucket = GridFSBuckets.create(database);
+        GridFSFile file = gridFSBucket.find(eq("_id", new ObjectId(id))).first();
+        return file != null ? file.getFilename() : null;
     }
 
     @Override
     public InputStream getTrimmedFileStream(String id) {
-        return null;
+        GridFSBucket gridFSBucket = GridFSBuckets.create(database);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(1024 * 8);
+        gridFSBucket.downloadToStream(new ObjectId(id), outputStream);
+        return new ByteArrayInputStream(outputStream.toByteArray());
     }
 
 

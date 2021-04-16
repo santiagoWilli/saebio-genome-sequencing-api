@@ -1,5 +1,8 @@
 package utils;
 
+import org.apache.tika.mime.MimeTypeException;
+import org.apache.tika.mime.MimeTypes;
+
 import java.io.InputStream;
 
 public final class AnswerFile {
@@ -17,5 +20,9 @@ public final class AnswerFile {
 
     public String getMimeType() {
         return mimeType;
+    }
+
+    public String guessExtension() throws MimeTypeException {
+        return MimeTypes.getDefaultMimeTypes().forName(mimeType).getExtension();
     }
 }

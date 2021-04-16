@@ -1,6 +1,7 @@
 package handlers;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import payloads.EmptyPayload;
 import payloads.Validable;
 import spark.Request;
@@ -9,6 +10,7 @@ import spark.Route;
 import utils.Answer;
 
 import javax.servlet.MultipartConfigElement;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -67,8 +69,20 @@ public abstract class AbstractHandler<V extends Validable> implements RequestHan
             deleteTempFiles(uuid);
 
             response.status(answer.getCode());
-            response.type("application/json");
-            return answer.getBody();
+
+            if (answer.hasFile()) {
+                response.header("Content-Disposition", "attachment; filename=file." + answer.getFile().guessExtension());
+                response.type(answer.getFile().getMimeType());
+
+                HttpServletResponse raw = response.raw();
+                raw.getOutputStream().write(IOUtils.toByteArray(answer.getFile().getInputStream()));
+                raw.getOutputStream().flush();
+                raw.getOutputStream().close();
+                return raw;
+            } else {
+                response.type("application/json");
+                return answer.getBody();
+            }
         } catch (Exception e) {
             deleteTempFiles(uuid);
             response.status(500);

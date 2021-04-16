@@ -6,15 +6,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.*;
+import com.mongodb.client.gridfs.GridFSBucket;
+import com.mongodb.client.gridfs.GridFSBuckets;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.set;
 
 public class MongoDB implements Database {
     private final MongoDatabase database;
@@ -50,6 +51,23 @@ public class MongoDB implements Database {
     public void insertFakeSequence(String token) {
         MongoCollection<Document> collection = database.getCollection("sequences");
         collection.insertOne(new Document("genomeToolToken", token));
+    }
+
+    @Override
+    public void insertFakeSequenceWithTrimmedFiles(String token, Collection<File> files) throws FileNotFoundException {
+        MongoCollection<Document> collection = database.getCollection("sequences");
+        Document document = new Document()
+                .append("genomeToolToken", token);
+        collection.insertOne(document);
+
+        GridFSBucket gridFSBucket = GridFSBuckets.create(database);
+        List<ObjectId> trimmedIds = new ArrayList<>();
+
+        for (File file : files) {
+            ObjectId id = gridFSBucket.uploadFromStream(file.getName(), new FileInputStream(file));
+            trimmedIds.add(id);
+        }
+        collection.updateOne(eq("genomeToolToken", token), set("trimmedPair", trimmedIds));
     }
 
     @Override
