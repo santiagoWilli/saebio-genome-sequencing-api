@@ -75,7 +75,7 @@ public abstract class AbstractHandler<V extends Validable> implements RequestHan
                 response.type(answer.getFile().getMimeType());
 
                 HttpServletResponse raw = response.raw();
-                raw.getOutputStream().write(IOUtils.toByteArray(answer.getFile().getInputStream()));
+                answer.getFile().getInputStream().transferTo(raw.getOutputStream());
                 raw.getOutputStream().flush();
                 raw.getOutputStream().close();
                 return raw;

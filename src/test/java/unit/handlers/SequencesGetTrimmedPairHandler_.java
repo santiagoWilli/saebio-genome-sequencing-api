@@ -8,7 +8,7 @@ import payloads.EmptyPayload;
 import utils.Answer;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.Map;
 
@@ -36,7 +36,7 @@ public class SequencesGetTrimmedPairHandler_ {
     }
 
     @Test
-    public void ifSequenceFound_and_hasItsTrimmedPair_returnHttpOk_and_file() throws FileNotFoundException {
+    public void ifSequenceFound_and_hasItsTrimmedPair_returnHttpOk_and_file() throws IOException {
         String trimmedId1 = "6075d6a71a62381d13c70a6f";
         String trimmedId2 = "6075d6aa1a62381d13c70c9b";
         when(dataAccess.getSequence(PARAMS.get(":id"))).thenReturn("{\"_id\": {\"$oid\": \"1\"}, \"trimmedPair\": [{\"$oid\": \""+trimmedId1+"\"}, {\"$oid\": \""+trimmedId2+"\"}]}");

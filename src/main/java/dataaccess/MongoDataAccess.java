@@ -96,11 +96,13 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
-    public InputStream getTrimmedFileStream(String id) {
+    public InputStream getTrimmedFileStream(String id) throws IOException {
         GridFSBucket gridFSBucket = GridFSBuckets.create(database);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(1024 * 8);
         gridFSBucket.downloadToStream(new ObjectId(id), outputStream);
-        return new ByteArrayInputStream(outputStream.toByteArray());
+        InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+        outputStream.close();
+        return inputStream;
     }
 
 

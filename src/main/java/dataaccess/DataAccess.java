@@ -13,5 +13,5 @@ public interface DataAccess {
     String getAllSequences();
     String getSequence(String id);
     String getTrimmedFileName(String id);
-    InputStream getTrimmedFileStream(String id);
+    InputStream getTrimmedFileStream(String id) throws IOException;
 }
