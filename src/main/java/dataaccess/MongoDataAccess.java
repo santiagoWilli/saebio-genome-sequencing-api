@@ -83,6 +83,7 @@ public class MongoDataAccess implements DataAccess {
 
     @Override
     public String getSequence(String id) {
+        if (!ObjectId.isValid(id)) return "";
         MongoCollection<Document> collection = database.getCollection("sequences");
         final Document sequence = collection.find(eq("_id", new ObjectId(id))).first();
         return sequence == null ? "" : sequence.toJson();

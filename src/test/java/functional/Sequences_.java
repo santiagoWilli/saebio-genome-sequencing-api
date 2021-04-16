@@ -209,6 +209,19 @@ public class Sequences_ {
         assertThat(sequenceJson.get("genomeToolToken")).isEqualTo(token);
     }
 
+    @Test
+    public void when_getToSequencesId_and_notFound_then_returnHttp404 () throws IOException {
+        when().
+                get("/api/sequences/6075d61d1a62381d13c70a6e").
+        then().
+                statusCode(404);
+
+        when().
+                get("/api/sequences/6075d61d1a62381d13c70").
+        then().
+                statusCode(404);
+    }
+
     @SuppressWarnings("unchecked")
     @Test
     public void when_getToSequencesIdTrimmed_then_returnTrimmedPairAsZip () throws IOException {
