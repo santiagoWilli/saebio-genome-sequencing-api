@@ -46,6 +46,7 @@ public class Application {
             });
 
             path("/references", () -> {
+                get("", new ReferencesGetAllHandler(new MongoDataAccess()));
                 post("", new ReferencesPostHandler(new MongoDataAccess()));
             });
         });

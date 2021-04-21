@@ -286,6 +286,22 @@ public class Application_ {
         assertThat(db.referenceExists(file.get("$oid"))).isTrue();
     }
 
+    @Test
+    public void when_getToReferences_then_returnAJsonOfAllReferences() throws IOException {
+        int amount = 5;
+        insertFakeReferences(amount);
+
+        String response =
+                when().
+                        get("/api/references").
+                then().
+                        statusCode(200).
+                        extract().asString();
+
+        List<Object> references = Arrays.asList(new ObjectMapper().readValue(response, Object[].class));
+        assertThat(references.size()).isEqualTo(amount);
+    }
+
     @BeforeAll
     static void startApplication() throws IOException, InterruptedException {
         port = PORT;
@@ -368,5 +384,9 @@ public class Application_ {
 
     private void insertFakeSequences(int amount) {
         for (int i = 0; i < amount; i++) db.insertFakeSequence(token());
+    }
+
+    private void insertFakeReferences(int amount) {
+        for (int i = 0; i < amount; i++) db.insertFakeReference();
     }
 }

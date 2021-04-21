@@ -83,4 +83,10 @@ public class MongoDB implements Database {
         GridFSFile file = gridFSBucket.find(eq("_id", new ObjectId(id))).first();
         return file != null;
     }
+
+    @Override
+    public void insertFakeReference() {
+        MongoCollection<Document> collection = database.getCollection("references");
+        collection.insertOne(new Document());
+    }
 }

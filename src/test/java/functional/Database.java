@@ -16,4 +16,5 @@ public interface Database {
     void empty(String collection);
 
     boolean referenceExists(String id);
+    void insertFakeReference();
 }

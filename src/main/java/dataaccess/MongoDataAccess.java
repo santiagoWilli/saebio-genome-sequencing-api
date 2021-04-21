@@ -72,14 +72,7 @@ public class MongoDataAccess implements DataAccess {
 
     @Override
     public String getAllSequences() {
-        MongoCollection<Document> collection = database.getCollection("sequences");
-        List<String> files = new ArrayList<>();
-        try (MongoCursor<Document> cursor = collection.find().iterator()) {
-            while (cursor.hasNext()) {
-                files.add(cursor.next().toJson());
-            }
-        }
-        return "[" + String.join(", ", files) + "]";
+        return findAllFromCollection("sequences");
     }
 
     @Override
@@ -124,7 +117,18 @@ public class MongoDataAccess implements DataAccess {
 
     @Override
     public String getAllReferences() {
-        return null;
+        return findAllFromCollection("references");
+    }
+
+    private String findAllFromCollection(String collectionName) {
+        MongoCollection<Document> collection = database.getCollection(collectionName);
+        List<String> documents = new ArrayList<>();
+        try (MongoCursor<Document> cursor = collection.find().iterator()) {
+            while (cursor.hasNext()) {
+                documents.add(cursor.next().toJson());
+            }
+        }
+        return "[" + String.join(", ", documents) + "]";
     }
 
     private static String formatDate(LocalDate date) {
