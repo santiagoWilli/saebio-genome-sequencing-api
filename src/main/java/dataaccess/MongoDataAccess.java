@@ -6,6 +6,7 @@ import com.mongodb.client.gridfs.GridFSBuckets;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import payloads.Reference;
 import payloads.Sequence;
 import payloads.TrimRequestResult;
 
@@ -104,6 +105,11 @@ public class MongoDataAccess implements DataAccess {
         InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
         outputStream.close();
         return inputStream;
+    }
+
+    @Override
+    public String uploadReference(Reference reference) throws IOException {
+        return null;
     }
 
 

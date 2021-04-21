@@ -1,5 +1,6 @@
 package dataaccess;
 
+import payloads.Reference;
 import payloads.Sequence;
 import payloads.TrimRequestResult;
 
@@ -14,4 +15,6 @@ public interface DataAccess {
     String getSequence(String id);
     String getTrimmedFileName(String id);
     InputStream getTrimmedFileStream(String id) throws IOException;
+
+    String uploadReference(Reference reference) throws IOException;
 }
