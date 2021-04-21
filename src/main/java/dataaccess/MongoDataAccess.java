@@ -120,6 +120,11 @@ public class MongoDataAccess implements DataAccess {
         return findAllFromCollection("references");
     }
 
+    @Override
+    public String getReference(String id) {
+        return null;
+    }
+
     private String findAllFromCollection(String collectionName) {
         MongoCollection<Document> collection = database.getCollection(collectionName);
         List<String> documents = new ArrayList<>();

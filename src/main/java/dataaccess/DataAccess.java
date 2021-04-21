@@ -18,4 +18,5 @@ public interface DataAccess {
 
     String uploadReference(Reference reference) throws IOException;
     String getAllReferences();
+    String getReference(String id);
 }
