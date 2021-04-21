@@ -10,6 +10,10 @@ public class Reference extends Multipart implements Validable {
 
     @Override
     public boolean isValid() {
-        return true;
+        return files.keySet().iterator().next().matches(fileNameRegex());
+    }
+
+    private static String fileNameRegex() {
+        return "[a-zA-Z]+[0-9]{1,6}(-|_)referencia.(fa|gbf)";
     }
 }
