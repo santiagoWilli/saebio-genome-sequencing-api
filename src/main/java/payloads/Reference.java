@@ -10,6 +10,6 @@ public class Reference extends Multipart implements Validable {
 
     @Override
     public boolean isValid() {
-        return false;
+        return true;
     }
 }
