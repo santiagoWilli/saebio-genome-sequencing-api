@@ -28,7 +28,7 @@ public class ReferencesGetOneHandler extends AbstractHandler<EmptyPayload> {
         try {
             reference = new ObjectMapper().readValue(referenceJson, new TypeReference<HashMap<String,Object>>(){});
             Map<String, String> file = (Map<String, String>) reference.get("file");
-            InputStream fileStream = dataAccess.getTrimmedFileStream(file.get("$oid"));
+            InputStream fileStream = dataAccess.getFileStream(file.get("$oid"));
 
             return Answer.withFile(fileStream, "text/x-fasta");
         } catch (IOException e) {

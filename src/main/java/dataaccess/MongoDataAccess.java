@@ -77,10 +77,7 @@ public class MongoDataAccess implements DataAccess {
 
     @Override
     public String getSequence(String id) {
-        if (!ObjectId.isValid(id)) return "";
-        MongoCollection<Document> collection = database.getCollection("sequences");
-        final Document sequence = collection.find(eq("_id", new ObjectId(id))).first();
-        return sequence == null ? "" : sequence.toJson();
+        return getOneDocument(id, "sequences");
     }
 
     @Override
@@ -91,7 +88,7 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
-    public InputStream getTrimmedFileStream(String id) throws IOException {
+    public InputStream getFileStream(String id) throws IOException {
         GridFSBucket gridFSBucket = GridFSBuckets.create(database);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(1024 * 8);
         gridFSBucket.downloadToStream(new ObjectId(id), outputStream);
@@ -122,12 +119,14 @@ public class MongoDataAccess implements DataAccess {
 
     @Override
     public String getReference(String id) {
-        return null;
+        return getOneDocument(id, "references");
     }
 
-    @Override
-    public InputStream getReferenceFileStream(String fileId) {
-        return null;
+    private String getOneDocument(String id, String collectionName) {
+        if (!ObjectId.isValid(id)) return "";
+        MongoCollection<Document> collection = database.getCollection(collectionName);
+        final Document document = collection.find(eq("_id", new ObjectId(id))).first();
+        return document == null ? "" : document.toJson();
     }
 
     private String findAllFromCollection(String collectionName) {

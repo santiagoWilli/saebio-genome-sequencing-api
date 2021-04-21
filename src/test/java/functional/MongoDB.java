@@ -89,4 +89,15 @@ public class MongoDB implements Database {
         MongoCollection<Document> collection = database.getCollection("references");
         collection.insertOne(new Document());
     }
+
+    @Override
+    public String insertFakeReferenceWithFile(File file) throws FileNotFoundException {
+        GridFSBucket gridFSBucket = GridFSBuckets.create(database);
+        ObjectId id = gridFSBucket.uploadFromStream(file.getName(), new FileInputStream(file));
+
+        MongoCollection<Document> collection = database.getCollection("references");
+        Document document = new Document("file", id);
+        collection.insertOne(document);
+        return document.getObjectId("_id").toString();
+    }
 }

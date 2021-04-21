@@ -12,10 +12,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import io.restassured.RestAssured;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.*;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.ZipEntry;
@@ -239,6 +239,7 @@ public class Application_ {
                 then().
                         statusCode(200).
                         contentType("application/zip").
+                        header("Content-Disposition", "attachment; filename=file.zip").
                         extract().asByteArray();
 
         File file = new File("temp/trimmed_test.zip");
@@ -300,6 +301,25 @@ public class Application_ {
 
         List<Object> references = Arrays.asList(new ObjectMapper().readValue(response, Object[].class));
         assertThat(references.size()).isEqualTo(amount);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void when_getToReferencesId_then_returnReferenceFile() throws IOException {
+        File file = new File(testFolderPath + "Kpneu231120_referencia.fa");
+        String id = db.insertFakeReferenceWithFile(file);
+
+        byte[] response =
+                when().
+                        get("/api/references/" + id).
+                then().
+                        statusCode(200).
+                        contentType("text/x-fasta").
+                        header("Content-Disposition", "attachment; filename=file.fa").
+                        extract().asByteArray();
+
+        InputStream responseStream = new ByteArrayInputStream(response);
+        assertThat(IOUtils.contentEquals(responseStream, new FileInputStream(file))).isTrue();
     }
 
     @BeforeAll

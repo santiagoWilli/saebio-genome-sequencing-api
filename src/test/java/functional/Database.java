@@ -17,4 +17,5 @@ public interface Database {
 
     boolean referenceExists(String id);
     void insertFakeReference();
+    String insertFakeReferenceWithFile(File file) throws FileNotFoundException;
 }

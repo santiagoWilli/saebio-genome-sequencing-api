@@ -14,10 +14,9 @@ public interface DataAccess {
     String getAllSequences();
     String getSequence(String id);
     String getTrimmedFileName(String id);
-    InputStream getTrimmedFileStream(String id) throws IOException;
+    InputStream getFileStream(String id) throws IOException;
 
     String uploadReference(Reference reference) throws IOException;
     String getAllReferences();
     String getReference(String id);
-    InputStream getReferenceFileStream(String fileId);
 }

@@ -47,6 +47,7 @@ public class Application {
 
             path("/references", () -> {
                 get("", new ReferencesGetAllHandler(new MongoDataAccess()));
+                get("/:id", new ReferencesGetOneHandler(new MongoDataAccess()));
                 post("", new ReferencesPostHandler(new MongoDataAccess()));
             });
         });

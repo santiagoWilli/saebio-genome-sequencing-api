@@ -39,7 +39,7 @@ public class SequencesGetTrimmedPairHandler extends AbstractHandler<EmptyPayload
             ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream);
 
             for (Map<String, String> trimmedFile : trimmedPair) {
-                InputStream fileStream = dataAccess.getTrimmedFileStream(trimmedFile.get("$oid"));
+                InputStream fileStream = dataAccess.getFileStream(trimmedFile.get("$oid"));
                 ZipEntry zipEntry = new ZipEntry(dataAccess.getTrimmedFileName(trimmedFile.get("$oid")));
                 writeNextZipEntry(zipOutputStream, zipEntry, fileStream);
             }

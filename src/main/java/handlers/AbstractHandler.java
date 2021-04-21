@@ -70,7 +70,7 @@ public abstract class AbstractHandler<V extends Validable> implements RequestHan
             response.status(answer.getCode());
 
             if (answer.hasFile()) {
-                response.header("Content-Disposition", "attachment; filename=file." + answer.getFile().guessExtension());
+                response.header("Content-Disposition", "attachment; filename=file" + answer.getFile().guessExtension());
                 response.type(answer.getFile().getMimeType());
 
                 HttpServletResponse raw = response.raw();
