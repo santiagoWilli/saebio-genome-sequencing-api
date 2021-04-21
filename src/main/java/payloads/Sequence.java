@@ -72,8 +72,7 @@ public class Sequence extends Multipart implements Validable {
     private String strainKey() {
         return files.keySet().iterator().next()
                 .split("_")[0]
-                .split("[0-9]")[0]
-                .toLowerCase();
+                .split("[0-9]")[0];
     }
 }
 

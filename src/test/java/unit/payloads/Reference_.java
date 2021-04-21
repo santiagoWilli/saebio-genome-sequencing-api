@@ -37,6 +37,12 @@ public class Reference_ {
         assertThat(reference.getName()).isEqualTo("Kneu123456-referencia.fa");
     }
 
+    @Test
+    public void getStrain_shouldReturn_theValueFromTheKeyInTheFilename() {
+        Reference reference = getReferenceFrom("Kneu123456-referencia.fa");
+        assertThat(reference.getStrain()).isEqualTo("Klebsiella pneumoniae");
+    }
+
     private static void iterateThroughFileNames(String[] fileNames, boolean expected) {
         for (String fileName : fileNames) {
             Reference reference = getReferenceFrom(fileName);
