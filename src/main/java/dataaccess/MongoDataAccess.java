@@ -122,6 +122,10 @@ public class MongoDataAccess implements DataAccess {
         return document.getObjectId("_id").toString();
     }
 
+    @Override
+    public String getAllReferences() {
+        return null;
+    }
 
     private static String formatDate(LocalDate date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");

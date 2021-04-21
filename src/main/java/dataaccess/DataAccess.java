@@ -17,4 +17,5 @@ public interface DataAccess {
     InputStream getTrimmedFileStream(String id) throws IOException;
 
     String uploadReference(Reference reference) throws IOException;
+    String getAllReferences();
 }
