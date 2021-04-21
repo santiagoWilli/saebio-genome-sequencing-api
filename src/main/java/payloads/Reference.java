@@ -18,6 +18,10 @@ public class Reference extends Multipart implements Validable {
         return StrainMap.get(strainKey());
     }
 
+    public String getCode() {
+        return fileNameFirstFieldRemove("[^0-9]");
+    }
+
     @Override
     public boolean isValid() {
         if (files.size() != 1) return false;
@@ -25,7 +29,11 @@ public class Reference extends Multipart implements Validable {
     }
 
     private String strainKey() {
-        return getName().split("[_\\-]")[0].replaceAll("[0-9]", "");
+        return fileNameFirstFieldRemove("[0-9]");
+    }
+
+    private String fileNameFirstFieldRemove(String regex) {
+        return getName().split("[_\\-]")[0].replaceAll(regex, "");
     }
 
     private static String fileNameRegex() {
