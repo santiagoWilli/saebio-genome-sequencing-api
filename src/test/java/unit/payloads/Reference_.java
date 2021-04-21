@@ -31,14 +31,20 @@ public class Reference_ {
         assertThat(reference.isValid()).isEqualTo(false);
     }
 
+    @Test
+    public void getName_shouldReturn_fileName() {
+        Reference reference = getReferenceFrom("Kneu123456-referencia.fa");
+        assertThat(reference.getName()).isEqualTo("Kneu123456-referencia.fa");
+    }
+
     private static void iterateThroughFileNames(String[] fileNames, boolean expected) {
         for (String fileName : fileNames) {
-            Reference reference = getSequenceFrom(fileName);
+            Reference reference = getReferenceFrom(fileName);
             assertThat(reference.isValid()).isEqualTo(expected);
         }
     }
 
-    private static Reference getSequenceFrom(String fileName) {
+    private static Reference getReferenceFrom(String fileName) {
         Map<String, File> fileMap = new HashMap<>();
         File file = mock(File.class);
         fileMap.put(fileName, file);

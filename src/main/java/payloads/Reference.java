@@ -8,6 +8,10 @@ public class Reference extends Multipart implements Validable {
         super(fields, files);
     }
 
+    public String getName() {
+        return files.keySet().iterator().next();
+    }
+
     @Override
     public boolean isValid() {
         if (files.size() != 1) return false;
