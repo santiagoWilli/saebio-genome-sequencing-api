@@ -14,4 +14,6 @@ public interface Database {
     void insertFakeSequenceWithTrimmedFiles(String token, Collection<File> files) throws FileNotFoundException;
 
     void empty(String collection);
+
+    boolean referenceExists(String id);
 }

@@ -109,7 +109,17 @@ public class MongoDataAccess implements DataAccess {
 
     @Override
     public String uploadReference(Reference reference) throws IOException {
-        return null;
+        GridFSBucket gridFSBucket = GridFSBuckets.create(database);
+
+        ObjectId id = gridFSBucket.uploadFromStream(reference.getName(), new FileInputStream(reference.getFile()));
+
+        MongoCollection<Document> collection = database.getCollection("references");
+        Document document = new Document()
+                .append("strain", reference.getStrain())
+                .append("code", reference.getCode())
+                .append("file", id);
+        collection.insertOne(document);
+        return document.getObjectId("_id").toString();
     }
 
 

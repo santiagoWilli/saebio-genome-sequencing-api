@@ -22,6 +22,10 @@ public class Reference extends Multipart implements Validable {
         return fileNameFirstFieldRemove("[^0-9]");
     }
 
+    public File getFile() {
+        return files.entrySet().iterator().next().getValue();
+    }
+
     @Override
     public boolean isValid() {
         if (files.size() != 1) return false;

@@ -21,7 +21,7 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-public class Sequences_ {
+public class Application_ {
     private static final int PORT = 5678;
     private static final int DB_PORT = 7017;
     private static final int WIREMOCK_PORT = 7717;
@@ -190,7 +190,7 @@ public class Sequences_ {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void when_getToSequencesId_then_returnSequenceWithGivenIdAsJson () throws IOException {
+    public void when_getToSequencesId_then_returnSequenceWithGivenIdAsJson() throws IOException {
         final String token = token();
         db.insertFakeSequence(token);
         Map<String, Object> sequence = db.get("sequences", "genomeToolToken", token);
@@ -210,7 +210,7 @@ public class Sequences_ {
     }
 
     @Test
-    public void when_getToSequencesId_and_notFound_then_returnHttp404 () throws IOException {
+    public void when_getToSequencesId_and_notFound_then_returnHttp404() {
         when().
                 get("/api/sequences/6075d61d1a62381d13c70a6e").
         then().
@@ -224,7 +224,7 @@ public class Sequences_ {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void when_getToSequencesIdTrimmed_then_returnTrimmedPairAsZip () throws IOException {
+    public void when_getToSequencesIdTrimmed_then_returnTrimmedPairAsZip() throws IOException {
         final String token = token();
         Collection<File> files = new ArrayList<>();
         files.add(new File(testFolderPath + "ngs/Kp4_R1_001_trimmed.fq.gz"));
@@ -258,6 +258,32 @@ public class Sequences_ {
         else assertThat(entryName[1]).contains("R1");
 
         file.delete();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void given_aValidFile_when_postToReferences_then_statusCode200_and_referenceUploaded() throws IOException {
+        String response =
+                given().
+                        multiPart("file", new File(testFolderPath + "Kpneu231120_referencia.fa")).
+                when().
+                        post("/api/references").
+                then().
+                        statusCode(200).
+                        extract().
+                        asString();
+
+        ObjectNode node = new ObjectMapper().readValue(response, ObjectNode.class);
+        String id = String.valueOf(node.get("id").asText());
+        Map<String, Object> reference = db.get("references", id);
+
+        assertThat(reference.get("strain")).isEqualTo("Klebsiella pneumoniae");
+        assertThat(reference.get("code")).isEqualTo("231120");
+        assertThat(reference.get("file")).isNotNull();
+        assertThat(reference.get("file")).isOfAnyClassIn(LinkedHashMap.class);
+        LinkedHashMap<String, String> file = (LinkedHashMap<String, String>) reference.get("file");
+        assertThat(file).containsKey("$oid");
+        assertThat(db.referenceExists(file.get("$oid"))).isTrue();
     }
 
     @BeforeAll

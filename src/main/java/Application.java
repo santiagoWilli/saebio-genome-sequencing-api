@@ -44,6 +44,10 @@ public class Application {
                 post("", new SequencesPostHandler(new NullarborClient(options.genomeToolUrl), new MongoDataAccess()));
                 post("/trimmed", (new TrimmedSequencesPostHandler(new MongoDataAccess())));
             });
+
+            path("/references", () -> {
+                post("", new ReferencesPostHandler(new MongoDataAccess()));
+            });
         });
 
         exception(Exception.class, (exception, request, response) -> System.out.println(" -ERROR: " + exception.getMessage()));

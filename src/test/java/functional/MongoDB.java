@@ -8,6 +8,7 @@ import com.mongodb.ServerAddress;
 import com.mongodb.client.*;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
+import com.mongodb.client.gridfs.model.GridFSFile;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -74,5 +75,12 @@ public class MongoDB implements Database {
     public void empty(String collectionName) {
         MongoCollection<Document> collection = database.getCollection(collectionName);
         collection.deleteMany(new Document());
+    }
+
+    @Override
+    public boolean referenceExists(String id) {
+        GridFSBucket gridFSBucket = GridFSBuckets.create(database);
+        GridFSFile file = gridFSBucket.find(eq("_id", new ObjectId(id))).first();
+        return file != null;
     }
 }
