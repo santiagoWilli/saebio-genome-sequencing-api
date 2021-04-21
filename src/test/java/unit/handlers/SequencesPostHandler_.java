@@ -8,6 +8,7 @@ import handlers.SequencesPostHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import payloads.Sequence;
+import utils.Json;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -50,7 +51,7 @@ public class SequencesPostHandler_ {
         when(toolAnswer.getStatus()).thenReturn(GenomeToolAnswer.Status.OK);
         when(toolAnswer.getMessage()).thenReturn(token);
         when(dataAccess.createSequence(sequence, token)).thenReturn(id);
-        assertThat(handler.process(sequence, null)).isEqualTo(new Answer(202, acceptedBodyJson(id)));
+        assertThat(handler.process(sequence, null)).isEqualTo(new Answer(202, Json.id(id)));
         verify(dataAccess, times(1)).createSequence(sequence, token);
     }
 
@@ -61,9 +62,5 @@ public class SequencesPostHandler_ {
         when(toolAnswer.getMessage()).thenReturn(exception);
         assertThat(handler.process(sequence, null)).isEqualTo(Answer.serverError(exception));
         verifyNoInteractions(dataAccess);
-    }
-
-    private String acceptedBodyJson(String id) {
-        return "{\"id\":\"" + id + "\"}";
     }
 }

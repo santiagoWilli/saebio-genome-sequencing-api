@@ -1,7 +1,6 @@
 package handlers;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import payloads.EmptyPayload;
 import payloads.Validable;
 import spark.Request;
@@ -49,7 +48,7 @@ public abstract class AbstractHandler<V extends Validable> implements RequestHan
 
                 uuid = UUID.randomUUID().toString();
                 for (Part part : request.raw().getParts()) {
-                    if (part.getName().matches("^file[1-2]$")) {
+                    if (part.getName().matches("^file[1-2]?$")) {
                         File file = new File("temp/" + uuid + "/" + part.getName());
                         FileUtils.copyInputStreamToFile(part.getInputStream(), file);
                         files.put(part.getSubmittedFileName(), file);

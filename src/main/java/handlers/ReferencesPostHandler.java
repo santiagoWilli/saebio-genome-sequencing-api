@@ -3,7 +3,9 @@ package handlers;
 import dataaccess.DataAccess;
 import payloads.Reference;
 import utils.Answer;
+import utils.Json;
 
+import java.io.IOException;
 import java.util.Map;
 
 public class ReferencesPostHandler extends AbstractHandler<Reference> {
@@ -15,7 +17,12 @@ public class ReferencesPostHandler extends AbstractHandler<Reference> {
     }
 
     @Override
-    protected Answer processRequest(Reference sequence, Map<String, String> requestParams) {
-        return new Answer(500, "Error encountered while uploading the given reference");
+    protected Answer processRequest(Reference reference, Map<String, String> requestParams) {
+        try {
+            return new Answer(200, Json.id(dataAccess.uploadReference(reference)));
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return Answer.serverError("Error encountered while uploading the given reference");
+        }
     }
 }

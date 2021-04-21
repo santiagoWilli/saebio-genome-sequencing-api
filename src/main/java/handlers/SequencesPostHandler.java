@@ -5,6 +5,7 @@ import genome.GenomeTool;
 import genome.GenomeToolAnswer;
 import payloads.Sequence;
 import utils.Answer;
+import utils.Json;
 
 import java.util.Map;
 
@@ -23,7 +24,7 @@ public class SequencesPostHandler extends AbstractHandler<Sequence> {
         GenomeToolAnswer toolAnswer = genomeTool.requestTrim(sequence);
         switch (toolAnswer.getStatus()) {
             case OK:
-                return new Answer(202, jsonOf(dataAccess.createSequence(sequence, toolAnswer.getMessage())));
+                return new Answer(202, Json.id(dataAccess.createSequence(sequence, toolAnswer.getMessage())));
             case API_DOWN:
                 return Answer.serviceUnavailable("Genome reporter tool is down");
             case SERVER_ERROR:
@@ -33,9 +34,5 @@ public class SequencesPostHandler extends AbstractHandler<Sequence> {
             default:
                 throw new IllegalArgumentException();
         }
-    }
-
-    private static String jsonOf(String id) {
-        return "{\"id\":\"" + id + "\"}";
     }
 }

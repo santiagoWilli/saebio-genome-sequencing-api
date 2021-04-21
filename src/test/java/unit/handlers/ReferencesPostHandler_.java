@@ -5,6 +5,8 @@ import handlers.ReferencesPostHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import payloads.Reference;
+import utils.Answer;
+import utils.Json;
 
 import java.io.IOException;
 
@@ -28,5 +30,11 @@ public class ReferencesPostHandler_ {
     public void if_writeExceptionWhenUploadingTheReference_return_httpServerError() throws IOException {
         when(dataAccess.uploadReference(reference)).thenThrow(IOException.class);
         assertThat(handler.process(reference, null).getCode()).isEqualTo(500);
+    }
+
+    @Test
+    public void if_referenceIsSuccessfullyUploaded_return_httpOk() throws IOException {
+        when(dataAccess.uploadReference(reference)).thenReturn("1234");
+        assertThat(handler.process(reference, null)).isEqualTo(new Answer(200, Json.id("1234")));
     }
 }
