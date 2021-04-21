@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Test;
 import payloads.TrimRequestResult;
 import utils.Answer;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -28,25 +26,25 @@ public class TrimmedSequencesPostHandler_ {
     }
 
     @Test
-    public void if_sequenceDoesNotExists_return_httpNotFound() throws IOException {
+    public void if_sequenceDoesNotExists_return_httpNotFound() {
         when(dataAccess.uploadTrimmedFile(trimResult)).thenReturn(UploadCode.NOT_FOUND);
-        assertThat(handler.process(trimResult, null)).isEqualTo(new Answer(404, notFoundJson(trimResult.getSequenceToken())));
+        assertThat(handler.process(trimResult, null)).isEqualTo(new Answer(404, notFoundJson()));
     }
 
     @Test
-    public void if_trimmedSequenceIsSuccessfullyUploaded_return_httpOk() throws IOException {
+    public void if_trimmedSequenceIsSuccessfullyUploaded_return_httpOk() {
         when(dataAccess.uploadTrimmedFile(trimResult)).thenReturn(UploadCode.OK);
         assertThat(handler.process(trimResult, null)).isEqualTo(new Answer(200, okJson()));
     }
 
     @Test
-    public void if_writeExceptionWhenUploadingTheTrimmedSequence_return_httpServerError() throws IOException {
+    public void if_writeExceptionWhenUploadingTheTrimmedSequence_return_httpServerError() {
         when(dataAccess.uploadTrimmedFile(trimResult)).thenReturn(UploadCode.WRITE_FAILED);
         assertThat(handler.process(trimResult, null)).isEqualTo(new Answer(500, errorJson()));
     }
 
-    private String notFoundJson(String token) {
-        return "{\"message\":\"Could not find the sequence with token " + token + "\"}";
+    private String notFoundJson() {
+        return "{\"message\":\"Could not find the sequence with the given token\"}";
     }
 
     private String okJson() {

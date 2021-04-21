@@ -8,7 +8,7 @@ import java.io.InputStream;
 
 public interface DataAccess {
     String createSequence(Sequence sequence, String genomeToolToken);
-    UploadCode uploadTrimmedFile(TrimRequestResult trimResult) throws IOException;
+    UploadCode uploadTrimmedFile(TrimRequestResult trimResult);
     boolean setSequenceTrimToFalse(String token);
     String getAllSequences();
     String getSequence(String id);
