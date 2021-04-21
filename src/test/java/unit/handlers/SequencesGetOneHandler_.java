@@ -11,8 +11,8 @@ import java.util.AbstractMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
 
 public class SequencesGetOneHandler_ {
     private static final Map<String, String> PARAMS = Map.ofEntries(
@@ -37,5 +37,6 @@ public class SequencesGetOneHandler_ {
     public void ifSequenceFound_returnHttpOk_and_sequenceJson() {
         when(dataAccess.getSequence(PARAMS.get(":id"))).thenReturn("abc");
         assertThat(handler.process(new EmptyPayload(), PARAMS)).isEqualTo(new Answer(200, "abc"));
+        verify(dataAccess, times(1)).getSequence(PARAMS.get(":id"));
     }
 }

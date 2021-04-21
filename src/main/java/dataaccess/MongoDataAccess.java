@@ -125,6 +125,11 @@ public class MongoDataAccess implements DataAccess {
         return null;
     }
 
+    @Override
+    public InputStream getReferenceFileStream(String fileId) {
+        return null;
+    }
+
     private String findAllFromCollection(String collectionName) {
         MongoCollection<Document> collection = database.getCollection(collectionName);
         List<String> documents = new ArrayList<>();
