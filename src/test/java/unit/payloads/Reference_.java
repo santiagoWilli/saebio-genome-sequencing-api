@@ -24,6 +24,13 @@ public class Reference_ {
         iterateThroughFileNames(INVALID_NAMES, false);
     }
 
+    @Test
+    public void invalid_if_noFileGiven() {
+        Map<String, File> fileMap = new HashMap<>();
+        Reference reference = new Reference(null, fileMap);
+        assertThat(reference.isValid()).isEqualTo(false);
+    }
+
     private static void iterateThroughFileNames(String[] fileNames, boolean expected) {
         for (String fileName : fileNames) {
             Reference reference = getSequenceFrom(fileName);

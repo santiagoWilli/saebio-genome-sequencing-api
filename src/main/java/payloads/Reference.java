@@ -10,6 +10,7 @@ public class Reference extends Multipart implements Validable {
 
     @Override
     public boolean isValid() {
+        if (files.size() != 1) return false;
         return files.keySet().iterator().next().matches(fileNameRegex());
     }
 
