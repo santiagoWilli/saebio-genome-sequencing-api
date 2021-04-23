@@ -31,4 +31,11 @@ public class StrainsGetOneHandler_ {
         when(dataAccess.getStrain(PARAMS.get(":id"))).thenReturn("");
         assertThat(handler.process(new EmptyPayload(), PARAMS)).isEqualTo(Answer.notFound());
     }
+
+    @Test
+    public void ifSequenceFound_returnHttpOk_and_sequenceJson() {
+        when(dataAccess.getStrain(PARAMS.get(":id"))).thenReturn("abc");
+        assertThat(handler.process(new EmptyPayload(), PARAMS)).isEqualTo(new Answer(200, "abc"));
+        verify(dataAccess, times(1)).getStrain(PARAMS.get(":id"));
+    }
 }
