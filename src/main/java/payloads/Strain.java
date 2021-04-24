@@ -7,6 +7,10 @@ public class Strain extends RequestParameters implements Validable {
         super(parameters);
     }
 
+    public String getName() {
+        return parameters.get("name");
+    }
+
     @Override
     public boolean isValid() {
         return parameters.get("name") != null && parameters.get("key") != null;
