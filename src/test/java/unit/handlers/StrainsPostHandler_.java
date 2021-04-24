@@ -28,4 +28,10 @@ public class StrainsPostHandler_ {
         when(dataAccess.createStrain(strain)).thenReturn(false);
         assertThat(handler.process(strain, null).getCode()).isEqualTo(400);
     }
+
+    @Test
+    public void if_strainCreated_return_httpOk() {
+        when(dataAccess.createStrain(strain)).thenReturn(true);
+        assertThat(handler.process(strain, null).getCode()).isEqualTo(200);
+    }
 }

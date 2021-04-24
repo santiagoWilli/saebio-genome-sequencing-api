@@ -16,6 +16,8 @@ public class StrainsPostHandler extends AbstractHandler<Strain> {
 
     @Override
     protected Answer processRequest(Strain strain, Map<String, String> requestParams) {
-        return new Answer(400, "");
+        return dataAccess.createStrain(strain) ?
+                new Answer(200, "Strain created") :
+                new Answer(400, "Strain key already exists");
     }
 }
