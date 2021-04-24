@@ -2,6 +2,7 @@ package dataaccess;
 
 import payloads.Reference;
 import payloads.Sequence;
+import payloads.Strain;
 import payloads.TrimRequestResult;
 
 import java.io.IOException;
@@ -22,4 +23,5 @@ public interface DataAccess {
 
     String getAllStrains();
     String getStrain(String id);
+    boolean createStrain(Strain strain);
 }

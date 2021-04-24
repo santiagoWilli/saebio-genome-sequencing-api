@@ -8,6 +8,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import payloads.Reference;
 import payloads.Sequence;
+import payloads.Strain;
 import payloads.TrimRequestResult;
 
 import java.io.*;
@@ -130,6 +131,11 @@ public class MongoDataAccess implements DataAccess {
     @Override
     public String getStrain(String id) {
         return null;
+    }
+
+    @Override
+    public boolean createStrain(Strain strain) {
+        return false;
     }
 
     private String getOneDocument(String id, String collectionName) {
