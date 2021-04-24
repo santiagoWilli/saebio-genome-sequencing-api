@@ -25,7 +25,7 @@ public class Strain_ {
         parameters.put("key", "");
         assertThat(strain.isValid()).isFalse();
 
-        parameters = new HashMap<>();
+        parameters.clear();
         parameters.put("name", "");
         assertThat(strain.isValid()).isFalse();
     }
@@ -34,6 +34,12 @@ public class Strain_ {
     public void getName_shouldReturn_nameParameter() {
         parameters.put("name", "Klebsiella pneumoniae");
         assertThat(strain.getName()).isEqualTo("Klebsiella pneumoniae");
+    }
+
+    @Test
+    public void getKey_shouldReturn_keyParameter() {
+        parameters.put("key", "kneu");
+        assertThat(strain.getKey()).isEqualTo("kneu");
     }
 
     @BeforeEach
