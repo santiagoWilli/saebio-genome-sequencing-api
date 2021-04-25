@@ -144,7 +144,9 @@ public class MongoDataAccess implements DataAccess {
 
     @Override
     public boolean deleteStrain(String id) {
-        return false;
+        MongoCollection<Document> collection = database.getCollection("strains");
+        collection.deleteOne(eq("_id", id));
+        return true;
     }
 
     private String getOneDocument(String id, String collectionName) {

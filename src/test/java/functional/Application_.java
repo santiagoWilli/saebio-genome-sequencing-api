@@ -365,6 +365,20 @@ public class Application_ {
                 statusCode(400);
     }
 
+    @Test
+    public void given_anIdThatExists_when_deleteToStrainsId_then_deleteStrain_and_returnHttpOk() {
+        String key = "key";
+        db.insertFakeStrain(key);
+        assertThat(db.strainExists(key)).isTrue();
+
+        when().
+                delete("/api/strains/" + key).
+        then().
+                statusCode(200);
+
+        assertThat(db.strainExists(key)).isFalse();
+    }
+
     @BeforeAll
     static void startApplication() throws IOException, InterruptedException {
         port = PORT;
