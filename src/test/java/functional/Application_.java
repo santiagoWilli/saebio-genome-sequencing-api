@@ -401,6 +401,8 @@ public class Application_ {
     @AfterEach
     public void cleanDatabase() {
         db.empty("sequences");
+        db.empty("references");
+        db.empty("strains");
     }
 
     @BeforeEach
