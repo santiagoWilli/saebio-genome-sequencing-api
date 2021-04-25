@@ -379,6 +379,14 @@ public class Application_ {
         assertThat(db.strainExists(key)).isFalse();
     }
 
+    @Test
+    public void given_anIdThatDoesNotExist_when_deleteToStrainsId_then_returnHttpNotFound() {
+        when().
+                delete("/api/strains/key").
+        then().
+                statusCode(404);
+    }
+
     @BeforeAll
     static void startApplication() throws IOException, InterruptedException {
         port = PORT;
