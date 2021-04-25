@@ -37,8 +37,8 @@ public class Strain_ {
     }
 
     @Test
-    public void getKey_shouldReturn_keyParameter() {
-        parameters.put("key", "kneu");
+    public void getKey_shouldReturn_keyParameterAlwaysInLowerCase() {
+        parameters.put("key", "kNEU");
         assertThat(strain.getKey()).isEqualTo("kneu");
     }
 

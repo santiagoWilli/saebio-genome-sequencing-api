@@ -12,7 +12,7 @@ public class Strain extends RequestParameters implements Validable {
     }
 
     public String getKey() {
-        return parameters.get("key");
+        return parameters.get("key").toLowerCase();
     }
 
     @Override
