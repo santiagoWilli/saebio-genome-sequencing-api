@@ -23,4 +23,5 @@ public interface DataAccess {
 
     String getAllStrains();
     boolean createStrain(Strain strain);
+    boolean deleteStrain(String id);
 }

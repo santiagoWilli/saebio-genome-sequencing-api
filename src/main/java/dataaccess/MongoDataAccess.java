@@ -142,6 +142,11 @@ public class MongoDataAccess implements DataAccess {
         }
     }
 
+    @Override
+    public boolean deleteStrain(String id) {
+        return false;
+    }
+
     private String getOneDocument(String id, String collectionName) {
         if (!ObjectId.isValid(id)) return "";
         MongoCollection<Document> collection = database.getCollection(collectionName);
