@@ -28,8 +28,14 @@ public class StrainsDeleteHandler_ {
     }
 
     @Test
-    public void ifStrainNotFound_returnHttpNotFound() {
+    public void ifDataAccessReturnsFalse_returnHttpNotFound() {
         when(dataAccess.deleteStrain(PARAMS.get(":id"))).thenReturn(false);
         assertThat(handler.process(new EmptyPayload(), PARAMS)).isEqualTo(Answer.notFound());
+    }
+
+    @Test
+    public void ifDataAccessReturnsTrue_returnHttpOk() {
+        when(dataAccess.deleteStrain(PARAMS.get(":id"))).thenReturn(true);
+        assertThat(handler.process(new EmptyPayload(), PARAMS).getCode()).isEqualTo(200);
     }
 }

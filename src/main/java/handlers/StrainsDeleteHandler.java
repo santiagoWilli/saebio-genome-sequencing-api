@@ -16,6 +16,8 @@ public class StrainsDeleteHandler extends AbstractHandler<EmptyPayload> {
 
     @Override
     protected Answer processRequest(EmptyPayload payload, Map<String, String> requestParams) {
-        return Answer.notFound();
+        return dataAccess.deleteStrain(requestParams.get(":id")) ?
+                new Answer(200, "Strain deleted") :
+                Answer.notFound();
     }
 }
