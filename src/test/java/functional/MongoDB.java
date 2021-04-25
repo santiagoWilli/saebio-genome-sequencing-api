@@ -100,4 +100,14 @@ public class MongoDB implements Database {
         collection.insertOne(document);
         return document.getObjectId("_id").toString();
     }
+
+    @Override
+    public String insertFakeStrain() {
+        MongoCollection<Document> collection = database.getCollection("strains");
+        Document document = new Document()
+                .append("_id", "anyKey")
+                .append("name", "anyName");
+        collection.insertOne(document);
+        return document.getString("_id");
+    }
 }

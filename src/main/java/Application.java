@@ -50,6 +50,10 @@ public class Application {
                 get("/:id", new ReferencesGetOneHandler(new MongoDataAccess()));
                 post("", new ReferencesPostHandler(new MongoDataAccess()));
             });
+
+            path("/strains", () -> {
+                get("/:id", new StrainsGetOneHandler(new MongoDataAccess()));
+            });
         });
 
         exception(Exception.class, (exception, request, response) -> System.out.println(" -ERROR: " + exception.getMessage()));

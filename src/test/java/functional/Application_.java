@@ -303,7 +303,6 @@ public class Application_ {
         assertThat(references.size()).isEqualTo(amount);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void when_getToReferencesId_then_returnReferenceFile() throws IOException {
         File file = new File(testFolderPath + "Kpneu231120_referencia.fa");
@@ -320,6 +319,22 @@ public class Application_ {
 
         InputStream responseStream = new ByteArrayInputStream(response);
         assertThat(IOUtils.contentEquals(responseStream, new FileInputStream(file))).isTrue();
+    }
+
+    @Test
+    public void when_getToStrainsId_then_returnStrainJson() throws IOException {
+        String id = db.insertFakeStrain();
+
+        String response =
+                when().
+                        get("/api/strains/" + id).
+                then().
+                        statusCode(200).
+                        contentType("application/json").
+                        extract().asString();
+
+        Map<String, Object> strainJson = new ObjectMapper().readValue(response, new TypeReference<HashMap<String,Object>>(){});
+        assertThat(strainJson.get("name")).isNotNull();
     }
 
     @BeforeAll
