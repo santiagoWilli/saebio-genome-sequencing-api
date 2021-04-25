@@ -22,6 +22,5 @@ public interface DataAccess {
     String getReference(String id);
 
     String getAllStrains();
-    String getStrain(String id);
     boolean createStrain(Strain strain);
 }

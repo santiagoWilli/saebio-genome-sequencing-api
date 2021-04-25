@@ -129,13 +129,6 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
-    public String getStrain(String id) {
-        MongoCollection<Document> collection = database.getCollection("strains");
-        final Document document = collection.find(eq("_id", id)).first();
-        return document == null ? "" : document.toJson();
-    }
-
-    @Override
     public boolean createStrain(Strain strain) {
         return false;
     }

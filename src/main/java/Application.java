@@ -52,7 +52,7 @@ public class Application {
             });
 
             path("/strains", () -> {
-                get("/:id", new StrainsGetOneHandler(new MongoDataAccess()));
+
             });
         });
 

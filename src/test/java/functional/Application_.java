@@ -321,22 +321,6 @@ public class Application_ {
         assertThat(IOUtils.contentEquals(responseStream, new FileInputStream(file))).isTrue();
     }
 
-    @Test
-    public void when_getToStrainsId_then_returnStrainJson() throws IOException {
-        String id = db.insertFakeStrain();
-
-        String response =
-                when().
-                        get("/api/strains/" + id).
-                then().
-                        statusCode(200).
-                        contentType("application/json").
-                        extract().asString();
-
-        Map<String, Object> strainJson = new ObjectMapper().readValue(response, new TypeReference<HashMap<String,Object>>(){});
-        assertThat(strainJson.get("name")).isNotNull();
-    }
-
     @BeforeAll
     static void startApplication() throws IOException, InterruptedException {
         port = PORT;
