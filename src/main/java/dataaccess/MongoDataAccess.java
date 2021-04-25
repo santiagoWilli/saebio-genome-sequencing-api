@@ -125,7 +125,7 @@ public class MongoDataAccess implements DataAccess {
 
     @Override
     public String getAllStrains() {
-        return null;
+        return findAllFromCollection("strains");
     }
 
     @Override
