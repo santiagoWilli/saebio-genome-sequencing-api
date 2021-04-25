@@ -352,6 +352,19 @@ public class Application_ {
         assertThat(db.strainExists(key.toLowerCase())).isTrue();
     }
 
+    @Test
+    public void given_aKeyAndAName_and_keyDoesAlreadyExist_when_postToStrains_then_returnHttpBadRequest() {
+        db.insertFakeStrain("existing");
+
+        given().
+                param("key", "existing").
+                param("name", "anyName").
+        when().
+                post("/api/strains").
+        then().
+                statusCode(400);
+    }
+
     @BeforeAll
     static void startApplication() throws IOException, InterruptedException {
         port = PORT;
