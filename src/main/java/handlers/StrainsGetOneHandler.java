@@ -16,8 +16,8 @@ public class StrainsGetOneHandler extends AbstractHandler<EmptyPayload> {
 
     @Override
     protected Answer processRequest(EmptyPayload payload, Map<String, String> requestParams) {
-        String sequenceJson = dataAccess.getStrain(requestParams.get(":id"));
-        if (sequenceJson.isEmpty()) return Answer.notFound();
-        return new Answer(200, sequenceJson);
+        String strainJson = dataAccess.getStrain(requestParams.get(":id"));
+        if (strainJson.isEmpty()) return Answer.notFound();
+        return new Answer(200, strainJson);
     }
 }

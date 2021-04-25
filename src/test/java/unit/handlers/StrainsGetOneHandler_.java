@@ -27,13 +27,13 @@ public class StrainsGetOneHandler_ {
     }
 
     @Test
-    public void ifSequenceNotFound_returnHttpNotFound() {
+    public void ifStrainNotFound_returnHttpNotFound() {
         when(dataAccess.getStrain(PARAMS.get(":id"))).thenReturn("");
         assertThat(handler.process(new EmptyPayload(), PARAMS)).isEqualTo(Answer.notFound());
     }
 
     @Test
-    public void ifSequenceFound_returnHttpOk_and_sequenceJson() {
+    public void ifStrainFound_returnHttpOk_and_strainJson() {
         when(dataAccess.getStrain(PARAMS.get(":id"))).thenReturn("abc");
         assertThat(handler.process(new EmptyPayload(), PARAMS)).isEqualTo(new Answer(200, "abc"));
         verify(dataAccess, times(1)).getStrain(PARAMS.get(":id"));
