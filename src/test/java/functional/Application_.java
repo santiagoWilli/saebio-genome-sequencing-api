@@ -337,6 +337,21 @@ public class Application_ {
         assertThat(strains.size()).isEqualTo(5);
     }
 
+    @Test
+    public void given_aKeyAndAName_and_keyDoesNotExist_when_postToStrains_then_strainIsCreatedWithKeyInLowerCase_and_returnHttpOk() {
+        String key = "newKey";
+
+        given().
+                param("key", key).
+                param("name", "anyName").
+        when().
+                post("/api/strains").
+        then().
+                statusCode(200);
+
+        assertThat(db.strainExists(key.toLowerCase())).isTrue();
+    }
+
     @BeforeAll
     static void startApplication() throws IOException, InterruptedException {
         port = PORT;

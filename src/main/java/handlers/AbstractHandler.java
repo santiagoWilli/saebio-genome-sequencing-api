@@ -2,6 +2,7 @@ package handlers;
 
 import org.apache.commons.io.FileUtils;
 import payloads.EmptyPayload;
+import payloads.Multipart;
 import payloads.Validable;
 import spark.Request;
 import spark.Response;
@@ -13,9 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class AbstractHandler<V extends Validable> implements RequestHandler<V>, Route {
@@ -41,7 +40,7 @@ public abstract class AbstractHandler<V extends Validable> implements RequestHan
         String uuid = null;
         try {
             V payload = null;
-            if (payloadClass != EmptyPayload.class) {
+            if (payloadClass.getSuperclass().equals(Multipart.class)) {
                 request.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
                 Map<String, String> fields = new HashMap<>();
                 Map<String, File> files = new HashMap<>();
@@ -62,6 +61,15 @@ public abstract class AbstractHandler<V extends Validable> implements RequestHan
                     part.delete();
                 }
                 payload = payloadClass.getConstructor(Map.class, Map.class).newInstance(fields, files);
+            } else if (payloadClass != EmptyPayload.class) {
+                Map<String, String> parameters = request.queryMap().toMap()
+                        .entrySet()
+                        .stream()
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                e -> e.getValue()[0]
+                        ));
+                payload = payloadClass.getConstructor(Map.class).newInstance(parameters);
             }
 
             Answer answer = process(payload, request.params());

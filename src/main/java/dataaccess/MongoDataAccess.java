@@ -130,7 +130,12 @@ public class MongoDataAccess implements DataAccess {
 
     @Override
     public boolean createStrain(Strain strain) {
-        return false;
+        MongoCollection<Document> collection = database.getCollection("strains");
+        Document document = new Document()
+                .append("_id", strain.getKey())
+                .append("name", strain.getName());
+        collection.insertOne(document);
+        return true;
     }
 
     private String getOneDocument(String id, String collectionName) {

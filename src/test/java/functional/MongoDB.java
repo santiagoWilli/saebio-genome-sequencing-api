@@ -102,12 +102,17 @@ public class MongoDB implements Database {
     }
 
     @Override
-    public String insertFakeStrain(String key) {
+    public void insertFakeStrain(String key) {
         MongoCollection<Document> collection = database.getCollection("strains");
         Document document = new Document()
                 .append("_id", key)
                 .append("name", "anyName");
         collection.insertOne(document);
-        return document.getString("_id");
+    }
+
+    @Override
+    public boolean strainExists(String id) {
+        MongoCollection<Document> collection = database.getCollection("strains");
+        return collection.find(eq("_id", id)).first() != null;
     }
 }

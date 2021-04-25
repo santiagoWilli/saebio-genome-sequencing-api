@@ -19,5 +19,6 @@ public interface Database {
     void insertFakeReference();
     String insertFakeReferenceWithFile(File file) throws FileNotFoundException;
 
-    String insertFakeStrain(String key);
+    void insertFakeStrain(String key);
+    boolean strainExists(String id);
 }
