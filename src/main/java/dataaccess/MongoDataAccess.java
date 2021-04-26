@@ -4,6 +4,7 @@ import com.mongodb.client.*;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
 import com.mongodb.client.gridfs.model.GridFSFile;
+import com.mongodb.client.model.IndexOptions;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import payloads.Reference;
@@ -130,25 +131,25 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
-    public String getStrainName(String id) {
+    public String getStrainName(String key) {
         MongoCollection<Document> collection = database.getCollection("strains");
-        Document document = collection.find(eq("_id", id))
-                .projection(fields(include("name"), excludeId())).first();
+        Document document = collection.find(eq("keys", key)).first();
         return document != null ? document.get("name").toString() : null;
     }
 
     @Override
     public boolean createStrain(Strain strain) {
+        MongoCollection<Document> collection = database.getCollection("strains");
+        collection.createIndex(new Document("name", 1), new IndexOptions().unique(true));
         try {
-            MongoCollection<Document> collection = database.getCollection("strains");
             Document document = new Document()
-                    .append("_id", strain.getKey())
-                    .append("name", strain.getName());
+                    .append("name", strain.getName())
+                    .append("keys", strain.getKeys());
             collection.insertOne(document);
-            return true;
         } catch (Exception e) {
             return false;
         }
+        return true;
     }
 
     @Override

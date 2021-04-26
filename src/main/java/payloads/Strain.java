@@ -1,33 +1,42 @@
 package payloads;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class Strain extends RequestParameters implements Validable {
-    public Strain(Map<String, String> parameters) {
+    public Strain(Map<String, String[]> parameters) {
         super(parameters);
     }
 
     public String getName() {
-        return parameters.get("name");
+        return parameters.get("name")[0];
     }
 
-    public String getKey() {
-        return parameters.get("key").toLowerCase();
+    public List<String> getKeys() {
+        return Arrays.stream(parameters.get("key"))
+                .filter(k -> !k.isEmpty())
+                .map(String::toLowerCase)
+                .collect(Collectors.toList());
     }
 
     @Override
     public boolean isValid() {
         if (parameters.get("name") != null && parameters.get("key") != null) {
-            return !parameters.get("name").isEmpty() &&
-                    !parameters.get("key").isEmpty() &&
-                    !onlyContainsAlphabeticChars(parameters.get("key"));
+            return !getName().isEmpty() &&
+                    getKeys().size() > 0 &&
+                    !keysContainNonAlphabeticChars();
         }
         return false;
     }
 
-    private static boolean onlyContainsAlphabeticChars(String string) {
+    private boolean keysContainNonAlphabeticChars() {
         Pattern p = Pattern.compile("[^a-z]", Pattern.CASE_INSENSITIVE);
-        return p.matcher(string).find();
+        for (String key : getKeys()) {
+            if (p.matcher(key).find()) return true;
+        }
+        return false;
     }
 }

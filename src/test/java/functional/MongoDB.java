@@ -105,14 +105,23 @@ public class MongoDB implements Database {
     public void insertFakeStrain(String key) {
         MongoCollection<Document> collection = database.getCollection("strains");
         Document document = new Document()
-                .append("_id", key)
+                .append("keys", Collections.singletonList(key))
                 .append("name", "anyName");
         collection.insertOne(document);
     }
 
     @Override
-    public boolean strainExists(String id) {
+    public void insertFakeStrain(String key, String name) {
         MongoCollection<Document> collection = database.getCollection("strains");
-        return collection.find(eq("_id", id)).first() != null;
+        Document document = new Document()
+                .append("keys", Collections.singletonList(key))
+                .append("name", name);
+        collection.insertOne(document);
+    }
+
+    @Override
+    public boolean strainExists(String key) {
+        MongoCollection<Document> collection = database.getCollection("strains");
+        return collection.find(eq("keys", key)).first() != null;
     }
 }

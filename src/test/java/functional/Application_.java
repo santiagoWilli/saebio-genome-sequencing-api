@@ -43,7 +43,7 @@ public class Application_ {
     @Test
     public void given_aPairOfValidFiles_when_postToSequences_then_statusCode202_and_sequenceCreated() throws IOException {
         db.insertFakeStrain("kp");
-        Map<String, Object> strain = db.get("strains", "_id", "kp");
+        Map<String, Object> strain = db.get("strains", "keys", "kp");
 
         final String token = token();
         stubFor(post(urlEqualTo("/trim"))
@@ -283,7 +283,7 @@ public class Application_ {
     @Test
     public void given_aValidFile_when_postToReferences_then_statusCode200_and_referenceUploaded() throws IOException {
         db.insertFakeStrain("kpneu");
-        Map<String, Object> strain = db.get("strains", "_id", "kpneu");
+        Map<String, Object> strain = db.get("strains", "keys", "kpneu");
 
         String response =
                 given().
@@ -354,7 +354,7 @@ public class Application_ {
 
     @Test
     public void when_getToStrains_then_returnStrainsAsJson() throws IOException {
-        for (int i = 0; i < 5; i++) db.insertFakeStrain("key" + i);
+        for (int i = 0; i < 5; i++) db.insertFakeStrain("key" + i, "name" + i);
 
         String response =
                 when().
@@ -394,28 +394,6 @@ public class Application_ {
                 post("/api/strains").
         then().
                 statusCode(400);
-    }
-
-    @Test
-    public void given_anIdThatExists_when_deleteToStrainsId_then_deleteStrain_and_returnHttpOk() {
-        String key = "key";
-        db.insertFakeStrain(key);
-        assertThat(db.strainExists(key)).isTrue();
-
-        when().
-                delete("/api/strains/" + key).
-        then().
-                statusCode(200);
-
-        assertThat(db.strainExists(key)).isFalse();
-    }
-
-    @Test
-    public void given_anIdThatDoesNotExist_when_deleteToStrainsId_then_returnHttpNotFound() {
-        when().
-                delete("/api/strains/key").
-        then().
-                statusCode(404);
     }
 
     @BeforeAll

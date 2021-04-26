@@ -62,14 +62,7 @@ public abstract class AbstractHandler<V extends Validable> implements RequestHan
                 }
                 payload = payloadClass.getConstructor(Map.class, Map.class).newInstance(fields, files);
             } else if (payloadClass != EmptyPayload.class) {
-                Map<String, String> parameters = request.queryMap().toMap()
-                        .entrySet()
-                        .stream()
-                        .collect(Collectors.toMap(
-                                Map.Entry::getKey,
-                                e -> e.getValue()[0]
-                        ));
-                payload = payloadClass.getConstructor(Map.class).newInstance(parameters);
+                payload = payloadClass.getConstructor(Map.class).newInstance(request.queryMap().toMap());
             }
 
             Answer answer = process(payload, request.params());

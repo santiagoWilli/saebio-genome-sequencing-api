@@ -10,56 +10,58 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class Strain_ {
-    private Map<String, String> parameters;
+    private Map<String, String[]> parameters;
     private Strain strain;
 
     @Test
     public void valid_if_requestHasKeyAndName_and_areNotEmpty() {
-        parameters.put("key", "kneu");
-        parameters.put("name", "klebsiella");
+        parameters.put("key", new String[]{"kneu"});
+        parameters.put("name", new String[]{"klebsiella"});
         assertThat(strain.isValid()).isTrue();
     }
 
     @Test
     public void invalid_if_requestHasKeyAndName_and_areEmpty() {
-        parameters.put("key", "");
-        parameters.put("name", "");
+        parameters.put("key", new String[]{""});
+        parameters.put("name", new String[]{""});
         assertThat(strain.isValid()).isFalse();
     }
 
     @Test
     public void invalid_if_requestHasKeyAndName_and_keyIsNotComposedOfOnlyAlphabeticCharacters() {
-        parameters.put("name", "klebsi");
-        parameters.put("key", "k_neu");
+        parameters.put("name", new String[]{"klebsi"});
+        parameters.put("key", new String[]{"k_neu"});
         assertThat(strain.isValid()).isFalse();
-        parameters.put("key", "key*");
+        parameters.put("key", new String[]{"key*"});
         assertThat(strain.isValid()).isFalse();
-        parameters.put("key", "any key");
+        parameters.put("key", new String[]{"any key"});
         assertThat(strain.isValid()).isFalse();
-        parameters.put("key", "key1");
+        parameters.put("key", new String[]{"key1"});
+        assertThat(strain.isValid()).isFalse();
+        parameters.put("key", new String[]{""});
         assertThat(strain.isValid()).isFalse();
     }
 
     @Test
     public void invalid_if_requestHasNotKeyOrName() {
-        parameters.put("key", "");
+        parameters.put("key", new String[]{"key"});
         assertThat(strain.isValid()).isFalse();
 
         parameters.clear();
-        parameters.put("name", "");
+        parameters.put("name", new String[]{"name"});
         assertThat(strain.isValid()).isFalse();
     }
 
     @Test
     public void getName_shouldReturn_nameParameter() {
-        parameters.put("name", "Klebsiella pneumoniae");
+        parameters.put("name", new String[]{"Klebsiella pneumoniae"});
         assertThat(strain.getName()).isEqualTo("Klebsiella pneumoniae");
     }
 
     @Test
-    public void getKey_shouldReturn_keyParameterAlwaysInLowerCase() {
-        parameters.put("key", "kNEU");
-        assertThat(strain.getKey()).isEqualTo("kneu");
+    public void getKeys_shouldReturn_keysInLowerCase() {
+        parameters.put("key", new String[]{"kNEU", "kp"});
+        assertThat(strain.getKeys()).containsExactly("kneu", "kp");
     }
 
     @BeforeEach

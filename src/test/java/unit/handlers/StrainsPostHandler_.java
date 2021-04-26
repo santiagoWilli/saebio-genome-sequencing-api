@@ -24,7 +24,7 @@ public class StrainsPostHandler_ {
     }
 
     @Test
-    public void if_keyAlreadyExists_return_badRequest() {
+    public void if_nameAlreadyExists_return_badRequest() {
         when(dataAccess.createStrain(strain)).thenReturn(false);
         assertThat(handler.process(strain, null).getCode()).isEqualTo(400);
     }
