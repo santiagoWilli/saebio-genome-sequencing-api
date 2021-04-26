@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Projections.*;
 import static com.mongodb.client.model.Updates.*;
 
 public class MongoDataAccess implements DataAccess {
@@ -32,7 +33,7 @@ public class MongoDataAccess implements DataAccess {
     public String createSequence(Sequence sequence, String genomeToolToken) {
         MongoCollection<Document> collection = database.getCollection("sequences");
         Document document = new Document("sequenceDate", formatDate(sequence.getDate()))
-                .append("strain", sequence.getStrainKey())
+                .append("strain", getStrainName(sequence.getStrainKey()))
                 .append("originalFilenames", sequence.getOriginalFileNames())
                 .append("genomeToolToken", genomeToolToken)
                 .append("trimRequestDate", formatDate(LocalDateTime.now(ZoneOffset.UTC)));
@@ -106,7 +107,7 @@ public class MongoDataAccess implements DataAccess {
 
         MongoCollection<Document> collection = database.getCollection("references");
         Document document = new Document()
-                .append("strain", reference.getStrain())
+                .append("strain", getStrainName(reference.getStrainKey()))
                 .append("code", reference.getCode())
                 .append("file", id);
         collection.insertOne(document);
@@ -130,7 +131,10 @@ public class MongoDataAccess implements DataAccess {
 
     @Override
     public String getStrainName(String id) {
-        return null;
+        MongoCollection<Document> collection = database.getCollection("strains");
+        Document document = collection.find(eq("_id", id))
+                .projection(fields(include("name"), excludeId())).first();
+        return document != null ? document.get("name").toString() : null;
     }
 
     @Override

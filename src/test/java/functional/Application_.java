@@ -42,6 +42,9 @@ public class Application_ {
 
     @Test
     public void given_aPairOfValidFiles_when_postToSequences_then_statusCode202_and_sequenceCreated() throws IOException {
+        db.insertFakeStrain("kp");
+        Map<String, Object> strain = db.get("strains", "_id", "kp");
+
         final String token = token();
         stubFor(post(urlEqualTo("/trim"))
                 .willReturn(aResponse()
@@ -66,7 +69,7 @@ public class Application_ {
         String id = String.valueOf(node.get("id").asText());
         Map<String, Object> sequence = db.get("sequences", id);
 
-        assertThat(sequence.get("strain")).isEqualTo("Klebsiella pneumoniae");
+        assertThat(sequence.get("strain")).isEqualTo(strain.get("name"));
         assertThat(sequence.get("originalFilenames")).isEqualTo(Arrays.asList("Kp1_231120_R1.fastq.gz", "Kp1_231120_R2.fastq.gz"));
         assertThat(sequence.get("genomeToolToken")).isEqualTo(token);
         assertThat(sequence.get("sequenceDate").toString())
@@ -74,6 +77,21 @@ public class Application_ {
         assertThat(sequence.get("trimRequestDate").toString())
                 .startsWith(dateFormat(Calendar.getInstance().getTime(), "yyyy-MM-dd HH:mm"));
         assertThat(sequence.get("trimmedPair")).isNull();
+    }
+
+    @Test
+    public void given_aPairOfFilesWhichStrainKeysDoNotExist_when_postToSequences_then_httpBadRequest() {
+        stubFor(post(urlEqualTo("/trim")));
+
+        given().
+                multiPart("file1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
+                multiPart("file2", new File(testFolderPath + "Kp1_231120_R2.fastq.gz")).
+        when().
+                post("/api/sequences").
+        then().
+                statusCode(400);
+
+        verify(exactly(0), postRequestedFor(urlEqualTo("/trim")));
     }
 
     @Test
@@ -264,6 +282,9 @@ public class Application_ {
     @SuppressWarnings("unchecked")
     @Test
     public void given_aValidFile_when_postToReferences_then_statusCode200_and_referenceUploaded() throws IOException {
+        db.insertFakeStrain("kpneu");
+        Map<String, Object> strain = db.get("strains", "_id", "kpneu");
+
         String response =
                 given().
                         multiPart("file", new File(testFolderPath + "Kpneu231120_referencia.fa")).
@@ -278,13 +299,23 @@ public class Application_ {
         String id = String.valueOf(node.get("id").asText());
         Map<String, Object> reference = db.get("references", id);
 
-        assertThat(reference.get("strain")).isEqualTo("Klebsiella pneumoniae");
+        assertThat(reference.get("strain")).isEqualTo(strain.get("name"));
         assertThat(reference.get("code")).isEqualTo("231120");
         assertThat(reference.get("file")).isNotNull();
         assertThat(reference.get("file")).isOfAnyClassIn(LinkedHashMap.class);
         LinkedHashMap<String, String> file = (LinkedHashMap<String, String>) reference.get("file");
         assertThat(file).containsKey("$oid");
         assertThat(db.referenceExists(file.get("$oid"))).isTrue();
+    }
+
+    @Test
+    public void given_aFileWhichStrainKeyDoesNotExist_when_postToReferences_then_httpBadRequest() {
+        given().
+                multiPart("file", new File(testFolderPath + "Kpneu231120_referencia.fa")).
+        when().
+                post("/api/references").
+        then().
+                statusCode(400);
     }
 
     @Test
