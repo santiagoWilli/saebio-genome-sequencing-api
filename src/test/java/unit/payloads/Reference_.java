@@ -38,9 +38,9 @@ public class Reference_ {
     }
 
     @Test
-    public void getStrain_shouldReturn_theValueFromTheKeyInTheFilename() {
+    public void getStrain_shouldReturn_theKeyInTheFilenameInLowercase() {
         Reference reference = getReferenceFrom("Kneu123456-referencia.fa");
-        assertThat(reference.getStrain()).isEqualTo("Klebsiella pneumoniae");
+        assertThat(reference.getStrain()).isEqualTo("kneu");
     }
 
     @Test

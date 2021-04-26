@@ -1,7 +1,5 @@
 package payloads;
 
-import utils.StrainMap;
-
 import java.io.File;
 import java.util.Map;
 
@@ -15,7 +13,7 @@ public class Reference extends Multipart implements Validable {
     }
 
     public String getStrain() {
-        return StrainMap.get(strainKey());
+        return fileNameFirstFieldRemove("[0-9]").toLowerCase();
     }
 
     public String getCode() {
@@ -30,10 +28,6 @@ public class Reference extends Multipart implements Validable {
     public boolean isValid() {
         if (files.size() != 1) return false;
         return files.keySet().iterator().next().matches(fileNameRegex());
-    }
-
-    private String strainKey() {
-        return fileNameFirstFieldRemove("[0-9]");
     }
 
     private String fileNameFirstFieldRemove(String regex) {
