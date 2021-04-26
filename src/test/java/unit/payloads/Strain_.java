@@ -14,10 +14,17 @@ public class Strain_ {
     private Strain strain;
 
     @Test
-    public void valid_if_requestHasKeyAndName() {
+    public void valid_if_requestHasKeyAndName_and_areNotEmpty() {
+        parameters.put("key", "kneu");
+        parameters.put("name", "klebsiella");
+        assertThat(strain.isValid()).isTrue();
+    }
+
+    @Test
+    public void invalid_if_requestHasKeyAndName_and_areEmpty() {
         parameters.put("key", "");
         parameters.put("name", "");
-        assertThat(strain.isValid()).isTrue();
+        assertThat(strain.isValid()).isFalse();
     }
 
     @Test
