@@ -70,9 +70,9 @@ public class Sequence_ {
     }
 
     @Test
-    public void getStrain_shouldReturn_theValueFromTheKeyInTheFilename() {
+    public void getStrain_shouldReturn_theKeyInTheFilenameInLowerCase() {
         Sequence sequence = getSequenceFrom(VALID_PAIRS[0]);
-        assertThat(sequence.getStrain()).isEqualTo("Klebsiella pneumoniae");
+        assertThat(sequence.getStrainKey()).isEqualTo("kp");
     }
 
     @Test

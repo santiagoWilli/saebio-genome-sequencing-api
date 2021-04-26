@@ -1,7 +1,5 @@
 package payloads;
 
-import utils.StrainMap;
-
 import java.io.File;
 import java.time.LocalDate;
 import java.util.List;
@@ -22,8 +20,11 @@ public class Sequence extends Multipart implements Validable {
         );
     }
 
-    public String getStrain() {
-        return StrainMap.get(strainKey());
+    public String getStrainKey() {
+        return files.keySet().iterator().next()
+                .split("_")[0]
+                .split("[0-9]")[0]
+                .toLowerCase();
     }
 
     public List<String> getOriginalFileNames() {
@@ -67,12 +68,6 @@ public class Sequence extends Multipart implements Validable {
             month = Integer.parseInt(date.substring(2, 4));
             year = Integer.parseInt(date.substring(4, 6));
         }
-    }
-
-    private String strainKey() {
-        return files.keySet().iterator().next()
-                .split("_")[0]
-                .split("[0-9]")[0];
     }
 }
 

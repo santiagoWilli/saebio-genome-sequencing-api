@@ -32,7 +32,7 @@ public class MongoDataAccess implements DataAccess {
     public String createSequence(Sequence sequence, String genomeToolToken) {
         MongoCollection<Document> collection = database.getCollection("sequences");
         Document document = new Document("sequenceDate", formatDate(sequence.getDate()))
-                .append("strain", sequence.getStrain())
+                .append("strain", sequence.getStrainKey())
                 .append("originalFilenames", sequence.getOriginalFileNames())
                 .append("genomeToolToken", genomeToolToken)
                 .append("trimRequestDate", formatDate(LocalDateTime.now(ZoneOffset.UTC)));
@@ -126,6 +126,11 @@ public class MongoDataAccess implements DataAccess {
     @Override
     public String getAllStrains() {
         return findAllFromCollection("strains");
+    }
+
+    @Override
+    public String getStrainName(String id) {
+        return null;
     }
 
     @Override
