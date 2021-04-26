@@ -28,6 +28,19 @@ public class Strain_ {
     }
 
     @Test
+    public void invalid_if_requestHasKeyAndName_and_keyIsNotComposedOfOnlyAlphabeticCharacters() {
+        parameters.put("name", "klebsi");
+        parameters.put("key", "k_neu");
+        assertThat(strain.isValid()).isFalse();
+        parameters.put("key", "key*");
+        assertThat(strain.isValid()).isFalse();
+        parameters.put("key", "any key");
+        assertThat(strain.isValid()).isFalse();
+        parameters.put("key", "key1");
+        assertThat(strain.isValid()).isFalse();
+    }
+
+    @Test
     public void invalid_if_requestHasNotKeyOrName() {
         parameters.put("key", "");
         assertThat(strain.isValid()).isFalse();
