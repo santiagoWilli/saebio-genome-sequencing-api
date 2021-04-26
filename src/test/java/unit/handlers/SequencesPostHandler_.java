@@ -77,5 +77,7 @@ public class SequencesPostHandler_ {
         when(dataAccess.getStrainName("kp")).thenReturn(null);
         assertThat(handler.process(sequence, null).getCode()).isEqualTo(400);
         verifyNoInteractions(toolAnswer);
+        verify(dataAccess, times(1)).getStrainName("kp");
+        verifyNoMoreInteractions(dataAccess);
     }
 }

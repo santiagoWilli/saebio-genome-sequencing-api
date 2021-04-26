@@ -12,7 +12,7 @@ public class Reference extends Multipart implements Validable {
         return files.keySet().iterator().next();
     }
 
-    public String getStrain() {
+    public String getStrainKey() {
         return fileNameFirstFieldRemove("[0-9]").toLowerCase();
     }
 

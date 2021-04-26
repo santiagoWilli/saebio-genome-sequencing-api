@@ -40,7 +40,7 @@ public class Reference_ {
     @Test
     public void getStrain_shouldReturn_theKeyInTheFilenameInLowercase() {
         Reference reference = getReferenceFrom("Kneu123456-referencia.fa");
-        assertThat(reference.getStrain()).isEqualTo("kneu");
+        assertThat(reference.getStrainKey()).isEqualTo("kneu");
     }
 
     @Test
