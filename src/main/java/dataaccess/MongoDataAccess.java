@@ -172,9 +172,12 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
-    public boolean deleteStrain(String id) {
+    public boolean deleteStrain(String id) throws DocumentPointsToStrainException {
         if (!ObjectId.isValid(id)) return false;
-        MongoCollection<Document> collection = database.getCollection("strains");
+        MongoCollection<Document> collection = database.getCollection("sequences");
+        if (collection.countDocuments(eq("strain", new ObjectId(id))) > 0) throw new DocumentPointsToStrainException();
+
+        collection = database.getCollection("strains");
         return collection.deleteOne(eq("_id", new ObjectId(id))).getDeletedCount() > 0;
     }
 
@@ -198,4 +201,6 @@ public class MongoDataAccess implements DataAccess {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
         return date.format(formatter);
     }
+
+    public static class DocumentPointsToStrainException extends Exception {}
 }

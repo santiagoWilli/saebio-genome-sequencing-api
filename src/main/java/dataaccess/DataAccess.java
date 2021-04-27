@@ -1,6 +1,5 @@
 package dataaccess;
 
-import org.bson.Document;
 import payloads.Reference;
 import payloads.Sequence;
 import payloads.Strain;
@@ -24,6 +23,6 @@ public interface DataAccess {
 
     String getAllStrains();
     boolean createStrain(Strain strain);
-    boolean deleteStrain(String id);
+    boolean deleteStrain(String id) throws MongoDataAccess.DocumentPointsToStrainException;
     boolean strainExists(String key);
 }

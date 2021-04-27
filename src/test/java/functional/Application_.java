@@ -416,6 +416,21 @@ public class Application_ {
     }
 
     @Test
+    public void given_anIdThatExists_and_oneOrMoreDocumentsPointToIt_when_deleteToStrainsId_then_strainNotDeleted_and_returnHttpConflict() {
+        String key = "key";
+        String id = db.insertFakeStrain(key);
+        db.insertFakeSequence(token(), id);
+        assertThat(db.strainExists(key)).isTrue();
+
+        when().
+                delete("/api/strains/" + id).
+        then().
+                statusCode(409);
+
+        assertThat(db.strainExists(key)).isTrue();
+    }
+
+    @Test
     public void given_anIdThatDoesNotExist_when_deleteToStrainsId_then_returnHttpNotFound() {
         when().
                 delete("/api/strains/1234").

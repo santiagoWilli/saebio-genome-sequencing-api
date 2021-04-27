@@ -1,6 +1,7 @@
 package handlers;
 
 import dataaccess.DataAccess;
+import dataaccess.MongoDataAccess;
 import payloads.EmptyPayload;
 import utils.Answer;
 
@@ -16,8 +17,12 @@ public class StrainsDeleteHandler extends AbstractHandler<EmptyPayload> {
 
     @Override
     protected Answer processRequest(EmptyPayload payload, Map<String, String> requestParams) {
-        return dataAccess.deleteStrain(requestParams.get(":id")) ?
-                new Answer(200, "Strain deleted") :
-                Answer.notFound();
+        try {
+            return dataAccess.deleteStrain(requestParams.get(":id")) ?
+                    new Answer(200, "Strain deleted") :
+                    Answer.notFound();
+        } catch (MongoDataAccess.DocumentPointsToStrainException e) {
+            return new Answer(409, "There are documents pointing to this strain");
+        }
     }
 }
