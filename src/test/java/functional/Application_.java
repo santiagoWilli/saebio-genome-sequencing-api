@@ -372,7 +372,7 @@ public class Application_ {
     }
 
     @Test
-    public void given_aKeyAndAName_and_keyDoesNotExist_when_postToStrains_then_strainIsCreatedWithKeyInLowerCase_and_returnHttpOk() {
+    public void given_aKeyAndAName_and_keyDoesNotExist_when_postToStrains_then_strainIsCreatedWithKeyInLowerCase_and_returnHttpOk() throws IOException {
         String key = "newKey";
 
         given().
@@ -384,6 +384,8 @@ public class Application_ {
                 statusCode(200);
 
         assertThat(db.strainExists(key.toLowerCase())).isTrue();
+        Map<String, Object> strain = db.get("strains", "keys", key.toLowerCase());
+        assertThat(strain.get("keys").getClass().getInterfaces()).contains(List.class);
     }
 
     @Test
