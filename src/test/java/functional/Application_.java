@@ -396,6 +396,28 @@ public class Application_ {
                 statusCode(400);
     }
 
+    @Test
+    public void given_anIdThatExists_and_noDocumentPointsToIt_when_deleteToStrainsId_then_deleteStrain_and_returnHttpOk() {
+        String key = "key";
+        String id = db.insertFakeStrain(key);
+        assertThat(db.strainExists(key)).isTrue();
+
+        when().
+                delete("/api/strains/" + id).
+        then().
+                statusCode(200);
+
+        assertThat(db.strainExists(key)).isFalse();
+    }
+
+    @Test
+    public void given_anIdThatDoesNotExist_when_deleteToStrainsId_then_returnHttpNotFound() {
+        when().
+                delete("/api/strains/1234").
+        then().
+                statusCode(404);
+    }
+
     @BeforeAll
     static void startApplication() throws IOException, InterruptedException {
         port = PORT;

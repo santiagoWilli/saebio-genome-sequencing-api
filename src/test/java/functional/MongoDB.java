@@ -102,21 +102,23 @@ public class MongoDB implements Database {
     }
 
     @Override
-    public void insertFakeStrain(String key) {
+    public String insertFakeStrain(String key) {
         MongoCollection<Document> collection = database.getCollection("strains");
         Document document = new Document()
                 .append("keys", Collections.singletonList(key))
                 .append("name", "anyName");
         collection.insertOne(document);
+        return document.getObjectId("_id").toString();
     }
 
     @Override
-    public void insertFakeStrain(String key, String name) {
+    public String insertFakeStrain(String key, String name) {
         MongoCollection<Document> collection = database.getCollection("strains");
         Document document = new Document()
                 .append("keys", Collections.singletonList(key))
                 .append("name", name);
         collection.insertOne(document);
+        return document.getObjectId("_id").toString();
     }
 
     @Override
