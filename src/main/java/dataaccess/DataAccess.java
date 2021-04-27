@@ -1,5 +1,6 @@
 package dataaccess;
 
+import org.bson.Document;
 import payloads.Reference;
 import payloads.Sequence;
 import payloads.Strain;
@@ -22,7 +23,7 @@ public interface DataAccess {
     String getReference(String id);
 
     String getAllStrains();
-    String getStrainName(String id);
     boolean createStrain(Strain strain);
     boolean deleteStrain(String id);
+    boolean strainExists(String key);
 }

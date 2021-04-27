@@ -11,7 +11,8 @@ public interface Database {
     Map<String, Object> get(String collection, String field, String value) throws IOException;
 
     void insertFakeSequence(String token);
-    void insertFakeSequenceWithTrimmedFiles(String token, Collection<File> files) throws FileNotFoundException;
+    void insertFakeSequence(String token, String strainId);
+    void insertFakeSequenceWithTrimmedFiles(String token, Collection<File> files, String strainId) throws FileNotFoundException;
 
     void empty(String collection);
 
@@ -21,6 +22,5 @@ public interface Database {
 
     String insertFakeStrain(String key);
     String insertFakeStrain(String key, String name);
-
     boolean strainExists(String id);
 }

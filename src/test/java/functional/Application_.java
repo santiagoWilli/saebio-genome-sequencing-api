@@ -69,7 +69,7 @@ public class Application_ {
         String id = String.valueOf(node.get("id").asText());
         Map<String, Object> sequence = db.get("sequences", id);
 
-        assertThat(sequence.get("strain")).isEqualTo(strain.get("name"));
+        assertThat(sequence.get("strain")).isEqualTo(strain.get("_id"));
         assertThat(sequence.get("originalFilenames")).isEqualTo(Arrays.asList("Kp1_231120_R1.fastq.gz", "Kp1_231120_R2.fastq.gz"));
         assertThat(sequence.get("genomeToolToken")).isEqualTo(token);
         assertThat(sequence.get("sequenceDate").toString())
@@ -210,7 +210,7 @@ public class Application_ {
     @Test
     public void when_getToSequencesId_then_returnSequenceWithGivenIdAsJson() throws IOException {
         final String token = token();
-        db.insertFakeSequence(token);
+        db.insertFakeSequence(token, db.insertFakeStrain("kp", "test"));
         Map<String, Object> sequence = db.get("sequences", "genomeToolToken", token);
         String id = ((Map<String, String>) sequence.get("_id")).get("$oid");
 
@@ -225,6 +225,9 @@ public class Application_ {
         assertThat(((Map<String, String>) sequenceJson.get("_id")).get("$oid"))
                 .isEqualTo(id);
         assertThat(sequenceJson.get("genomeToolToken")).isEqualTo(token);
+        Map<String, Object> strain = (Map<String, Object>) sequenceJson.get("strain");
+        assertThat(strain.get("_id")).isNotNull();
+        assertThat((String) strain.get("name")).isEqualTo("test");
     }
 
     @Test
@@ -247,7 +250,7 @@ public class Application_ {
         Collection<File> files = new ArrayList<>();
         files.add(new File(testFolderPath + "ngs/Kp4_R1_001_trimmed.fq.gz"));
         files.add(new File(testFolderPath + "ngs/Kp4_R2_001_trimmed.fq.gz"));
-        db.insertFakeSequenceWithTrimmedFiles(token, files);
+        db.insertFakeSequenceWithTrimmedFiles(token, files, db.insertFakeStrain("kp", "test"));
         Map<String, Object> sequence = db.get("sequences", "genomeToolToken", token);
         String id = ((Map<String, String>) sequence.get("_id")).get("$oid");
 
@@ -299,7 +302,7 @@ public class Application_ {
         String id = String.valueOf(node.get("id").asText());
         Map<String, Object> reference = db.get("references", id);
 
-        assertThat(reference.get("strain")).isEqualTo(strain.get("name"));
+        assertThat(reference.get("strain")).isEqualTo(strain.get("_id"));
         assertThat(reference.get("code")).isEqualTo("231120");
         assertThat(reference.get("file")).isNotNull();
         assertThat(reference.get("file")).isOfAnyClassIn(LinkedHashMap.class);

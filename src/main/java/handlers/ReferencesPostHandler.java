@@ -18,7 +18,7 @@ public class ReferencesPostHandler extends AbstractHandler<Reference> {
 
     @Override
     protected Answer processRequest(Reference reference, Map<String, String> requestParams) {
-        if (dataAccess.getStrainName(reference.getStrainKey()) == null) {
+        if (!dataAccess.strainExists(reference.getStrainKey())) {
             return Answer.badRequest(reference.getStrainKey() + " strain does not exist");
         }
 

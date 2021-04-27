@@ -55,10 +55,21 @@ public class MongoDB implements Database {
     }
 
     @Override
-    public void insertFakeSequenceWithTrimmedFiles(String token, Collection<File> files) throws FileNotFoundException {
+    public void insertFakeSequence(String token, String strainId) {
+        MongoCollection<Document> collection = database.getCollection("sequences");
+        collection.insertOne(new Document()
+                .append("genomeToolToken", token)
+                .append("strain", new ObjectId(strainId))
+        );
+    }
+
+    @Override
+    public void insertFakeSequenceWithTrimmedFiles(String token, Collection<File> files, String strainId) throws FileNotFoundException {
         MongoCollection<Document> collection = database.getCollection("sequences");
         Document document = new Document()
-                .append("genomeToolToken", token);
+                .append("genomeToolToken", token)
+                .append("strain", new ObjectId(strainId));
+
         collection.insertOne(document);
 
         GridFSBucket gridFSBucket = GridFSBuckets.create(database);

@@ -21,7 +21,7 @@ public class SequencesPostHandler extends AbstractHandler<Sequence> {
 
     @Override
     protected Answer processRequest(Sequence sequence, Map<String, String> requestParams) {
-        if (dataAccess.getStrainName(sequence.getStrainKey()) == null) {
+        if (!dataAccess.strainExists(sequence.getStrainKey())) {
             return Answer.badRequest(sequence.getStrainKey() + " strain does not exist");
         }
 

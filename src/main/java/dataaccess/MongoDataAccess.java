@@ -4,6 +4,7 @@ import com.mongodb.client.*;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
 import com.mongodb.client.gridfs.model.GridFSFile;
+import com.mongodb.client.model.Field;
 import com.mongodb.client.model.IndexOptions;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -16,12 +17,15 @@ import java.io.*;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Projections.*;
 import static com.mongodb.client.model.Updates.*;
+
 
 public class MongoDataAccess implements DataAccess {
     private final MongoDatabase database;
@@ -34,7 +38,7 @@ public class MongoDataAccess implements DataAccess {
     public String createSequence(Sequence sequence, String genomeToolToken) {
         MongoCollection<Document> collection = database.getCollection("sequences");
         Document document = new Document("sequenceDate", formatDate(sequence.getDate()))
-                .append("strain", getStrainName(sequence.getStrainKey()))
+                .append("strain", getStrain(sequence.getStrainKey()).getObjectId("_id"))
                 .append("originalFilenames", sequence.getOriginalFileNames())
                 .append("genomeToolToken", genomeToolToken)
                 .append("trimRequestDate", formatDate(LocalDateTime.now(ZoneOffset.UTC)));
@@ -80,7 +84,16 @@ public class MongoDataAccess implements DataAccess {
 
     @Override
     public String getSequence(String id) {
-        return getOneDocument(id, "sequences");
+        if (!ObjectId.isValid(id)) return "";
+        MongoCollection<Document> collection = database.getCollection("sequences");
+
+        ArrayList<Document> result = collection.aggregate(Arrays.asList(
+                match(eq("_id", new ObjectId(id))),
+                lookup("strains", "strain", "_id", "strain"),
+                unwind("$strain"),
+                project(fields(exclude("strain.keys")))
+        )).into(new ArrayList<>());
+        return result.size() < 1 ? "" : result.get(0).toJson();
     }
 
     @Override
@@ -108,7 +121,7 @@ public class MongoDataAccess implements DataAccess {
 
         MongoCollection<Document> collection = database.getCollection("references");
         Document document = new Document()
-                .append("strain", getStrainName(reference.getStrainKey()))
+                .append("strain", getStrain(reference.getStrainKey()).getObjectId("_id"))
                 .append("code", reference.getCode())
                 .append("file", id);
         collection.insertOne(document);
@@ -122,7 +135,10 @@ public class MongoDataAccess implements DataAccess {
 
     @Override
     public String getReference(String id) {
-        return getOneDocument(id, "references");
+        if (!ObjectId.isValid(id)) return "";
+        MongoCollection<Document> collection = database.getCollection("references");
+        final Document document = collection.find(eq("_id", new ObjectId(id))).first();
+        return document == null ? "" : document.toJson();
     }
 
     @Override
@@ -131,10 +147,14 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
-    public String getStrainName(String key) {
+    public boolean strainExists(String key) {
         MongoCollection<Document> collection = database.getCollection("strains");
-        Document document = collection.find(eq("keys", key)).first();
-        return document != null ? document.get("name").toString() : null;
+        return collection.find(eq("keys", key)).first() != null;
+    }
+
+    private Document getStrain(String key) {
+        MongoCollection<Document> collection = database.getCollection("strains");
+        return collection.find(eq("keys", key)).first();
     }
 
     @Override
@@ -157,13 +177,6 @@ public class MongoDataAccess implements DataAccess {
         if (!ObjectId.isValid(id)) return false;
         MongoCollection<Document> collection = database.getCollection("strains");
         return collection.deleteOne(eq("_id", new ObjectId(id))).getDeletedCount() > 0;
-    }
-
-    private String getOneDocument(String id, String collectionName) {
-        if (!ObjectId.isValid(id)) return "";
-        MongoCollection<Document> collection = database.getCollection(collectionName);
-        final Document document = collection.find(eq("_id", new ObjectId(id))).first();
-        return document == null ? "" : document.toJson();
     }
 
     private String findAllFromCollection(String collectionName) {
