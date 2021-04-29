@@ -9,6 +9,6 @@ public class StrainKeys extends AbstractStrain implements Validable {
 
     @Override
     public boolean isValid() {
-        return true;
+        return parameters.get("key") != null;
     }
 }

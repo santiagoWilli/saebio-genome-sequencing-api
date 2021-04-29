@@ -19,6 +19,12 @@ public class StrainKeys_ {
         assertThat(keys.isValid()).isTrue();
     }
 
+    @Test
+    public void invalid_if_requestHasNoKeys() {
+        parameters.put("anything", new String[]{"kneu"});
+        assertThat(keys.isValid()).isFalse();
+    }
+
     @BeforeEach
     public void setUp() {
         parameters = new HashMap<>();
