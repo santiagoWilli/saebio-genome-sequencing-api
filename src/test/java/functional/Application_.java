@@ -462,6 +462,22 @@ public class Application_ {
                 statusCode(404);
     }
 
+    @Test
+    public void given_keys_and_anyKeyAlreadyExists_when_patchToStrainsId_then_returnHttpConflict_and_strainKeysAreNotModified() throws IOException {
+        String id = db.insertFakeStrain("kp");
+
+        given().
+                param("key", "kp").
+                param("key", "kneu").
+        when().
+                patch("/api/strains/" + id).
+        then().
+                statusCode(409);
+
+        Map<String, Object> strain = db.get("strains", id);
+        assertThat((List<String>) strain.get("keys")).containsExactly("kp");
+    }
+
     @BeforeAll
     static void startApplication() throws IOException, InterruptedException {
         port = PORT;

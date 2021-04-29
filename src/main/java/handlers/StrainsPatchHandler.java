@@ -22,7 +22,7 @@ public class StrainsPatchHandler extends AbstractHandler<StrainKeys> {
                     new Answer(200, "Strain keys updated") :
                     Answer.notFound();
         } catch (UniquenessViolationException e) {
-            return new Answer(409, "Key already exists");
+            return new Answer(409, e.getMessage());
         }
     }
 }

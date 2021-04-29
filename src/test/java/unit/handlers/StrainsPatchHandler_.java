@@ -48,5 +48,6 @@ public class StrainsPatchHandler_ {
     public void ifDataAccessThrowsException_returnHttpConflict() throws UniquenessViolationException {
         when(dataAccess.updateStrainKeys(PARAMS.get(":id"), keys)).thenThrow(UniquenessViolationException.class);
         assertThat(handler.process(keys, PARAMS).getCode()).isEqualTo(409);
+        verify(dataAccess, times(1)).updateStrainKeys(PARAMS.get(":id"), keys);
     }
 }

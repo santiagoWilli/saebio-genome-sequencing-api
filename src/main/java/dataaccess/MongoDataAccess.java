@@ -170,6 +170,10 @@ public class MongoDataAccess implements DataAccess {
 
     @Override
     public boolean updateStrainKeys(String id, StrainKeys keys) throws UniquenessViolationException {
+        MongoCollection<Document> collection = database.getCollection("strains");
+        for (String key : keys.getKeys()) {
+            if (collection.countDocuments(eq("keys", key)) > 0) throw new UniquenessViolationException("Strain key already exists");
+        }
         return false;
     }
 

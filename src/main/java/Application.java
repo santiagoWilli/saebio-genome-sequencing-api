@@ -54,6 +54,7 @@ public class Application {
             path("/strains", () -> {
                 get("", new StrainsGetAllHandler(new MongoDataAccess()));
                 post("", new StrainsPostHandler(new MongoDataAccess()));
+                patch("/:id", new StrainsPatchHandler(new MongoDataAccess()));
                 delete("/:id", new StrainsDeleteHandler(new MongoDataAccess()));
             });
         });
