@@ -1,6 +1,7 @@
 package unit.handlers;
 
 import dataaccess.DataAccess;
+import dataaccess.exceptions.UniquenessViolationException;
 import handlers.StrainsPostHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,14 +25,14 @@ public class StrainsPostHandler_ {
     }
 
     @Test
-    public void if_nameOrKeyAlreadyExists_return_badRequest() {
-        when(dataAccess.createStrain(strain)).thenReturn(false);
-        assertThat(handler.process(strain, null).getCode()).isEqualTo(400);
+    public void if_nameOrKeyAlreadyExists_return_badRequest() throws UniquenessViolationException {
+        when(dataAccess.createStrain(strain)).thenThrow(UniquenessViolationException.class);
+        assertThat(handler.process(strain, null).getCode()).isEqualTo(409);
     }
 
     @Test
-    public void if_strainCreated_return_httpOk() {
-        when(dataAccess.createStrain(strain)).thenReturn(true);
+    public void if_strainCreated_return_httpOk() throws UniquenessViolationException {
+        when(dataAccess.createStrain(strain)).thenReturn("abc");
         assertThat(handler.process(strain, null).getCode()).isEqualTo(200);
     }
 }

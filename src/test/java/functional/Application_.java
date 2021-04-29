@@ -392,27 +392,37 @@ public class Application_ {
     public void given_aKeyAndAName_and_nameDoesAlreadyExist_when_postToStrains_then_returnHttpBadRequest() {
         db.insertFakeStrain("kp", "klebsi");
 
-        given().
-                param("key", "kneu").
-                param("name", "klebsi").
-        when().
-                post("/api/strains").
-        then().
-                statusCode(400);
+        String response =
+                given().
+                        param("key", "kneu").
+                        param("name", "klebsi").
+                when().
+                        post("/api/strains").
+                then().
+                        statusCode(409).
+                        extract().asString();
+
+        assertThat(response).contains("name");
+        assertThat(response).doesNotContain("key");
     }
 
     @Test
     public void given_aKeyAndAName_and_keyDoesAlreadyExist_when_postToStrains_then_returnHttpBadRequest() {
         db.insertFakeStrain("kneu", "klebsiella pneumoniae");
 
-        given().
-                param("key", "kneu").
-                param("key", "kaer").
-                param("name", "klebsiella aerogenes").
+        String response =
+                given().
+                        param("key", "kneu").
+                        param("key", "kaer").
+                        param("name", "klebsiella aerogenes").
                 when().
-                post("/api/strains").
+                        post("/api/strains").
                 then().
-                statusCode(400);
+                        statusCode(409).
+                        extract().asString();
+
+        assertThat(response).contains("key");
+        assertThat(response).doesNotContain("name");
     }
 
     @Test

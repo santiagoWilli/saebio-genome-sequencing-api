@@ -20,7 +20,7 @@ public interface DataAccess {
     String getReference(String id);
 
     String getAllStrains();
-    boolean createStrain(Strain strain);
+    String createStrain(Strain strain) throws UniquenessViolationException;
     boolean deleteStrain(String id) throws DocumentPointsToStrainException;
     boolean strainExists(String key);
     boolean updateStrainKeys(String id, StrainKeys keys) throws UniquenessViolationException;

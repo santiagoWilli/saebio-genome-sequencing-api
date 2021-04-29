@@ -1,8 +1,10 @@
 package handlers;
 
 import dataaccess.DataAccess;
+import dataaccess.exceptions.UniquenessViolationException;
 import payloads.Strain;
 import utils.Answer;
+import utils.Json;
 
 import java.util.Map;
 
@@ -16,8 +18,10 @@ public class StrainsPostHandler extends AbstractHandler<Strain> {
 
     @Override
     protected Answer processRequest(Strain strain, Map<String, String> requestParams) {
-        return dataAccess.createStrain(strain) ?
-                new Answer(200, "Strain created") :
-                new Answer(400, "Strain key already exists");
+        try {
+            return new Answer(200, Json.id(dataAccess.createStrain(strain)));
+        } catch (UniquenessViolationException e) {
+            return new Answer(409, e.getMessage());
+        }
     }
 }

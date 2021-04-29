@@ -150,6 +150,25 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
+    public String createStrain(Strain strain) throws UniquenessViolationException {
+        MongoCollection<Document> collection = database.getCollection("strains");
+        collection.createIndex(new Document("name", 1), new IndexOptions().unique(true));
+
+        for (String key : strain.getKeys()) {
+            if (collection.countDocuments(eq("keys", key)) > 0) throw new UniquenessViolationException("Strain key already exists");
+        }
+        Document document = new Document()
+                .append("name", strain.getName())
+                .append("keys", strain.getKeys());
+        try {
+            collection.insertOne(document);
+        } catch (Exception e) {
+            throw new UniquenessViolationException("Strain name already exists");
+        }
+        return document.getObjectId("_id").toString();
+    }
+
+    @Override
     public boolean updateStrainKeys(String id, StrainKeys keys) throws UniquenessViolationException {
         return false;
     }
@@ -157,24 +176,6 @@ public class MongoDataAccess implements DataAccess {
     private Document getStrain(String key) {
         MongoCollection<Document> collection = database.getCollection("strains");
         return collection.find(eq("keys", key)).first();
-    }
-
-    @Override
-    public boolean createStrain(Strain strain) {
-        MongoCollection<Document> collection = database.getCollection("strains");
-        collection.createIndex(new Document("name", 1), new IndexOptions().unique(true));
-
-        for (String key : strain.getKeys()) if (collection.countDocuments(eq("keys", key)) > 0) return false;
-
-        try {
-            Document document = new Document()
-                    .append("name", strain.getName())
-                    .append("keys", strain.getKeys());
-            collection.insertOne(document);
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
     }
 
     @Override
