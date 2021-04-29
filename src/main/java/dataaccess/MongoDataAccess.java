@@ -5,6 +5,7 @@ import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import com.mongodb.client.model.IndexOptions;
+import dataaccess.exceptions.*;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import payloads.*;
@@ -149,7 +150,7 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
-    public boolean updateStrainKeys(String id, StrainKeys keys) {
+    public boolean updateStrainKeys(String id, StrainKeys keys) throws UniquenessViolationException {
         return false;
     }
 

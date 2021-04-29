@@ -1,6 +1,7 @@
 package handlers;
 
 import dataaccess.DataAccess;
+import dataaccess.exceptions.UniquenessViolationException;
 import payloads.StrainKeys;
 import utils.Answer;
 
@@ -16,8 +17,12 @@ public class StrainsPatchHandler extends AbstractHandler<StrainKeys> {
 
     @Override
     protected Answer processRequest(StrainKeys keys, Map<String, String> requestParams) {
-        return dataAccess.updateStrainKeys(requestParams.get(":id"), keys) ?
-                new Answer(200, "Strain keys updated") :
-                Answer.notFound();
+        try {
+            return dataAccess.updateStrainKeys(requestParams.get(":id"), keys) ?
+                    new Answer(200, "Strain keys updated") :
+                    Answer.notFound();
+        } catch (UniquenessViolationException e) {
+            return new Answer(409, "Key already exists");
+        }
     }
 }

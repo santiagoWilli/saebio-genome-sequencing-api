@@ -1,7 +1,7 @@
 package handlers;
 
 import dataaccess.DataAccess;
-import dataaccess.DocumentPointsToStrainException;
+import dataaccess.exceptions.DocumentPointsToStrainException;
 import payloads.EmptyPayload;
 import utils.Answer;
 

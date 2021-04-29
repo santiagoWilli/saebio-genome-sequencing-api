@@ -1,5 +1,6 @@
 package dataaccess;
 
+import dataaccess.exceptions.*;
 import payloads.*;
 
 import java.io.IOException;
@@ -22,5 +23,5 @@ public interface DataAccess {
     boolean createStrain(Strain strain);
     boolean deleteStrain(String id) throws DocumentPointsToStrainException;
     boolean strainExists(String key);
-    boolean updateStrainKeys(String id, StrainKeys keys);
+    boolean updateStrainKeys(String id, StrainKeys keys) throws UniquenessViolationException;
 }

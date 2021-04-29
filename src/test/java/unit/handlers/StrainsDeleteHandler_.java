@@ -1,7 +1,7 @@
 package unit.handlers;
 
 import dataaccess.DataAccess;
-import dataaccess.DocumentPointsToStrainException;
+import dataaccess.exceptions.DocumentPointsToStrainException;
 import handlers.StrainsDeleteHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

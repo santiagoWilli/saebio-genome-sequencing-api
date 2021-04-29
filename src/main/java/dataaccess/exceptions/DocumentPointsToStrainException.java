@@ -1,3 +1,3 @@
-package dataaccess;
+package dataaccess.exceptions;
 
 public class DocumentPointsToStrainException extends Exception {}

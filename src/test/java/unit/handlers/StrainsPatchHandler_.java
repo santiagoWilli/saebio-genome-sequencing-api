@@ -1,11 +1,10 @@
 package unit.handlers;
 
 import dataaccess.DataAccess;
-import dataaccess.DocumentPointsToStrainException;
+import dataaccess.exceptions.UniquenessViolationException;
 import handlers.StrainsPatchHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import payloads.EmptyPayload;
 import payloads.StrainKeys;
 import utils.Answer;
 
@@ -32,16 +31,22 @@ public class StrainsPatchHandler_ {
     }
 
     @Test
-    public void ifDataAccessReturnsFalse_returnHttpNotFound() {
+    public void ifDataAccessReturnsFalse_returnHttpNotFound() throws UniquenessViolationException {
         when(dataAccess.updateStrainKeys(PARAMS.get(":id"), keys)).thenReturn(false);
         assertThat(handler.process(keys, PARAMS)).isEqualTo(Answer.notFound());
         verify(dataAccess, times(1)).updateStrainKeys(PARAMS.get(":id"), keys);
     }
 
     @Test
-    public void ifDataAccessReturnsTrue_returnHttpOk() {
+    public void ifDataAccessReturnsTrue_returnHttpOk() throws UniquenessViolationException {
         when(dataAccess.updateStrainKeys(PARAMS.get(":id"), keys)).thenReturn(true);
         assertThat(handler.process(keys, PARAMS).getCode()).isEqualTo(200);
         verify(dataAccess, times(1)).updateStrainKeys(PARAMS.get(":id"), keys);
+    }
+
+    @Test
+    public void ifDataAccessThrowsException_returnHttpConflict() throws UniquenessViolationException {
+        when(dataAccess.updateStrainKeys(PARAMS.get(":id"), keys)).thenThrow(UniquenessViolationException.class);
+        assertThat(handler.process(keys, PARAMS).getCode()).isEqualTo(409);
     }
 }
