@@ -31,6 +31,12 @@ public class StrainKeys_ {
         assertThat(keys.isValid()).isFalse();
     }
 
+    @Test
+    public void invalid_if_requestKeysHaveNonAlphabeticCharacters() {
+        parameters.put("key", new String[]{"kp", "k_neu"});
+        assertThat(keys.isValid()).isFalse();
+    }
+
     @BeforeEach
     public void setUp() {
         parameters = new HashMap<>();
