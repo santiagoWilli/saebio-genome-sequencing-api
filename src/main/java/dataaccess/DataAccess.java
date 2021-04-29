@@ -1,9 +1,6 @@
 package dataaccess;
 
-import payloads.Reference;
-import payloads.Sequence;
-import payloads.Strain;
-import payloads.TrimRequestResult;
+import payloads.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,6 +20,7 @@ public interface DataAccess {
 
     String getAllStrains();
     boolean createStrain(Strain strain);
-    boolean deleteStrain(String id) throws MongoDataAccess.DocumentPointsToStrainException;
+    boolean deleteStrain(String id) throws DocumentPointsToStrainException;
     boolean strainExists(String key);
+    boolean updateStrainKeys(String id, StrainKeys keys);
 }

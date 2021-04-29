@@ -7,10 +7,7 @@ import com.mongodb.client.gridfs.model.GridFSFile;
 import com.mongodb.client.model.IndexOptions;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import payloads.Reference;
-import payloads.Sequence;
-import payloads.Strain;
-import payloads.TrimRequestResult;
+import payloads.*;
 
 import java.io.*;
 import java.time.*;
@@ -151,6 +148,11 @@ public class MongoDataAccess implements DataAccess {
         return collection.find(eq("keys", key)).first() != null;
     }
 
+    @Override
+    public boolean updateStrainKeys(String id, StrainKeys keys) {
+        return false;
+    }
+
     private Document getStrain(String key) {
         MongoCollection<Document> collection = database.getCollection("strains");
         return collection.find(eq("keys", key)).first();
@@ -204,6 +206,4 @@ public class MongoDataAccess implements DataAccess {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
         return date.format(formatter);
     }
-
-    public static class DocumentPointsToStrainException extends Exception {}
 }

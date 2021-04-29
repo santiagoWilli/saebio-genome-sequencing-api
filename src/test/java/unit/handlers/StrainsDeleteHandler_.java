@@ -1,7 +1,7 @@
 package unit.handlers;
 
 import dataaccess.DataAccess;
-import dataaccess.MongoDataAccess;
+import dataaccess.DocumentPointsToStrainException;
 import handlers.StrainsDeleteHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,20 +29,20 @@ public class StrainsDeleteHandler_ {
     }
 
     @Test
-    public void ifDataAccessReturnsFalse_returnHttpNotFound() throws MongoDataAccess.DocumentPointsToStrainException {
+    public void ifDataAccessReturnsFalse_returnHttpNotFound() throws DocumentPointsToStrainException {
         when(dataAccess.deleteStrain(PARAMS.get(":id"))).thenReturn(false);
         assertThat(handler.process(new EmptyPayload(), PARAMS)).isEqualTo(Answer.notFound());
     }
 
     @Test
-    public void ifDataAccessReturnsTrue_returnHttpOk() throws MongoDataAccess.DocumentPointsToStrainException {
+    public void ifDataAccessReturnsTrue_returnHttpOk() throws DocumentPointsToStrainException {
         when(dataAccess.deleteStrain(PARAMS.get(":id"))).thenReturn(true);
         assertThat(handler.process(new EmptyPayload(), PARAMS).getCode()).isEqualTo(200);
     }
 
     @Test
-    public void ifDataAccessThrowsException_returnHttpConflict() throws MongoDataAccess.DocumentPointsToStrainException {
-        when(dataAccess.deleteStrain(PARAMS.get(":id"))).thenThrow(MongoDataAccess.DocumentPointsToStrainException.class);
+    public void ifDataAccessThrowsException_returnHttpConflict() throws DocumentPointsToStrainException {
+        when(dataAccess.deleteStrain(PARAMS.get(":id"))).thenThrow(DocumentPointsToStrainException.class);
         assertThat(handler.process(new EmptyPayload(), PARAMS).getCode()).isEqualTo(409);
     }
 }
