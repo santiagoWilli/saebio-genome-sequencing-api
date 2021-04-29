@@ -482,7 +482,6 @@ public class Application_ {
     public void given_keys_and_keysDoNotExist_when_patchToStrainsId_then_keysAreAddedToStrainKeys_and_returnHttpOk() throws IOException {
         String id = db.insertFakeStrain("kp");
 
-        System.out.println(id);
         given().
                 param("key", "kpn").
                 param("key", "kneu").
@@ -493,6 +492,16 @@ public class Application_ {
 
         Map<String, Object> strain = db.get("strains", id);
         assertThat((List<String>) strain.get("keys")).containsExactlyInAnyOrder("kp", "kpn", "kneu");
+    }
+
+    @Test
+    public void given_idDoesNotExist_when_patchToStrainsId_then_returnHttpNotFound() {
+        given().
+                param("key", "kneu").
+        when().
+                patch("/api/strains/6075d61d1a62381d13c70a6e").
+        then().
+                statusCode(404);
     }
 
     @BeforeAll
