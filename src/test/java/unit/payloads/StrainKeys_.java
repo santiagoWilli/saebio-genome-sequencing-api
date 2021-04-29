@@ -25,6 +25,12 @@ public class StrainKeys_ {
         assertThat(keys.isValid()).isFalse();
     }
 
+    @Test
+    public void invalid_if_requestHasAtLeastOneKeyButTheyAreEmpty() {
+        parameters.put("key", new String[]{""});
+        assertThat(keys.isValid()).isFalse();
+    }
+
     @BeforeEach
     public void setUp() {
         parameters = new HashMap<>();
