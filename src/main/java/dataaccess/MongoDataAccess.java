@@ -174,7 +174,11 @@ public class MongoDataAccess implements DataAccess {
         for (String key : keys.getKeys()) {
             if (collection.countDocuments(eq("keys", key)) > 0) throw new UniquenessViolationException("Strain key already exists");
         }
-        return false;
+        collection.updateOne(
+                eq("_id", new ObjectId(id)),
+                pushEach("keys", keys.getKeys())
+        );
+        return true;
     }
 
     private Document getStrain(String key) {

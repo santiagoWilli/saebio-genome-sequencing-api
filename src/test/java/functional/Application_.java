@@ -478,6 +478,23 @@ public class Application_ {
         assertThat((List<String>) strain.get("keys")).containsExactly("kp");
     }
 
+    @Test
+    public void given_keys_and_keysDoNotExist_when_patchToStrainsId_then_keysAreAddedToStrainKeys_and_returnHttpOk() throws IOException {
+        String id = db.insertFakeStrain("kp");
+
+        System.out.println(id);
+        given().
+                param("key", "kpn").
+                param("key", "kneu").
+        when().
+                patch("/api/strains/" + id).
+        then().
+                statusCode(200);
+
+        Map<String, Object> strain = db.get("strains", id);
+        assertThat((List<String>) strain.get("keys")).containsExactlyInAnyOrder("kp", "kpn", "kneu");
+    }
+
     @BeforeAll
     static void startApplication() throws IOException, InterruptedException {
         port = PORT;
