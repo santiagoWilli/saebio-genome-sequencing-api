@@ -389,15 +389,29 @@ public class Application_ {
     }
 
     @Test
-    public void given_aKeyAndAName_and_keyDoesAlreadyExist_when_postToStrains_then_returnHttpBadRequest() {
-        db.insertFakeStrain("existing");
+    public void given_aKeyAndAName_and_nameDoesAlreadyExist_when_postToStrains_then_returnHttpBadRequest() {
+        db.insertFakeStrain("kp", "klebsi");
 
         given().
-                param("key", "existing").
-                param("name", "anyName").
+                param("key", "kneu").
+                param("name", "klebsi").
         when().
                 post("/api/strains").
         then().
+                statusCode(400);
+    }
+
+    @Test
+    public void given_aKeyAndAName_and_keyDoesAlreadyExist_when_postToStrains_then_returnHttpBadRequest() {
+        db.insertFakeStrain("kneu", "klebsiella pneumoniae");
+
+        given().
+                param("key", "kneu").
+                param("key", "kaer").
+                param("name", "klebsiella aerogenes").
+                when().
+                post("/api/strains").
+                then().
                 statusCode(400);
     }
 

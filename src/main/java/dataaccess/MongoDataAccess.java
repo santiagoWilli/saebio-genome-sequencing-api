@@ -160,6 +160,9 @@ public class MongoDataAccess implements DataAccess {
     public boolean createStrain(Strain strain) {
         MongoCollection<Document> collection = database.getCollection("strains");
         collection.createIndex(new Document("name", 1), new IndexOptions().unique(true));
+
+        for (String key : strain.getKeys()) if (collection.countDocuments(eq("keys", key)) > 0) return false;
+
         try {
             Document document = new Document()
                     .append("name", strain.getName())
