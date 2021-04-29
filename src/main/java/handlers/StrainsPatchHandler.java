@@ -16,6 +16,8 @@ public class StrainsPatchHandler extends AbstractHandler<StrainKeys> {
 
     @Override
     protected Answer processRequest(StrainKeys keys, Map<String, String> requestParams) {
-        return Answer.notFound();
+        return dataAccess.updateStrainKeys(requestParams.get(":id"), keys) ?
+                new Answer(200, "Strain keys updated") :
+                Answer.notFound();
     }
 }

@@ -1,9 +1,11 @@
 package unit.handlers;
 
 import dataaccess.DataAccess;
+import dataaccess.DocumentPointsToStrainException;
 import handlers.StrainsPatchHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import payloads.EmptyPayload;
 import payloads.StrainKeys;
 import utils.Answer;
 
@@ -11,8 +13,7 @@ import java.util.AbstractMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class StrainsPatchHandler_ {
     private static final Map<String, String> PARAMS = Map.ofEntries(
@@ -34,5 +35,13 @@ public class StrainsPatchHandler_ {
     public void ifDataAccessReturnsFalse_returnHttpNotFound() {
         when(dataAccess.updateStrainKeys(PARAMS.get(":id"), keys)).thenReturn(false);
         assertThat(handler.process(keys, PARAMS)).isEqualTo(Answer.notFound());
+        verify(dataAccess, times(1)).updateStrainKeys(PARAMS.get(":id"), keys);
+    }
+
+    @Test
+    public void ifDataAccessReturnsTrue_returnHttpOk() {
+        when(dataAccess.updateStrainKeys(PARAMS.get(":id"), keys)).thenReturn(true);
+        assertThat(handler.process(keys, PARAMS).getCode()).isEqualTo(200);
+        verify(dataAccess, times(1)).updateStrainKeys(PARAMS.get(":id"), keys);
     }
 }
