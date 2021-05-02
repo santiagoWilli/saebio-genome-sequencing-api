@@ -53,4 +53,13 @@ public class ReportsPostHandler_ {
         verify(dataAccess, times(1)).referenceAndSequencesShareTheSameStrain(reportRequest.getReference(), reportRequest.getSequences());
         verifyNoMoreInteractions(dataAccess);
     }
+
+    @Test
+    public void badGateway_if_genomeToolAnswerIsServerError() {
+        when(dataAccess.referenceAndSequencesShareTheSameStrain(reportRequest.getReference(), reportRequest.getSequences())).thenReturn(true);
+        when(toolAnswer.getStatus()).thenReturn(GenomeToolAnswer.Status.SERVER_ERROR);
+        assertThat(handler.process(reportRequest, null).getCode()).isEqualTo(Answer.badGateway("").getCode());
+        verify(dataAccess, times(1)).referenceAndSequencesShareTheSameStrain(reportRequest.getReference(), reportRequest.getSequences());
+        verifyNoMoreInteractions(dataAccess);
+    }
 }
