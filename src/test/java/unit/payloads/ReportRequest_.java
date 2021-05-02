@@ -45,9 +45,22 @@ public class ReportRequest_ {
     }
 
     @Test
+    public void invalid_if_referenceIsEmpty() {
+        parameters.put("sequences", new String[]{"1"});
+        parameters.put("reference", new String[]{""});
+        assertThat(reportRequest.isValid()).isFalse();
+    }
+
+    @Test
     public void getSequences_should_returnASetWithThePassedIds() {
         parameters.put("sequences", new String[]{"1", "2", "2", "1", "2"});
         assertThat(reportRequest.getSequences()).containsExactlyInAnyOrder("1", "2");
+    }
+
+    @Test
+    public void getReference_should_returnTheIdOfTheFirstPassedReference() {
+        parameters.put("reference", new String[]{"1", "2"});
+        assertThat(reportRequest.getReference()).isEqualTo("1");
     }
 
     @BeforeEach
