@@ -13,10 +13,7 @@ import payloads.*;
 import java.io.*;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Filters.eq;
@@ -180,6 +177,11 @@ public class MongoDataAccess implements DataAccess {
                 pushEach("keys", keys.getKeys())
         );
         return true;
+    }
+
+    @Override
+    public boolean referenceAndSequencesShareTheSameStrain(String reference, Set<String> sequences) {
+        return false;
     }
 
     private Document getStrain(String key) {

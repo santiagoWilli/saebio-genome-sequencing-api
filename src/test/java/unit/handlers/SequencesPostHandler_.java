@@ -15,6 +15,7 @@ import static org.mockito.Mockito.*;
 
 public class SequencesPostHandler_ {
     private Sequence sequence;
+    private GenomeTool genomeTool;
     private GenomeToolAnswer toolAnswer;
     private SequencesPostHandler handler;
     private DataAccess dataAccess;
@@ -24,7 +25,7 @@ public class SequencesPostHandler_ {
         sequence = mock(Sequence.class);
         when(sequence.isValid()).thenReturn(true);
         when(sequence.getStrainKey()).thenReturn("kp");
-        GenomeTool genomeTool = mock(GenomeTool.class);
+        genomeTool = mock(GenomeTool.class);
         toolAnswer = mock(GenomeToolAnswer.class);
         dataAccess = mock(DataAccess.class);
         handler = new SequencesPostHandler(genomeTool, dataAccess);
@@ -76,7 +77,7 @@ public class SequencesPostHandler_ {
     public void if_sequenceStrainKeyDoesNotExist_return_httpBadRequest() {
         when(dataAccess.strainExists("kp")).thenReturn(false);
         assertThat(handler.process(sequence, null).getCode()).isEqualTo(400);
-        verifyNoInteractions(toolAnswer);
+        verifyNoInteractions(genomeTool);
         verify(dataAccess, times(1)).strainExists("kp");
         verifyNoMoreInteractions(dataAccess);
     }

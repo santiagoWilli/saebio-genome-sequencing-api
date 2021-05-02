@@ -3,6 +3,7 @@ package genome;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
+import payloads.ReportRequest;
 import payloads.Sequence;
 
 import java.io.FileInputStream;
@@ -36,5 +37,10 @@ public class NullarborClient implements GenomeTool {
         } catch (IOException e) {
             return new GenomeToolAnswer(GenomeToolAnswer.Status.EXCEPTION_ENCOUNTERED);
         }
+    }
+
+    @Override
+    public GenomeToolAnswer requestAnalysis(ReportRequest reportRequest) {
+        return null;
     }
 }

@@ -5,6 +5,7 @@ import payloads.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Set;
 
 public interface DataAccess {
     String createSequence(Sequence sequence, String genomeToolToken);
@@ -24,4 +25,6 @@ public interface DataAccess {
     boolean deleteStrain(String id) throws DocumentPointsToStrainException;
     boolean strainExists(String key);
     boolean updateStrainKeys(String id, StrainKeys keys) throws UniquenessViolationException;
+
+    boolean referenceAndSequencesShareTheSameStrain(String reference, Set<String> sequences);
 }

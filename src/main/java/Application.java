@@ -59,7 +59,7 @@ public class Application {
             });
 
             path("/reports", () -> {
-                post("", new ReportsPostHandler());
+                post("", new ReportsPostHandler(new NullarborClient(options.genomeToolUrl), new MongoDataAccess()));
             });
         });
 
