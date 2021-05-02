@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import payloads.ReportRequest;
 import utils.Answer;
+import utils.Json;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -59,6 +60,17 @@ public class ReportsPostHandler_ {
         when(dataAccess.referenceAndSequencesShareTheSameStrain(reportRequest.getReference(), reportRequest.getSequences())).thenReturn(true);
         when(toolAnswer.getStatus()).thenReturn(GenomeToolAnswer.Status.SERVER_ERROR);
         assertThat(handler.process(reportRequest, null).getCode()).isEqualTo(Answer.badGateway("").getCode());
+        verify(dataAccess, times(1)).referenceAndSequencesShareTheSameStrain(reportRequest.getReference(), reportRequest.getSequences());
+        verifyNoMoreInteractions(dataAccess);
+    }
+
+    @Test
+    public void serverError_if_genomeToolAnswerIsExceptionEncountered() {
+        when(dataAccess.referenceAndSequencesShareTheSameStrain(reportRequest.getReference(), reportRequest.getSequences())).thenReturn(true);
+        final String exception = "Error";
+        when(toolAnswer.getStatus()).thenReturn(GenomeToolAnswer.Status.EXCEPTION_ENCOUNTERED);
+        when(toolAnswer.getMessage()).thenReturn(exception);
+        assertThat(handler.process(reportRequest, null)).isEqualTo(Answer.serverError(exception));
         verify(dataAccess, times(1)).referenceAndSequencesShareTheSameStrain(reportRequest.getReference(), reportRequest.getSequences());
         verifyNoMoreInteractions(dataAccess);
     }
