@@ -27,4 +27,5 @@ public interface DataAccess {
     boolean updateStrainKeys(String id, StrainKeys keys) throws UniquenessViolationException;
 
     boolean referenceAndSequencesShareTheSameStrain(String reference, Set<String> sequences);
+    String createReport(ReportRequest reportRequest, String token);
 }

@@ -74,4 +74,17 @@ public class ReportsPostHandler_ {
         verify(dataAccess, times(1)).referenceAndSequencesShareTheSameStrain(reportRequest.getReference(), reportRequest.getSequences());
         verifyNoMoreInteractions(dataAccess);
     }
+
+    @Test
+    public void if_genomeToolAnswerIsOk_return_httpAccepted_and_sequenceId() {
+        when(dataAccess.referenceAndSequencesShareTheSameStrain(reportRequest.getReference(), reportRequest.getSequences())).thenReturn(true);
+        final String token = "123e4567-e89b-12d3-a456-556642440000";
+        final String id = "507f1f77bcf86cd799439011";
+        when(toolAnswer.getStatus()).thenReturn(GenomeToolAnswer.Status.OK);
+        when(toolAnswer.getMessage()).thenReturn(token);
+        when(dataAccess.createReport(reportRequest, token)).thenReturn(id);
+        assertThat(handler.process(reportRequest, null)).isEqualTo(new Answer(202, Json.id(id)));
+        verify(dataAccess, times(1)).referenceAndSequencesShareTheSameStrain(reportRequest.getReference(), reportRequest.getSequences());
+        verify(dataAccess, times(1)).createReport(reportRequest, token);
+    }
 }

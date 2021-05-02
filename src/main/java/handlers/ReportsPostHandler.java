@@ -5,6 +5,7 @@ import genome.GenomeTool;
 import genome.GenomeToolAnswer;
 import payloads.ReportRequest;
 import utils.Answer;
+import utils.Json;
 
 import java.util.Map;
 
@@ -24,6 +25,8 @@ public class ReportsPostHandler extends AbstractHandler<ReportRequest> {
 
         GenomeToolAnswer toolAnswer = genomeTool.requestAnalysis(reportRequest);
         switch (toolAnswer.getStatus()) {
+            case OK:
+                return new Answer(202, Json.id(dataAccess.createReport(reportRequest, toolAnswer.getMessage())));
             case API_DOWN:
                 return Answer.serviceUnavailable("Genome reporter tool is down");
             case SERVER_ERROR:
