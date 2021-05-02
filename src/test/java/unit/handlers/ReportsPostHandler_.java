@@ -7,6 +7,7 @@ import handlers.ReportsPostHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import payloads.ReportRequest;
+import utils.Answer;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -42,5 +43,14 @@ public class ReportsPostHandler_ {
         verify(dataAccess, times(1)).referenceAndSequencesShareTheSameStrain(reportRequest.getReference(), reportRequest.getSequences());
         verifyNoMoreInteractions(dataAccess);
         verifyNoInteractions(genomeTool);
+    }
+
+    @Test
+    public void serviceUnavailable_if_genomeToolAnswerIsApiDown() {
+        when(dataAccess.referenceAndSequencesShareTheSameStrain(reportRequest.getReference(), reportRequest.getSequences())).thenReturn(true);
+        when(toolAnswer.getStatus()).thenReturn(GenomeToolAnswer.Status.API_DOWN);
+        assertThat(handler.process(reportRequest, null).getCode()).isEqualTo(Answer.serviceUnavailable("").getCode());
+        verify(dataAccess, times(1)).referenceAndSequencesShareTheSameStrain(reportRequest.getReference(), reportRequest.getSequences());
+        verifyNoMoreInteractions(dataAccess);
     }
 }

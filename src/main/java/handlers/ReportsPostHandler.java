@@ -19,7 +19,7 @@ public class ReportsPostHandler extends AbstractHandler<ReportRequest> {
 
     @Override
     protected Answer processRequest(ReportRequest reportRequest, Map<String, String> requestParams) {
-        dataAccess.referenceAndSequencesShareTheSameStrain(reportRequest.getReference(), reportRequest.getSequences());
-        return new Answer(409, "");
+        if (!dataAccess.referenceAndSequencesShareTheSameStrain(reportRequest.getReference(), reportRequest.getSequences())) return new Answer(409, "");
+        return Answer.serviceUnavailable("Genome reporter tool is down");
     }
 }
