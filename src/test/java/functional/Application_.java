@@ -504,6 +504,14 @@ public class Application_ {
                 statusCode(404);
     }
 
+    @Test
+    public void given_noIds_when_postToReports_then_returnHttpBadRequest() {
+        when().
+                post("/api/reports").
+        then().
+                statusCode(400);
+    }
+
     @BeforeAll
     static void startApplication() throws IOException, InterruptedException {
         port = PORT;

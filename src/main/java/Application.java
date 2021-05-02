@@ -57,6 +57,10 @@ public class Application {
                 patch("/:id", new StrainsPatchHandler(new MongoDataAccess()));
                 delete("/:id", new StrainsDeleteHandler(new MongoDataAccess()));
             });
+
+            path("/reports", () -> {
+                post("", new ReportsPostHandler());
+            });
         });
 
         exception(Exception.class, (exception, request, response) -> System.out.println(" -ERROR: " + exception.getMessage()));
