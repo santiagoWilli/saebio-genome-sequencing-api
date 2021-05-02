@@ -9,6 +9,6 @@ public class ReportRequest extends RequestParameters implements Validable {
 
     @Override
     public boolean isValid() {
-        return false;
+        return parameters.get("sequences") != null;
     }
 }

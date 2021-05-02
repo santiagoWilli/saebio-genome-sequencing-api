@@ -18,6 +18,12 @@ public class ReportRequest_ {
         assertThat(reportRequest.isValid()).isFalse();
     }
 
+    @Test
+    public void valid_if_sequencesListIsNotEmpty() {
+        parameters.put("sequences", new String[]{"1", "2", "3"});
+        assertThat(reportRequest.isValid()).isTrue();
+    }
+
     @BeforeEach
     public void setUp() {
         parameters = new HashMap<>();
