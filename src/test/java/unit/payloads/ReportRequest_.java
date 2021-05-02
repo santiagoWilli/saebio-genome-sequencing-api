@@ -24,6 +24,18 @@ public class ReportRequest_ {
         assertThat(reportRequest.isValid()).isTrue();
     }
 
+    @Test
+    public void invalid_if_sequencesListIsEmpty() {
+        parameters.put("sequences", new String[]{"", ""});
+        assertThat(reportRequest.isValid()).isFalse();
+    }
+
+    @Test
+    public void getSequences_should_returnASetWithThePassedIds() {
+        parameters.put("sequences", new String[]{"1", "2", "2", "1", "2"});
+        assertThat(reportRequest.getSequences()).containsExactlyInAnyOrder("1", "2");
+    }
+
     @BeforeEach
     public void setUp() {
         parameters = new HashMap<>();
