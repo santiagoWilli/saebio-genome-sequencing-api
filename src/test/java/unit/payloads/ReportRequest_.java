@@ -14,19 +14,26 @@ public class ReportRequest_ {
     private ReportRequest reportRequest;
 
     @Test
-    public void invalid_if_parametersDoesNotHaveIds() {
+    public void invalid_if_parametersDoesNotHaveSequences() {
         assertThat(reportRequest.isValid()).isFalse();
     }
 
     @Test
-    public void valid_if_sequencesListIsNotEmpty() {
+    public void valid_if_sequencesListIsNotEmpty_and_parametersHasAReference() {
         parameters.put("sequences", new String[]{"1", "2", "3"});
+        parameters.put("reference", new String[]{"1"});
         assertThat(reportRequest.isValid()).isTrue();
     }
 
     @Test
     public void invalid_if_sequencesListIsEmpty() {
         parameters.put("sequences", new String[]{"", ""});
+        assertThat(reportRequest.isValid()).isFalse();
+    }
+
+    @Test
+    public void invalid_if_parametersDoesNotHaveAReference() {
+        parameters.put("sequences", new String[]{"1", "2", "3"});
         assertThat(reportRequest.isValid()).isFalse();
     }
 

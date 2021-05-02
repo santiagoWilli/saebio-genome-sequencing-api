@@ -10,7 +10,7 @@ public class ReportRequest extends RequestParameters implements Validable {
 
     @Override
     public boolean isValid() {
-        if (parameters.get("sequences") == null) return false;
+        if (parameters.get("sequences") == null || parameters.get("reference") == null) return false;
         return getSequences().size() > 0;
     }
 
