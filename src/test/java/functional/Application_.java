@@ -505,12 +505,33 @@ public class Application_ {
     }
 
     @Test
-    public void given_noIds_when_postToReports_then_returnHttpBadRequest() {
+    public void given_noSequences_when_postToReports_then_returnHttpBadRequest() {
+        given().
+                param("reference", "1").
         when().
                 post("/api/reports").
         then().
                 statusCode(400);
     }
+
+    @Test
+    public void given_noReference_or_multipleReferences_when_postToReports_then_returnHttpBadRequest() {
+        given().
+                param("sequences", "1", "2").
+        when().
+                post("/api/reports").
+        then().
+                statusCode(400);
+
+        given().
+                param("sequences", "1", "2").
+                param("reference", "1", "2").
+        when().
+                post("/api/reports").
+        then().
+                statusCode(400);
+    }
+
 
     @BeforeAll
     static void startApplication() throws IOException, InterruptedException {
