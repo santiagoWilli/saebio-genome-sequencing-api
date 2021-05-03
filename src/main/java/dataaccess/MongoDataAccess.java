@@ -91,7 +91,7 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
-    public String getTrimmedFileName(String id) {
+    public String getFileName(String id) {
         GridFSBucket gridFSBucket = GridFSBuckets.create(database);
         GridFSFile file = gridFSBucket.find(eq("_id", new ObjectId(id))).first();
         return file != null ? file.getFilename() : null;

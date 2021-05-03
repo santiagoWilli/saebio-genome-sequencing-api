@@ -45,15 +45,13 @@ public class NullarborClient_ {
     @Test
     public void requestTrim_httpAccepted_returns_okCode_and_nullarborToken() {
         mockFileMap();
-        String token = "123e4567-e89b-12d3-a456-556642440000";
-
         stubFor(post(urlEqualTo("/trim"))
                 .willReturn(aResponse()
                         .withStatus(202)
                         .withHeader("Content-Type", "application/json")
-                        .withBody("{\"token\":\"" + token + "\"}")));
+                        .withBody("{\"token\":\"" + token() + "\"}")));
         GenomeToolAnswer clientAnswer = client.requestTrim(sequence);
-        assertThat(clientAnswer).isEqualTo(new GenomeToolAnswer(GenomeToolAnswer.Status.OK, token));
+        assertThat(clientAnswer).isEqualTo(new GenomeToolAnswer(GenomeToolAnswer.Status.OK, token()));
         verify(exactly(1), postRequestedFor(urlEqualTo("/trim"))
                 .withHeader("Content-Type", containing("multipart/form-data"))
                 .withRequestBodyPart(aMultipart().withName("pair1").build())
@@ -62,16 +60,26 @@ public class NullarborClient_ {
 
     @Test
     public void requestToSendAnalysisFiles_httpAccepted_returns_okCode_and_analysisToken() {
-        String token = "123e4567-e89b-12d3-a456-556642440000";
-
         stubFor(post(urlEqualTo("/request_analysis"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody("{\"token\":\"" + token + "\"}")));
+                        .withBody("{\"token\":\"" + token() + "\"}")));
         GenomeToolAnswer clientAnswer = client.requestToSendAnalysisFiles();
-        assertThat(clientAnswer).isEqualTo(new GenomeToolAnswer(GenomeToolAnswer.Status.OK, token));
+        assertThat(clientAnswer).isEqualTo(new GenomeToolAnswer(GenomeToolAnswer.Status.OK, token()));
         verify(exactly(1), postRequestedFor(urlEqualTo("/request_analysis")));
+    }
+
+    @Test
+    public void sendFile_httpAccepted_returns_okCode_and_analysisToken() throws FileNotFoundException {
+        stubFor(post(urlEqualTo("/analysis/" + token() + "/file")).willReturn(aResponse().withStatus(200)));
+
+        InputStream stream = new FileInputStream("test/resources/sequences/Kpneu231120_referencia.fa");
+        GenomeToolAnswer clientAnswer = client.sendAnalysisFile(token(), stream, "name");
+        assertThat(clientAnswer).isEqualTo(new GenomeToolAnswer(GenomeToolAnswer.Status.OK));
+        verify(exactly(1), postRequestedFor(urlEqualTo("/analysis/" + token() + "/file"))
+                .withHeader("Content-Type", containing("multipart/form-data"))
+                .withRequestBodyPart(aMultipart().withName("file").build()));
     }
 
     @BeforeEach
@@ -101,5 +109,9 @@ public class NullarborClient_ {
 
     private void addMockedEntryToFileMap(int i) {
         files.put(Integer.toString(i), new File("test/resources/sequences/Kpneu1_191120_R1.fastq.gz"));
+    }
+
+    private String token() {
+        return "123e4567-e89b-12d3-a456-556642440000";
     }
 }

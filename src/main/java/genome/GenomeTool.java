@@ -7,6 +7,6 @@ public interface GenomeTool {
     GenomeToolAnswer requestTrim(Sequence sequence);
 
     GenomeToolAnswer requestToSendAnalysisFiles();
-    GenomeToolAnswer sendAnalysisFile(String token, InputStream stream);
+    GenomeToolAnswer sendAnalysisFile(String token, InputStream stream, String fileName);
     GenomeToolAnswer requestToStartAnalysis(String token);
 }

@@ -14,7 +14,7 @@ public interface DataAccess {
     boolean setSequenceTrimToFalse(String token);
     String getAllSequences();
     String getSequence(String id);
-    String getTrimmedFileName(String id);
+    String getFileName(String id);
     InputStream getFileStream(String id) throws IOException;
 
     String uploadReference(Reference reference) throws IOException;

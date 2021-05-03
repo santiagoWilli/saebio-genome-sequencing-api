@@ -36,7 +36,7 @@ public class ReportsPostHandler extends AbstractHandler<ReportRequest> {
         for (String sequenceId : reportRequest.getSequences()) {
             for (String fileId : dataAccess.getSequenceTrimmedFilesIds(sequenceId)) {
                 try {
-                    toolAnswer = genomeTool.sendAnalysisFile(token, dataAccess.getFileStream(fileId));
+                    toolAnswer = genomeTool.sendAnalysisFile(token, dataAccess.getFileStream(fileId), dataAccess.getFileName(fileId));
                     if (toolAnswer.getStatus() != GenomeToolAnswer.Status.OK) return toolAnswerToAnswer(toolAnswer);
                 } catch (IOException e) {
                     e.printStackTrace();

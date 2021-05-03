@@ -92,8 +92,9 @@ public class ReportsPostHandler_ {
         }
         InputStream stream = new FileInputStream("test/resources/sequences/Kpneu231120_referencia.fa");
         when(dataAccess.getFileStream("1")).thenReturn(stream);
+        when(dataAccess.getFileName("1")).thenReturn("abc");
 
-        when(genomeTool.sendAnalysisFile(token, stream)).thenReturn(toolAnswer);
+        when(genomeTool.sendAnalysisFile(token, stream, "abc")).thenReturn(toolAnswer);
         when(genomeTool.requestToStartAnalysis(token)).thenReturn(toolAnswer);
         when(dataAccess.createReport(reportRequest, token)).thenReturn(id);
 

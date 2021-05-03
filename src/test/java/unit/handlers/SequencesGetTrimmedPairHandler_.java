@@ -40,8 +40,8 @@ public class SequencesGetTrimmedPairHandler_ {
         String trimmedId1 = "6075d6a71a62381d13c70a6f";
         String trimmedId2 = "6075d6aa1a62381d13c70c9b";
         when(dataAccess.getSequence(PARAMS.get(":id"))).thenReturn("{\"_id\": {\"$oid\": \"1\"}, \"trimmedPair\": [{\"$oid\": \""+trimmedId1+"\"}, {\"$oid\": \""+trimmedId2+"\"}]}");
-        when(dataAccess.getTrimmedFileName(trimmedId1)).thenReturn("Kp1_R1_trimmed.fq.gz");
-        when(dataAccess.getTrimmedFileName(trimmedId2)).thenReturn("Kp1_R2_trimmed.fq.gz");
+        when(dataAccess.getFileName(trimmedId1)).thenReturn("Kp1_R1_trimmed.fq.gz");
+        when(dataAccess.getFileName(trimmedId2)).thenReturn("Kp1_R2_trimmed.fq.gz");
         when(dataAccess.getFileStream(trimmedId1)).thenReturn(new FileInputStream("test/resources/sequences/Kp1_231120_R1.fastq.gz"));
         when(dataAccess.getFileStream(trimmedId2)).thenReturn(new FileInputStream("test/resources/sequences/Kp1_231120_R1.fastq.gz"));
 
