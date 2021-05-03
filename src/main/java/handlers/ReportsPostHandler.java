@@ -21,8 +21,12 @@ public class ReportsPostHandler extends AbstractHandler<ReportRequest> {
 
     @Override
     protected Answer processRequest(ReportRequest reportRequest, Map<String, String> requestParams) {
-        if (!dataAccess.referenceAndSequencesShareTheSameStrain(reportRequest.getReference(), reportRequest.getSequences())) return new Answer(409, "");
-
+        try {
+            if (!dataAccess.referenceAndSequencesShareTheSameStrain(reportRequest.getReference(), reportRequest.getSequences()))
+                return new Answer(409, "Reference and sequences must share the same strain");
+        } catch (NullPointerException e) {
+            return new Answer(404, "One or more of the requested elements for the report could not be found");
+        }
         GenomeToolAnswer toolAnswer = genomeTool.requestAnalysis(reportRequest);
         switch (toolAnswer.getStatus()) {
             case OK:

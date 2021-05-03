@@ -87,4 +87,13 @@ public class ReportsPostHandler_ {
         verify(dataAccess, times(1)).referenceAndSequencesShareTheSameStrain(reportRequest.getReference(), reportRequest.getSequences());
         verify(dataAccess, times(1)).createReport(reportRequest, token);
     }
+
+    @Test
+    public void if_AnyOfThePassedIdsDoNotExist_return_httpNotFound() {
+        when(dataAccess.referenceAndSequencesShareTheSameStrain(reportRequest.getReference(), reportRequest.getSequences())).thenThrow(NullPointerException.class);
+        assertThat(handler.process(reportRequest, null).getCode()).isEqualTo(404);
+        verify(dataAccess, times(1)).referenceAndSequencesShareTheSameStrain(reportRequest.getReference(), reportRequest.getSequences());
+        verifyNoMoreInteractions(dataAccess);
+        verifyNoInteractions(genomeTool);
+    }
 }
