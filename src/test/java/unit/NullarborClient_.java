@@ -82,6 +82,14 @@ public class NullarborClient_ {
                 .withRequestBodyPart(aMultipart().withName("file").build()));
     }
 
+    @Test
+    public void requestToStartAnalysis_httpAccepted_returns_okCode_and_analysisToken() {
+        stubFor(post(urlEqualTo("/analysis/" + token() + "/start")).willReturn(aResponse().withStatus(202)));
+        GenomeToolAnswer clientAnswer = client.requestToStartAnalysis(token());
+        assertThat(clientAnswer).isEqualTo(new GenomeToolAnswer(GenomeToolAnswer.Status.OK));
+        verify(exactly(1), postRequestedFor(urlEqualTo("/analysis/" + token() + "/start")));
+    }
+
     @BeforeEach
     public void objectsSetUp() {
         files = new HashMap<>();

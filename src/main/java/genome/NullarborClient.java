@@ -60,6 +60,8 @@ public class NullarborClient implements GenomeTool {
 
     @Override
     public GenomeToolAnswer requestToStartAnalysis(String token) {
-        return null;
+        HttpResponse<JsonNode> response = Unirest.post(endpoint + "/analysis/" + token + "/start").asJson();
+        if (response.getStatus() == 202) return new GenomeToolAnswer(GenomeToolAnswer.Status.OK);
+        return new GenomeToolAnswer(response.getStatus() == 404 ? GenomeToolAnswer.Status.API_DOWN : GenomeToolAnswer.Status.SERVER_ERROR);
     }
 }
