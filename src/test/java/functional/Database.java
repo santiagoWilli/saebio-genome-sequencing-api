@@ -12,13 +12,15 @@ public interface Database {
 
     void insertFakeSequence(String token);
     void insertFakeSequence(String token, String strainId);
-    void insertFakeSequenceWithTrimmedFiles(String token, Collection<File> files, String strainId) throws FileNotFoundException;
+    String insertFakeSequenceWithTrimmedFiles(String token, Collection<File> files, String strainId) throws FileNotFoundException;
 
     void empty(String collection);
 
     boolean referenceExists(String id);
     void insertFakeReference();
     String insertFakeReferenceWithFile(File file) throws FileNotFoundException;
+
+    String insertFakeReferenceWithFile(File file, String strainId) throws FileNotFoundException;
 
     String insertFakeStrain(String key);
     String insertFakeStrain(String key, String name);

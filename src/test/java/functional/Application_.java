@@ -532,6 +532,31 @@ public class Application_ {
                 statusCode(400);
     }
 
+    @Test
+    public void given_aReference_and_oneOrMoreSequences_and_theyDoNotShareTheSameStrain_when_postToReports_then_httpConflict() throws IOException {
+        final String token = token();
+        final String strain1Id = db.insertFakeStrain("kp", "test");
+        final String strain2Id = db.insertFakeStrain("zo", "zoo");
+        Collection<File> files = new ArrayList<>();
+        files.add(new File(testFolderPath + "ngs/Kp4_R1_001_trimmed.fq.gz"));
+        files.add(new File(testFolderPath + "ngs/Kp4_R2_001_trimmed.fq.gz"));
+        File referenceFile = new File(testFolderPath + "Kpneu231120_referencia.fa");
+        final String sequence1Id = db.insertFakeSequenceWithTrimmedFiles(token, files, strain1Id);
+        final String sequence2Id = db.insertFakeSequenceWithTrimmedFiles(token, files, strain2Id);
+        final String referenceId = db.insertFakeReferenceWithFile(referenceFile, strain1Id);
+
+        stubFor(post(urlEqualTo("/analyze")));
+
+        given().
+                param("sequences", sequence1Id, sequence2Id).
+                param("reference", referenceId).
+        when().
+                post("/api/reports").
+        then().
+                statusCode(409);
+
+        verify(exactly(0), postRequestedFor(urlEqualTo("/analyze")));
+    }
 
     @BeforeAll
     static void startApplication() throws IOException, InterruptedException {

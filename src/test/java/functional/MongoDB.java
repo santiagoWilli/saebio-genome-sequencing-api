@@ -64,13 +64,8 @@ public class MongoDB implements Database {
     }
 
     @Override
-    public void insertFakeSequenceWithTrimmedFiles(String token, Collection<File> files, String strainId) throws FileNotFoundException {
+    public String insertFakeSequenceWithTrimmedFiles(String token, Collection<File> files, String strainId) throws FileNotFoundException {
         MongoCollection<Document> collection = database.getCollection("sequences");
-        Document document = new Document()
-                .append("genomeToolToken", token)
-                .append("strain", new ObjectId(strainId));
-
-        collection.insertOne(document);
 
         GridFSBucket gridFSBucket = GridFSBuckets.create(database);
         List<ObjectId> trimmedIds = new ArrayList<>();
@@ -79,7 +74,14 @@ public class MongoDB implements Database {
             ObjectId id = gridFSBucket.uploadFromStream(file.getName(), new FileInputStream(file));
             trimmedIds.add(id);
         }
-        collection.updateOne(eq("genomeToolToken", token), set("trimmedPair", trimmedIds));
+
+        Document document = new Document()
+                .append("genomeToolToken", token)
+                .append("strain", new ObjectId(strainId))
+                .append("trimmedPair", trimmedIds);
+
+        collection.insertOne(document);
+        return document.getObjectId("_id").toString();
     }
 
     @Override
@@ -108,6 +110,20 @@ public class MongoDB implements Database {
 
         MongoCollection<Document> collection = database.getCollection("references");
         Document document = new Document("file", id);
+        collection.insertOne(document);
+        return document.getObjectId("_id").toString();
+    }
+
+
+    @Override
+    public String insertFakeReferenceWithFile(File file, String strainId) throws FileNotFoundException {
+        GridFSBucket gridFSBucket = GridFSBuckets.create(database);
+        ObjectId id = gridFSBucket.uploadFromStream(file.getName(), new FileInputStream(file));
+
+        MongoCollection<Document> collection = database.getCollection("references");
+        Document document = new Document()
+                .append("file", id)
+                .append("strain", strainId);
         collection.insertOne(document);
         return document.getObjectId("_id").toString();
     }
