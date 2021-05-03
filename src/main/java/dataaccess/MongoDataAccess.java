@@ -14,6 +14,7 @@ import java.io.*;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Filters.eq;
@@ -35,7 +36,7 @@ public class MongoDataAccess implements DataAccess {
                 .append("strain", getStrain(sequence.getStrainKey()).getObjectId("_id"))
                 .append("originalFilenames", sequence.getOriginalFileNames())
                 .append("genomeToolToken", genomeToolToken)
-                .append("trimRequestDate", formatDate(LocalDateTime.now(ZoneOffset.UTC)));
+                .append("trimRequestDate", formatDate(LocalDateTime.now(ZoneOffset.UTC), "yyyy-MM-dd HH:mm:ss.SSS"));
         collection.insertOne(document);
         return document.getObjectId("_id").toString();
     }
@@ -191,17 +192,50 @@ public class MongoDataAccess implements DataAccess {
 
     @Override
     public boolean referenceAndSequencesShareTheSameStrain(String referenceId, Set<String> sequencesIds) {
-        return false;
+        Document reference = database.getCollection("references")
+                .find(eq("_id", new ObjectId(referenceId))).first();
+        String strainId = reference.getObjectId("strain").toString();
+
+        MongoCollection<Document> collection = database.getCollection("sequences");
+        for (String sequenceId : sequencesIds) {
+            Document sequence = collection.find(eq("_id", new ObjectId(sequenceId))).first();
+            if (!sequence.getObjectId("strain").toString().equals(strainId)) return false;
+        }
+        return true;
     }
 
     @Override
     public String createReport(ReportRequest reportRequest, String token) {
-        return null;
+        String date = formatDate(LocalDateTime.now(ZoneOffset.UTC), "dd/MM/yyyy HH:mm");
+
+        MongoCollection<Document> collection = database.getCollection("references");
+        Document strain = collection.aggregate(Arrays.asList(
+                match(eq("_id", new ObjectId(reportRequest.getReference()))),
+                lookup("strains", "strain", "_id", "strain"),
+                unwind("$strain"),
+                project(fields(include("name"), computed("name", "$strain.name"), computed("_id", "$strain._id")))
+        )).into(new ArrayList<>()).get(0);
+
+        collection = database.getCollection("reports");
+        Document document = new Document()
+                .append("name", strain.getString("name") + " " + date)
+                .append("strain", strain.getObjectId("_id"))
+                .append("sequences", reportRequest.getSequences().stream().map(ObjectId::new).collect(Collectors.toList()))
+                .append("reference", new ObjectId(reportRequest.getReference()))
+                .append("genomeToolToken", token)
+                .append("requestDate", date);
+        collection.insertOne(document);
+        return document.getObjectId("_id").toString();
     }
 
     @Override
     public List<String> getSequenceTrimmedFilesIds(String sequenceId) {
-        return null;
+        MongoCollection<Document> collection = database.getCollection("sequences");
+        final Document document = collection.find(eq("_id", new ObjectId(sequenceId))).first();
+        return document.getList("trimmedPair", ObjectId.class)
+                .stream()
+                .map(ObjectId::toString)
+                .collect(Collectors.toList());
     }
 
     private Document getStrain(String key) {
@@ -225,8 +259,8 @@ public class MongoDataAccess implements DataAccess {
         return date.format(formatter);
     }
 
-    private static String formatDate(LocalDateTime date) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    private static String formatDate(LocalDateTime date, String pattern) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
         return date.format(formatter);
     }
 }

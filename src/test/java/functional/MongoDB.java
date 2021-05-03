@@ -123,7 +123,7 @@ public class MongoDB implements Database {
         MongoCollection<Document> collection = database.getCollection("references");
         Document document = new Document()
                 .append("file", id)
-                .append("strain", strainId);
+                .append("strain", new ObjectId(strainId));
         collection.insertOne(document);
         return document.getObjectId("_id").toString();
     }

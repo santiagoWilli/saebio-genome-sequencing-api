@@ -545,7 +545,7 @@ public class Application_ {
         final String sequence2Id = db.insertFakeSequenceWithTrimmedFiles(token, files, strain2Id);
         final String referenceId = db.insertFakeReferenceWithFile(referenceFile, strain1Id);
 
-        stubFor(post(urlEqualTo("/analyze")));
+        stubFor(post(urlEqualTo("/request_analysis")));
 
         given().
                 param("sequences", sequence1Id, sequence2Id).
@@ -555,8 +555,72 @@ public class Application_ {
         then().
                 statusCode(409);
 
-        verify(exactly(0), postRequestedFor(urlEqualTo("/analyze")));
+        verify(exactly(0), postRequestedFor(urlEqualTo("/request_analysis")));
     }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void given_aReference_and_oneOrMoreSequences_when_postToReports_then_reportCreated_and_returnHttpAccepted() throws IOException {
+        final String token = token();
+        final String strainId = db.insertFakeStrain("kp", "test");
+        Collection<File> files = new ArrayList<>();
+        files.add(new File(testFolderPath + "ngs/Kp4_R1_001_trimmed.fq.gz"));
+        files.add(new File(testFolderPath + "ngs/Kp4_R2_001_trimmed.fq.gz"));
+        File referenceFile = new File(testFolderPath + "Kpneu231120_referencia.fa");
+        final String sequence1Id = db.insertFakeSequenceWithTrimmedFiles(token, files, strainId);
+        final String sequence2Id = db.insertFakeSequenceWithTrimmedFiles(token, files, strainId);
+        final String referenceId = db.insertFakeReferenceWithFile(referenceFile, strainId);
+
+        stubFor(post(urlEqualTo("/request_analysis"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{\"token\":\"" + token + "\"}")));
+
+        stubFor(post(urlEqualTo("/analysis/" + token + "/file"))
+                .willReturn(aResponse()
+                        .withStatus(200)));
+
+        stubFor(post(urlEqualTo("/analysis/" + token + "/start"))
+                .willReturn(aResponse()
+                        .withStatus(202)));
+
+        String response =
+                given().
+                        param("sequences", sequence1Id, sequence2Id).
+                        param("reference", referenceId).
+                when().
+                        post("/api/reports").
+                then().
+                        statusCode(202).
+                        extract().
+                        asString();
+
+        verify(exactly(1), postRequestedFor(urlEqualTo("/request_analysis")));
+        verify(exactly(1), postRequestedFor(urlEqualTo("/analysis/" + token + "/start")));
+
+        ObjectNode node = new ObjectMapper().readValue(response, ObjectNode.class);
+        String id = String.valueOf(node.get("id").asText());
+        Map<String, Object> report = db.get("reports", id);
+        Map<String, Object> strain = db.get("strains", "keys", "kp");
+
+        String date = dateFormat(Calendar.getInstance().getTime(), "dd/MM/yyyy HH:mm");
+
+        assertThat(report.get("name")).isEqualTo(strain.get("name") + " " + date);
+        assertThat(report.get("strain")).isEqualTo(strain.get("_id"));
+
+        assertThat(report.get("sequences")).isOfAnyClassIn(ArrayList.class);
+        ArrayList<Map<String, String>> sequences = (ArrayList<Map<String, String>>) report.get("sequences");
+        assertThat(sequences.size()).isEqualTo(2);
+        assertThat(sequences).containsExactlyInAnyOrder(Map.of("$oid", sequence1Id), Map.of("$oid", sequence2Id));
+
+        LinkedHashMap<String, String> reference = (LinkedHashMap<String, String>) report.get("reference");
+        assertThat(reference.get("$oid")).isEqualTo(referenceId);
+        assertThat(report.get("genomeToolToken")).isEqualTo(token);
+        assertThat(report.get("requestDate").toString()).isEqualTo(date);
+        assertThat(report.get("file")).isNull();
+    }
+
 
     @BeforeAll
     static void startApplication() throws IOException, InterruptedException {

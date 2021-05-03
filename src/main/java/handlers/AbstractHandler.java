@@ -84,7 +84,7 @@ public abstract class AbstractHandler<V extends Validable> implements RequestHan
                 return answer.getBody();
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
             deleteTempFiles(uuid);
             response.status(500);
             response.type("application/json");
