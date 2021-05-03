@@ -51,6 +51,7 @@ public class SequencesGetTrimmedPairHandler extends AbstractHandler<EmptyPayload
 
             return Answer.withFile(fileStream, "application/zip");
         } catch (IOException e) {
+            e.printStackTrace();
             return Answer.serverError(e.getMessage());
         }
     }

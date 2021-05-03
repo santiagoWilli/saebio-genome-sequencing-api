@@ -10,6 +10,10 @@ import payloads.ReportRequest;
 import utils.Answer;
 import utils.Json;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 
@@ -34,7 +38,7 @@ public class ReportsPostHandler_ {
         toolAnswer = mock(GenomeToolAnswer.class);
         dataAccess = mock(DataAccess.class);
         handler = new ReportsPostHandler(genomeTool, dataAccess);
-        when(genomeTool.requestAnalysis(reportRequest)).thenReturn(toolAnswer);
+        when(genomeTool.requestToSendAnalysisFiles()).thenReturn(toolAnswer);
     }
 
     @Test
@@ -76,13 +80,23 @@ public class ReportsPostHandler_ {
     }
 
     @Test
-    public void if_genomeToolAnswerIsOk_return_httpAccepted_and_sequenceId() {
+    public void if_genomeToolAnswerIsOk_return_httpAccepted_and_sequenceId() throws IOException {
         when(dataAccess.referenceAndSequencesShareTheSameStrain(reportRequest.getReference(), reportRequest.getSequences())).thenReturn(true);
         final String token = "123e4567-e89b-12d3-a456-556642440000";
         final String id = "507f1f77bcf86cd799439011";
         when(toolAnswer.getStatus()).thenReturn(GenomeToolAnswer.Status.OK);
         when(toolAnswer.getMessage()).thenReturn(token);
+
+        for (String sequenceId : reportRequest.getSequences()) {
+            when(dataAccess.getSequenceTrimmedFilesIds(sequenceId)).thenReturn(Arrays.asList("1", "1"));
+        }
+        InputStream stream = new FileInputStream("test/resources/sequences/Kpneu231120_referencia.fa");
+        when(dataAccess.getFileStream("1")).thenReturn(stream);
+
+        when(genomeTool.sendAnalysisFile(token, stream)).thenReturn(toolAnswer);
+        when(genomeTool.requestToStartAnalysis(token)).thenReturn(toolAnswer);
         when(dataAccess.createReport(reportRequest, token)).thenReturn(id);
+
         assertThat(handler.process(reportRequest, null)).isEqualTo(new Answer(202, Json.id(id)));
         verify(dataAccess, times(1)).referenceAndSequencesShareTheSameStrain(reportRequest.getReference(), reportRequest.getSequences());
         verify(dataAccess, times(1)).createReport(reportRequest, token);

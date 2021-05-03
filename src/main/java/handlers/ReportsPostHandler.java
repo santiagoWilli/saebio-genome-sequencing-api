@@ -7,6 +7,7 @@ import payloads.ReportRequest;
 import utils.Answer;
 import utils.Json;
 
+import java.io.IOException;
 import java.util.Map;
 
 public class ReportsPostHandler extends AbstractHandler<ReportRequest> {
@@ -27,10 +28,30 @@ public class ReportsPostHandler extends AbstractHandler<ReportRequest> {
         } catch (NullPointerException e) {
             return new Answer(404, "One or more of the requested elements for the report could not be found");
         }
-        GenomeToolAnswer toolAnswer = genomeTool.requestAnalysis(reportRequest);
+
+        GenomeToolAnswer toolAnswer = genomeTool.requestToSendAnalysisFiles();
+        if (toolAnswer.getStatus() != GenomeToolAnswer.Status.OK) return toolAnswerToAnswer(toolAnswer);
+        String token = toolAnswer.getMessage();
+
+        for (String sequenceId : reportRequest.getSequences()) {
+            for (String fileId : dataAccess.getSequenceTrimmedFilesIds(sequenceId)) {
+                try {
+                    toolAnswer = genomeTool.sendAnalysisFile(token, dataAccess.getFileStream(fileId));
+                    if (toolAnswer.getStatus() != GenomeToolAnswer.Status.OK) return toolAnswerToAnswer(toolAnswer);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return Answer.serverError(e.getMessage());
+                }
+            }
+        }
+
+        toolAnswer = genomeTool.requestToStartAnalysis(token);
+        if (toolAnswer.getStatus() != GenomeToolAnswer.Status.OK) return toolAnswerToAnswer(toolAnswer);
+        return new Answer(202, Json.id(dataAccess.createReport(reportRequest, token)));
+    }
+
+    private Answer toolAnswerToAnswer(GenomeToolAnswer toolAnswer) {
         switch (toolAnswer.getStatus()) {
-            case OK:
-                return new Answer(202, Json.id(dataAccess.createReport(reportRequest, toolAnswer.getMessage())));
             case API_DOWN:
                 return Answer.serviceUnavailable("Genome reporter tool is down");
             case SERVER_ERROR:

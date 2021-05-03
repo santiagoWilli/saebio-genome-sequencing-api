@@ -180,7 +180,17 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
-    public boolean referenceAndSequencesShareTheSameStrain(String reference, Set<String> sequences) {
+    public boolean deleteStrain(String id) throws DocumentPointsToStrainException {
+        if (!ObjectId.isValid(id)) return false;
+        MongoCollection<Document> collection = database.getCollection("sequences");
+        if (collection.countDocuments(eq("strain", new ObjectId(id))) > 0) throw new DocumentPointsToStrainException();
+
+        collection = database.getCollection("strains");
+        return collection.deleteOne(eq("_id", new ObjectId(id))).getDeletedCount() > 0;
+    }
+
+    @Override
+    public boolean referenceAndSequencesShareTheSameStrain(String referenceId, Set<String> sequencesIds) {
         return false;
     }
 
@@ -189,19 +199,14 @@ public class MongoDataAccess implements DataAccess {
         return null;
     }
 
+    @Override
+    public List<String> getSequenceTrimmedFilesIds(String sequenceId) {
+        return null;
+    }
+
     private Document getStrain(String key) {
         MongoCollection<Document> collection = database.getCollection("strains");
         return collection.find(eq("keys", key)).first();
-    }
-
-    @Override
-    public boolean deleteStrain(String id) throws DocumentPointsToStrainException {
-        if (!ObjectId.isValid(id)) return false;
-        MongoCollection<Document> collection = database.getCollection("sequences");
-        if (collection.countDocuments(eq("strain", new ObjectId(id))) > 0) throw new DocumentPointsToStrainException();
-
-        collection = database.getCollection("strains");
-        return collection.deleteOne(eq("_id", new ObjectId(id))).getDeletedCount() > 0;
     }
 
     private String findAllFromCollection(String collectionName) {

@@ -3,7 +3,6 @@ package genome;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
-import payloads.ReportRequest;
 import payloads.Sequence;
 
 import java.io.FileInputStream;
@@ -40,7 +39,17 @@ public class NullarborClient implements GenomeTool {
     }
 
     @Override
-    public GenomeToolAnswer requestAnalysis(ReportRequest reportRequest) {
+    public GenomeToolAnswer requestToSendAnalysisFiles() {
+        return null;
+    }
+
+    @Override
+    public GenomeToolAnswer sendAnalysisFile(String token, InputStream stream) {
+        return null;
+    }
+
+    @Override
+    public GenomeToolAnswer requestToStartAnalysis(String token) {
         return null;
     }
 }

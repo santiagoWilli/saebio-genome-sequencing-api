@@ -1,9 +1,12 @@
 package genome;
 
-import payloads.ReportRequest;
 import payloads.Sequence;
+import java.io.InputStream;
 
 public interface GenomeTool {
     GenomeToolAnswer requestTrim(Sequence sequence);
-    GenomeToolAnswer requestAnalysis(ReportRequest reportRequest);
+
+    GenomeToolAnswer requestToSendAnalysisFiles();
+    GenomeToolAnswer sendAnalysisFile(String token, InputStream stream);
+    GenomeToolAnswer requestToStartAnalysis(String token);
 }

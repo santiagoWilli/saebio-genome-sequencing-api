@@ -5,6 +5,7 @@ import payloads.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Set;
 
 public interface DataAccess {
@@ -28,4 +29,6 @@ public interface DataAccess {
 
     boolean referenceAndSequencesShareTheSameStrain(String reference, Set<String> sequences);
     String createReport(ReportRequest reportRequest, String token);
+
+    List<String> getSequenceTrimmedFilesIds(String sequenceId);
 }
