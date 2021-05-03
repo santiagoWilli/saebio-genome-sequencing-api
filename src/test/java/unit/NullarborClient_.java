@@ -43,7 +43,7 @@ public class NullarborClient_ {
     }
 
     @Test
-    public void httpAccepted_returns_okCode_and_nullarborToken() {
+    public void requestTrim_httpAccepted_returns_okCode_and_nullarborToken() {
         mockFileMap();
         String token = "123e4567-e89b-12d3-a456-556642440000";
 
@@ -58,6 +58,20 @@ public class NullarborClient_ {
                 .withHeader("Content-Type", containing("multipart/form-data"))
                 .withRequestBodyPart(aMultipart().withName("pair1").build())
                 .withRequestBodyPart(aMultipart().withName("pair2").build()));
+    }
+
+    @Test
+    public void requestToSendAnalysisFiles_httpAccepted_returns_okCode_and_analysisToken() {
+        String token = "123e4567-e89b-12d3-a456-556642440000";
+
+        stubFor(post(urlEqualTo("/request_analysis"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{\"token\":\"" + token + "\"}")));
+        GenomeToolAnswer clientAnswer = client.requestToSendAnalysisFiles();
+        assertThat(clientAnswer).isEqualTo(new GenomeToolAnswer(GenomeToolAnswer.Status.OK, token));
+        verify(exactly(1), postRequestedFor(urlEqualTo("/request_analysis")));
     }
 
     @BeforeEach
