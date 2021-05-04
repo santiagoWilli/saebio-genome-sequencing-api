@@ -3,21 +3,9 @@ package payloads;
 import java.io.File;
 import java.util.Map;
 
-public class Reference extends Multipart implements Validable {
+public class Reference extends Isolate implements Validable {
     public Reference(Map<String, String> fields, Map<String, File> files) {
         super(fields, files);
-    }
-
-    public String getName() {
-        return files.keySet().iterator().next();
-    }
-
-    public String getStrainKey() {
-        return fileNameFirstFieldRemove("[0-9]").toLowerCase();
-    }
-
-    public String getCode() {
-        return fileNameFirstFieldRemove("[^0-9]");
     }
 
     public File getFile() {
@@ -27,11 +15,7 @@ public class Reference extends Multipart implements Validable {
     @Override
     public boolean isValid() {
         if (files.size() != 1) return false;
-        return files.keySet().iterator().next().matches(fileNameRegex());
-    }
-
-    private String fileNameFirstFieldRemove(String regex) {
-        return getName().split("[_\\-]")[0].replaceAll(regex, "");
+        return getName().matches(fileNameRegex());
     }
 
     private static String fileNameRegex() {

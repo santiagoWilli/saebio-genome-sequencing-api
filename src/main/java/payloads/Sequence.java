@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class Sequence extends Multipart implements Validable {
+public class Sequence extends Isolate implements Validable {
     public Sequence(Map<String, String> fields, Map<String, File> files) {
         super(fields, files);
     }
@@ -18,13 +18,6 @@ public class Sequence extends Multipart implements Validable {
                 fileNameDate.month,
                 fileNameDate.day
         );
-    }
-
-    public String getStrainKey() {
-        return files.keySet().iterator().next()
-                .split("_")[0]
-                .split("[0-9]")[0]
-                .toLowerCase();
     }
 
     public List<String> getOriginalFileNames() {

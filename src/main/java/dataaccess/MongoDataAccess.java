@@ -34,6 +34,7 @@ public class MongoDataAccess implements DataAccess {
         MongoCollection<Document> collection = database.getCollection("sequences");
         Document document = new Document("sequenceDate", formatDate(sequence.getDate()))
                 .append("strain", getStrain(sequence.getStrainKey()).getObjectId("_id"))
+                .append("code", sequence.getIsolateCode())
                 .append("originalFilenames", sequence.getOriginalFileNames())
                 .append("genomeToolToken", genomeToolToken)
                 .append("trimRequestDate", formatDate(LocalDateTime.now(ZoneOffset.UTC), "yyyy-MM-dd HH:mm:ss.SSS"));
@@ -117,7 +118,7 @@ public class MongoDataAccess implements DataAccess {
         MongoCollection<Document> collection = database.getCollection("references");
         Document document = new Document()
                 .append("strain", getStrain(reference.getStrainKey()).getObjectId("_id"))
-                .append("code", reference.getCode())
+                .append("code", reference.getIsolateCode())
                 .append("file", id);
         collection.insertOne(document);
         return document.getObjectId("_id").toString();

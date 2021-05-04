@@ -81,6 +81,11 @@ public class Sequence_ {
         assertThat(sequence.getOriginalFileNames()).isEqualTo(Arrays.asList("Kp1_231120_R1.fastq.gz", "Kp1_231120_R2.fastq.gz"));
     }
 
+    @Test
+    public void getIsolateCode_shouldReturn_theNumbersRightNextToTheStrainKey() {
+        Sequence sequence = getSequenceFrom(VALID_PAIRS[0]);
+        assertThat(sequence.getIsolateCode()).isEqualTo("1");    }
+
     private static void iterateThroughPairs(String[][] pairs, boolean expected) {
         for (String[] pair : pairs) {
             Sequence sequence = getSequenceFrom(pair);

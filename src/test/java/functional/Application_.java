@@ -70,6 +70,7 @@ public class Application_ {
         Map<String, Object> sequence = db.get("sequences", id);
 
         assertThat(sequence.get("strain")).isEqualTo(strain.get("_id"));
+        assertThat(sequence.get("code")).isEqualTo("1");
         assertThat(sequence.get("originalFilenames")).isEqualTo(Arrays.asList("Kp1_231120_R1.fastq.gz", "Kp1_231120_R2.fastq.gz"));
         assertThat(sequence.get("genomeToolToken")).isEqualTo(token);
         assertThat(sequence.get("sequenceDate").toString())

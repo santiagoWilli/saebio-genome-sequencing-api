@@ -46,7 +46,7 @@ public class Reference_ {
     @Test
     public void getCode_shouldReturn_theNumberTheFilename() {
         Reference reference = getReferenceFrom("Kneu123456-referencia.fa");
-        assertThat(reference.getCode()).isEqualTo("123456");
+        assertThat(reference.getIsolateCode()).isEqualTo("123456");
     }
 
     private static void iterateThroughFileNames(String[] fileNames, boolean expected) {

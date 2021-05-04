@@ -2,6 +2,7 @@ package handlers;
 
 import org.apache.commons.io.FileUtils;
 import payloads.EmptyPayload;
+import payloads.Isolate;
 import payloads.Multipart;
 import payloads.Validable;
 import spark.Request;
@@ -40,7 +41,7 @@ public abstract class AbstractHandler<V extends Validable> implements RequestHan
         String uuid = null;
         try {
             V payload = null;
-            if (payloadClass.getSuperclass().equals(Multipart.class)) {
+            if (payloadClass.getSuperclass().equals(Multipart.class) || payloadClass.getSuperclass().equals(Isolate.class)) {
                 request.attribute("org.eclipse.jetty.multipartConfig", new MultipartConfigElement("/temp"));
                 Map<String, String> fields = new HashMap<>();
                 Map<String, File> files = new HashMap<>();
