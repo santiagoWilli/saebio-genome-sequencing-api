@@ -4,7 +4,7 @@ import dataaccess.DataAccess;
 import genome.GenomeTool;
 import genome.GenomeToolAnswer;
 import utils.Answer;
-import handlers.SequencesPostHandler;
+import handlers.sequences.SequencesPostHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import payloads.Sequence;

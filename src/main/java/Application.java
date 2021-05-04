@@ -4,7 +4,10 @@ import static spark.Spark.*;
 import dataaccess.Database;
 import dataaccess.MongoDataAccess;
 import genome.NullarborClient;
-import handlers.*;
+import handlers.references.*;
+import handlers.reports.*;
+import handlers.sequences.*;
+import handlers.strains.*;
 import utils.Arguments;
 
 import java.net.MalformedURLException;

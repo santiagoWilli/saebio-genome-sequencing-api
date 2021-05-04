@@ -1,6 +1,7 @@
-package handlers;
+package handlers.strains;
 
 import dataaccess.DataAccess;
+import handlers.AbstractHandler;
 import payloads.EmptyPayload;
 import utils.Answer;
 

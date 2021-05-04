@@ -1,7 +1,7 @@
 package unit.handlers;
 
 import dataaccess.DataAccess;
-import handlers.SequencesGetAllHandler;
+import handlers.sequences.SequencesGetAllHandler;
 import org.junit.jupiter.api.Test;
 import payloads.EmptyPayload;
 import utils.Answer;

@@ -1,7 +1,8 @@
-package handlers;
+package handlers.strains;
 
 import dataaccess.DataAccess;
 import dataaccess.exceptions.UniquenessViolationException;
+import handlers.AbstractHandler;
 import payloads.StrainKeys;
 import utils.Answer;
 

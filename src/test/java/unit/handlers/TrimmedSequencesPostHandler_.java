@@ -2,7 +2,7 @@ package unit.handlers;
 
 import dataaccess.DataAccess;
 import dataaccess.UploadCode;
-import handlers.TrimmedSequencesPostHandler;
+import handlers.sequences.TrimmedSequencesPostHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import payloads.TrimRequestResult;

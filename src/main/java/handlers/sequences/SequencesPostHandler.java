@@ -1,8 +1,9 @@
-package handlers;
+package handlers.sequences;
 
 import dataaccess.DataAccess;
 import genome.GenomeTool;
 import genome.GenomeToolAnswer;
+import handlers.AbstractHandler;
 import payloads.Sequence;
 import utils.Answer;
 import utils.Json;

@@ -3,7 +3,7 @@ package unit.handlers;
 import dataaccess.DataAccess;
 import genome.GenomeTool;
 import genome.GenomeToolAnswer;
-import handlers.ReportsPostHandler;
+import handlers.reports.ReportsPostHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import payloads.ReportRequest;

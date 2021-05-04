@@ -1,8 +1,9 @@
-package handlers;
+package handlers.reports;
 
 import dataaccess.DataAccess;
 import genome.GenomeTool;
 import genome.GenomeToolAnswer;
+import handlers.AbstractHandler;
 import payloads.ReportRequest;
 import utils.Answer;
 import utils.Json;

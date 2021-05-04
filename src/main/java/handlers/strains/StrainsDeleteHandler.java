@@ -1,7 +1,8 @@
-package handlers;
+package handlers.strains;
 
 import dataaccess.DataAccess;
 import dataaccess.exceptions.DocumentPointsToStrainException;
+import handlers.AbstractHandler;
 import payloads.EmptyPayload;
 import utils.Answer;
 

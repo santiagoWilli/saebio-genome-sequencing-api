@@ -1,6 +1,7 @@
-package handlers;
+package handlers.sequences;
 
 import dataaccess.DataAccess;
+import handlers.AbstractHandler;
 import payloads.TrimRequestResult;
 import utils.Answer;
 

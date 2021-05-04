@@ -2,7 +2,7 @@ package unit.handlers;
 
 import dataaccess.DataAccess;
 import dataaccess.exceptions.UniquenessViolationException;
-import handlers.StrainsPostHandler;
+import handlers.strains.StrainsPostHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import payloads.Strain;
