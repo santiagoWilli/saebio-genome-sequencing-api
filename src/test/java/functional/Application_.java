@@ -534,7 +534,7 @@ public class Application_ {
     }
 
     @Test
-    public void given_aReference_and_oneOrMoreSequences_and_theyDoNotShareTheSameStrain_when_postToReports_then_httpConflict() throws IOException {
+    public void given_aReference_and_fourOrMoreSequences_and_theyDoNotShareTheSameStrain_when_postToReports_then_httpConflict() throws IOException {
         final String token = token();
         final String strain1Id = db.insertFakeStrain("kp", "test");
         final String strain2Id = db.insertFakeStrain("zo", "zoo");
@@ -542,53 +542,87 @@ public class Application_ {
         files.add(new File(testFolderPath + "ngs/Kp4_R1_001_trimmed.fq.gz"));
         files.add(new File(testFolderPath + "ngs/Kp4_R2_001_trimmed.fq.gz"));
         File referenceFile = new File(testFolderPath + "Kpneu231120_referencia.fa");
-        final String sequence1Id = db.insertFakeSequenceWithTrimmedFiles(token, files, strain1Id);
-        final String sequence2Id = db.insertFakeSequenceWithTrimmedFiles(token, files, strain2Id);
+        String[] sequenceIds = new String[4];
+        for (int i = 0; i < 2; i++) sequenceIds[i] = db.insertFakeSequenceWithTrimmedFiles(token, files, strain1Id);
+        for (int i = 2; i < 4; i++) sequenceIds[i] = db.insertFakeSequenceWithTrimmedFiles(token, files, strain2Id);
         final String referenceId = db.insertFakeReferenceWithFile(referenceFile, strain1Id);
 
-        stubFor(post(urlEqualTo("/request_analysis")));
+        stubFor(post(urlEqualTo("/analysis")));
 
         given().
-                param("sequences", sequence1Id, sequence2Id).
+                param("sequences", sequenceIds[0], sequenceIds[1], sequenceIds[2], sequenceIds[3]).
                 param("reference", referenceId).
         when().
                 post("/api/reports").
         then().
                 statusCode(409);
 
-        verify(exactly(0), postRequestedFor(urlEqualTo("/request_analysis")));
+        verify(exactly(0), postRequestedFor(urlEqualTo("/analysis")));
     }
 
-    @SuppressWarnings("unchecked")
     @Test
-    public void given_aReference_and_oneOrMoreSequences_when_postToReports_then_reportCreated_and_returnHttpAccepted() throws IOException {
+    public void given_aReference_and_lessThanFourSequences_when_postToReports_then_badRequest() throws IOException {
         final String token = token();
         final String strainId = db.insertFakeStrain("kp", "test");
         Collection<File> files = new ArrayList<>();
         files.add(new File(testFolderPath + "ngs/Kp4_R1_001_trimmed.fq.gz"));
         files.add(new File(testFolderPath + "ngs/Kp4_R2_001_trimmed.fq.gz"));
         File referenceFile = new File(testFolderPath + "Kpneu231120_referencia.fa");
-        final String sequence1Id = db.insertFakeSequenceWithTrimmedFiles(token, files, strainId);
-        final String sequence2Id = db.insertFakeSequenceWithTrimmedFiles(token, files, strainId);
+        String[] sequenceIds = new String[3];
+        for (int i = 0; i < 3; i++) {
+            sequenceIds[i] = db.insertFakeSequenceWithTrimmedFiles(token, files, strainId);
+        }
         final String referenceId = db.insertFakeReferenceWithFile(referenceFile, strainId);
 
-        stubFor(post(urlEqualTo("/request_analysis"))
+        stubFor(post(urlEqualTo("/analysis")).willReturn(aResponse()));
+        stubFor(patch(urlEqualTo("/analysis/" + token)).willReturn(aResponse()));
+        stubFor(post(urlEqualTo("/analysis/" + token)).willReturn(aResponse()));
+
+        given().
+                param("sequences", sequenceIds[0], sequenceIds[1], sequenceIds[2]).
+                param("reference", referenceId).
+        when().
+                post("/api/reports").
+        then().
+                statusCode(400);
+
+        verify(exactly(0), postRequestedFor(urlEqualTo("/analysis")));
+        verify(exactly(0), patchRequestedFor(urlEqualTo("/analysis/" + token)));
+        verify(exactly(0), postRequestedFor(urlEqualTo("/analysis/" + token)));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void given_aReference_and_fourOrMoreSequences_when_postToReports_then_reportCreated_and_returnHttpAccepted() throws IOException {
+        final String token = token();
+        final String strainId = db.insertFakeStrain("kp", "test");
+        Collection<File> files = new ArrayList<>();
+        files.add(new File(testFolderPath + "ngs/Kp4_R1_001_trimmed.fq.gz"));
+        files.add(new File(testFolderPath + "ngs/Kp4_R2_001_trimmed.fq.gz"));
+        File referenceFile = new File(testFolderPath + "Kpneu231120_referencia.fa");
+        String[] sequenceIds = new String[4];
+        for (int i = 0; i < 4; i++) {
+            sequenceIds[i] = db.insertFakeSequenceWithTrimmedFiles(token, files, strainId);
+        }
+        final String referenceId = db.insertFakeReferenceWithFile(referenceFile, strainId);
+
+        stubFor(post(urlEqualTo("/analysis"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody("{\"token\":\"" + token + "\"}")));
 
-        stubFor(post(urlEqualTo("/analysis/" + token + "/file"))
+        stubFor(patch(urlEqualTo("/analysis/" + token))
                 .willReturn(aResponse()
                         .withStatus(200)));
 
-        stubFor(post(urlEqualTo("/analysis/" + token + "/start"))
+        stubFor(post(urlEqualTo("/analysis/" + token))
                 .willReturn(aResponse()
                         .withStatus(202)));
 
         String response =
                 given().
-                        param("sequences", sequence1Id, sequence2Id).
+                        param("sequences", sequenceIds[0], sequenceIds[1], sequenceIds[2], sequenceIds[3]).
                         param("reference", referenceId).
                 when().
                         post("/api/reports").
@@ -597,8 +631,9 @@ public class Application_ {
                         extract().
                         asString();
 
-        verify(exactly(1), postRequestedFor(urlEqualTo("/request_analysis")));
-        verify(exactly(1), postRequestedFor(urlEqualTo("/analysis/" + token + "/start")));
+        verify(exactly(1), postRequestedFor(urlEqualTo("/analysis")));
+        verify(exactly(8), patchRequestedFor(urlEqualTo("/analysis/" + token)));
+        verify(exactly(1), postRequestedFor(urlEqualTo("/analysis/" + token)));
 
         ObjectNode node = new ObjectMapper().readValue(response, ObjectNode.class);
         String id = String.valueOf(node.get("id").asText());
@@ -612,8 +647,12 @@ public class Application_ {
 
         assertThat(report.get("sequences")).isOfAnyClassIn(ArrayList.class);
         ArrayList<Map<String, String>> sequences = (ArrayList<Map<String, String>>) report.get("sequences");
-        assertThat(sequences.size()).isEqualTo(2);
-        assertThat(sequences).containsExactlyInAnyOrder(Map.of("$oid", sequence1Id), Map.of("$oid", sequence2Id));
+        assertThat(sequences.size()).isEqualTo(4);
+        assertThat(sequences).containsExactlyInAnyOrder(
+                Map.of("$oid", sequenceIds[0]),
+                Map.of("$oid", sequenceIds[1]),
+                Map.of("$oid", sequenceIds[2]),
+                Map.of("$oid", sequenceIds[3]));
 
         LinkedHashMap<String, String> reference = (LinkedHashMap<String, String>) report.get("reference");
         assertThat(reference.get("$oid")).isEqualTo(referenceId);
@@ -621,7 +660,6 @@ public class Application_ {
         assertThat(report.get("requestDate").toString()).isEqualTo(date);
         assertThat(report.get("file")).isNull();
     }
-
 
     @BeforeAll
     static void startApplication() throws IOException, InterruptedException {

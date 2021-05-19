@@ -19,8 +19,8 @@ public class ReportRequest_ {
     }
 
     @Test
-    public void valid_if_sequencesListIsNotEmpty_and_parametersHasAReference() {
-        parameters.put("sequences", new String[]{"1", "2", "3"});
+    public void valid_if_sequencesListIsGreaterThanThree_and_parametersHasAReference() {
+        parameters.put("sequences", new String[]{"1", "2", "3", "4"});
         parameters.put("reference", new String[]{"1"});
         assertThat(reportRequest.isValid()).isTrue();
     }
@@ -48,6 +48,13 @@ public class ReportRequest_ {
     public void invalid_if_referenceIsEmpty() {
         parameters.put("sequences", new String[]{"1"});
         parameters.put("reference", new String[]{""});
+        assertThat(reportRequest.isValid()).isFalse();
+    }
+
+    @Test
+    public void invalid_if_lessThanFourSequences() {
+        parameters.put("sequences", new String[]{"1", "2", "3"});
+        parameters.put("reference", new String[]{"1"});
         assertThat(reportRequest.isValid()).isFalse();
     }
 
