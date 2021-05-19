@@ -31,4 +31,5 @@ public interface DataAccess {
     String createReport(ReportRequest reportRequest, String token);
 
     List<String> getSequenceTrimmedFilesIds(String sequenceId);
+    String getReferenceFileId(String referenceId);
 }

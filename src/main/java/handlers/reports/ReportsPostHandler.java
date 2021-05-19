@@ -34,6 +34,16 @@ public class ReportsPostHandler extends AbstractHandler<ReportRequest> {
         if (toolAnswer.getStatus() != GenomeToolAnswer.Status.OK) return toolAnswerToAnswer(toolAnswer);
         String token = toolAnswer.getMessage();
 
+        try {
+            String fileId = dataAccess.getReferenceFileId(reportRequest.getReference());
+            toolAnswer = genomeTool.sendAnalysisFile(token, dataAccess.getFileStream(fileId), dataAccess.getFileName(fileId));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Answer.serverError(e.getMessage());
+        }
+
+        if (toolAnswer.getStatus() != GenomeToolAnswer.Status.OK) return toolAnswerToAnswer(toolAnswer);
+
         for (String sequenceId : reportRequest.getSequences()) {
             for (String fileId : dataAccess.getSequenceTrimmedFilesIds(sequenceId)) {
                 try {

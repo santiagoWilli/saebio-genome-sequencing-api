@@ -631,8 +631,10 @@ public class Application_ {
                         extract().
                         asString();
 
+        System.out.println(response);
+
         verify(exactly(1), postRequestedFor(urlEqualTo("/analysis")));
-        verify(exactly(8), patchRequestedFor(urlEqualTo("/analysis/" + token)));
+        verify(exactly(9), patchRequestedFor(urlEqualTo("/analysis/" + token)));
         verify(exactly(1), postRequestedFor(urlEqualTo("/analysis/" + token)));
 
         ObjectNode node = new ObjectMapper().readValue(response, ObjectNode.class);

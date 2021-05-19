@@ -80,7 +80,7 @@ public class ReportsPostHandler_ {
     }
 
     @Test
-    public void if_genomeToolAnswerIsOk_return_httpAccepted_and_sequenceId() throws IOException {
+    public void if_genomeToolAnswerIsOk_return_httpAccepted_and_reportId() throws IOException {
         when(dataAccess.referenceAndSequencesShareTheSameStrain(reportRequest.getReference(), reportRequest.getSequences())).thenReturn(true);
         final String token = "123e4567-e89b-12d3-a456-556642440000";
         final String id = "507f1f77bcf86cd799439011";
@@ -88,18 +88,28 @@ public class ReportsPostHandler_ {
         when(toolAnswer.getMessage()).thenReturn(token);
 
         for (String sequenceId : reportRequest.getSequences()) {
-            when(dataAccess.getSequenceTrimmedFilesIds(sequenceId)).thenReturn(Arrays.asList("1", "1"));
+            when(dataAccess.getSequenceTrimmedFilesIds(sequenceId)).thenReturn(Arrays.asList("2", "2"));
         }
-        InputStream stream = new FileInputStream("test/resources/sequences/Kpneu231120_referencia.fa");
-        when(dataAccess.getFileStream("1")).thenReturn(stream);
-        when(dataAccess.getFileName("1")).thenReturn("abc");
+        when(dataAccess.getReferenceFileId(reportRequest.getReference())).thenReturn("1");
 
-        when(genomeTool.sendAnalysisFile(token, stream, "abc")).thenReturn(toolAnswer);
+        InputStream referenceStream = new FileInputStream("test/resources/sequences/Kpneu231120_referencia.fa");
+        InputStream sequenceStream = new FileInputStream("test/resources/sequences/Kp1_231120_R1.fastq.gz");
+        when(dataAccess.getFileStream("2")).thenReturn(sequenceStream);
+        when(dataAccess.getFileName("2")).thenReturn("abc");
+        when(dataAccess.getFileStream("1")).thenReturn(referenceStream);
+        when(dataAccess.getFileName("1")).thenReturn("ref");
+
+        when(genomeTool.sendAnalysisFile(token, sequenceStream, "abc")).thenReturn(toolAnswer);
+        when(genomeTool.sendAnalysisFile(token, referenceStream, "ref")).thenReturn(toolAnswer);
         when(genomeTool.requestToStartAnalysis(token)).thenReturn(toolAnswer);
         when(dataAccess.createReport(reportRequest, token)).thenReturn(id);
 
         assertThat(handler.process(reportRequest, null)).isEqualTo(new Answer(202, Json.id(id)));
         verify(dataAccess, times(1)).referenceAndSequencesShareTheSameStrain(reportRequest.getReference(), reportRequest.getSequences());
+        verify(genomeTool, times(1)).requestToSendAnalysisFiles();
+        verify(genomeTool, times(2)).sendAnalysisFile(token, sequenceStream, "abc");
+        verify(genomeTool, times(1)).sendAnalysisFile(token, referenceStream, "ref");
+        verify(genomeTool, times(1)).requestToStartAnalysis(token);
         verify(dataAccess, times(1)).createReport(reportRequest, token);
     }
 

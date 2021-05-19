@@ -239,6 +239,13 @@ public class MongoDataAccess implements DataAccess {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public String getReferenceFileId(String referenceId) {
+        MongoCollection<Document> collection = database.getCollection("references");
+        final Document document = collection.find(eq("_id", new ObjectId(referenceId))).first();
+        return document.getObjectId("file").toString();
+    }
+
     private Document getStrain(String key) {
         MongoCollection<Document> collection = database.getCollection("strains");
         return collection.find(eq("keys", key)).first();
