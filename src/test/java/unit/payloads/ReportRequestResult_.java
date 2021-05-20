@@ -56,6 +56,14 @@ public class ReportRequestResult_ {
         assertThat(result.isValid()).isEqualTo(true);
     }
 
+    @Test
+    public void valid_if_successStatus_and_hasFileButNotHtml() {
+        fields.put("status", "2");
+        fields.put("token", token());
+        files.put("index.fa", mock(File.class));
+        assertThat(result.isValid()).isEqualTo(false);
+    }
+
     private String token() {
         return "123e4567-e89b-12d3-a456-556642440000";
     }
