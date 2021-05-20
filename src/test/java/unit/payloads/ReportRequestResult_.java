@@ -13,14 +13,14 @@ import static org.mockito.Mockito.mock;
 
 public class ReportRequestResult_ {
     private Map<String, String> fields;
-    private Map<String, File> file;
+    private Map<String, File> files;
     private ReportRequestResult result;
 
     @BeforeEach
     public void setup() {
         fields = new HashMap<>();
-        file = new HashMap<>();
-        result = new ReportRequestResult(fields, file);
+        files = new HashMap<>();
+        result = new ReportRequestResult(fields, files);
     }
 
     @Test
@@ -37,7 +37,7 @@ public class ReportRequestResult_ {
 
         fields.clear();
         fields.put("token", token());
-        result = new ReportRequestResult(fields, file);
+        result = new ReportRequestResult(fields, files);
         assertThat(result.isValid()).isEqualTo(false);
     }
 
@@ -45,8 +45,15 @@ public class ReportRequestResult_ {
     public void invalid_if_successStatus_and_hasNoFile() {
         fields.put("status", "2");
         fields.put("token", token());
-
         assertThat(result.isValid()).isEqualTo(false);
+    }
+
+    @Test
+    public void valid_if_successStatus_and_hasHtmlFile() {
+        fields.put("status", "2");
+        fields.put("token", token());
+        files.put("index.html", mock(File.class));
+        assertThat(result.isValid()).isEqualTo(true);
     }
 
     private String token() {

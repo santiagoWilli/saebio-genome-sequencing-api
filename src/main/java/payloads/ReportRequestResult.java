@@ -11,6 +11,9 @@ public class ReportRequestResult extends RequestResult implements Validable {
     @Override
     public boolean isValid() {
         if (fields.get("status") == null || getSequenceToken() == null) return false;
-        return getStatusCode() != 2;
+        if (getStatusCode() == 2) {
+            return files.keySet().size() == 1;
+        }
+        return true;
     }
 }
