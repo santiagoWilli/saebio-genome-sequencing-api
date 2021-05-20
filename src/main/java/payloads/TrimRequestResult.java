@@ -4,17 +4,9 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Map;
 
-public class TrimRequestResult extends Multipart implements Validable {
+public class TrimRequestResult extends RequestResult implements Validable {
     public TrimRequestResult(Map<String, String> fields, Map<String, File> files) {
         super(fields, files);
-    }
-
-    public String getSequenceToken() {
-        return fields.get("token");
-    }
-
-    public int getStatusCode() {
-        return Integer.parseInt(fields.get("status"));
     }
 
     @Override
