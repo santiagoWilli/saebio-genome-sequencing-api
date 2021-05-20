@@ -41,6 +41,14 @@ public class ReportRequestResult_ {
         assertThat(result.isValid()).isEqualTo(false);
     }
 
+    @Test
+    public void invalid_if_successStatus_and_hasNoFile() {
+        fields.put("status", "2");
+        fields.put("token", token());
+
+        assertThat(result.isValid()).isEqualTo(false);
+    }
+
     private String token() {
         return "123e4567-e89b-12d3-a456-556642440000";
     }
