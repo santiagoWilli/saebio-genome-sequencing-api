@@ -10,6 +10,6 @@ public class ReportRequestResult extends RequestResult implements Validable {
 
     @Override
     public boolean isValid() {
-        return true;
+        return !(fields.get("status") == null || getSequenceToken() == null);
     }
 }

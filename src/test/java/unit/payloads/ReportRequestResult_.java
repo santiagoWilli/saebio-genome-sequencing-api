@@ -27,8 +27,18 @@ public class ReportRequestResult_ {
     public void valid_if_failureStatus_and_hasTokenField() {
         fields.put("status", "5");
         fields.put("token", token());
-
         assertThat(result.isValid()).isEqualTo(true);
+    }
+
+    @Test
+    public void invalid_if_noStatusOrTokenFields() {
+        fields.put("status", "5");
+        assertThat(result.isValid()).isEqualTo(false);
+
+        fields.clear();
+        fields.put("token", token());
+        result = new ReportRequestResult(fields, file);
+        assertThat(result.isValid()).isEqualTo(false);
     }
 
     private String token() {
