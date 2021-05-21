@@ -705,6 +705,22 @@ public class Application_ {
         assertThat(sequence.get("file")).isEqualTo(false);
     }
 
+    @Test
+    public void when_getToReports_then_returnAJsonOfAllReports() throws IOException {
+        final int amount = 5;
+        for (int i = 0; i < amount; i++) db.insertFakeReport(token());
+
+        String response =
+                when().
+                        get("/api/reports").
+                then().
+                        statusCode(200).
+                        extract().asString();
+
+        List<Object> reports = Arrays.asList(new ObjectMapper().readValue(response, Object[].class));
+        assertThat(reports.size()).isEqualTo(amount);
+    }
+
     @BeforeAll
     static void startApplication() throws IOException, InterruptedException {
         port = PORT;
