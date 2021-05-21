@@ -22,7 +22,7 @@ public class ReportsResultPostHandler_ {
         when(reportResult.isValid()).thenReturn(true);
         dataAccess = mock(DataAccess.class);
         handler = new ReportsResultPostHandler(dataAccess);
-        when(reportResult.getSequenceToken()).thenReturn("123e4567-e89b-12d3-a456-556642440000");
+        when(reportResult.getToken()).thenReturn("123e4567-e89b-12d3-a456-556642440000");
     }
 
     @Test
@@ -53,16 +53,16 @@ public class ReportsResultPostHandler_ {
     @Test
     public void if_failureStatusCode_and_reportFound_httpOk() {
         when(reportResult.getStatusCode()).thenReturn(5);
-        when(dataAccess.setReportFileToFalse(reportResult.getSequenceToken())).thenReturn(true);
+        when(dataAccess.setReportFileToFalse(reportResult.getToken())).thenReturn(true);
         assertThat(handler.process(reportResult, null).getCode()).isEqualTo(200);
-        verify(dataAccess, times(1)).setReportFileToFalse(reportResult.getSequenceToken());
+        verify(dataAccess, times(1)).setReportFileToFalse(reportResult.getToken());
     }
 
     @Test
     public void if_failureStatusCode_and_reportNotFound_httpNotFound() {
         when(reportResult.getStatusCode()).thenReturn(5);
-        when(dataAccess.setReportFileToFalse(reportResult.getSequenceToken())).thenReturn(false);
+        when(dataAccess.setReportFileToFalse(reportResult.getToken())).thenReturn(false);
         assertThat(handler.process(reportResult, null)).isEqualTo(Answer.notFound());
-        verify(dataAccess, times(1)).setReportFileToFalse(reportResult.getSequenceToken());
+        verify(dataAccess, times(1)).setReportFileToFalse(reportResult.getToken());
     }
 }

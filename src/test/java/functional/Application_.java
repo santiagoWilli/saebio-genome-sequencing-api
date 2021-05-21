@@ -687,6 +687,24 @@ public class Application_ {
         assertThat(file.containsKey("$oid"));
     }
 
+    @Test
+    public void given_anErrorStatus_when_postToReportsResult_then_setFileFieldToFalse() throws IOException {
+        final String token = token();
+        final String id = db.insertFakeReport(token);
+
+        given().
+                multiPart("status", 5).
+                multiPart("token", token).
+        when().
+                post("/api/reports/result").
+        then().
+                statusCode(200);
+
+        Map<String, Object> sequence = db.get("reports", id);
+        assertThat(sequence.get("file")).isNotNull();
+        assertThat(sequence.get("file")).isEqualTo(false);
+    }
+
     @BeforeAll
     static void startApplication() throws IOException, InterruptedException {
         port = PORT;

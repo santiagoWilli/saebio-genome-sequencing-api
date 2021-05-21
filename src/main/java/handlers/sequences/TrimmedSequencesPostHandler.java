@@ -18,7 +18,7 @@ public class TrimmedSequencesPostHandler extends AbstractHandler<TrimRequestResu
     @Override
     protected Answer processRequest(TrimRequestResult result, Map<String, String> requestParams) {
         if (result.getStatusCode() == 5) {
-            if (dataAccess.setSequenceTrimToFalse(result.getSequenceToken())) {
+            if (dataAccess.setSequenceTrimToFalse(result.getToken())) {
                 return new Answer(200, "Sequence trimmed files field updated to false");
             }
             return new Answer(404, "Could not find the sequence with the given token");

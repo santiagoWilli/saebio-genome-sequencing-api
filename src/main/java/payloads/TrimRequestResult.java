@@ -11,7 +11,7 @@ public class TrimRequestResult extends RequestResult implements Validable {
 
     @Override
     public boolean isValid() {
-        if (fields.get("status") == null || getSequenceToken() == null) return false;
+        if (fields.get("status") == null || getToken() == null) return false;
         if (getStatusCode() == 2) {
             if (files.keySet().size() != 2) return false;
             for (String fileName : files.keySet()) if (!fileIsFastq(fileName)) return false;

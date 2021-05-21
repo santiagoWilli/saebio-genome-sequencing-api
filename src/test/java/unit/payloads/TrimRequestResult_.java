@@ -26,7 +26,7 @@ public class TrimRequestResult_ {
     public void getSequenceToken_returns_theTokenField() {
         fields.put("token", token());
         result = new TrimRequestResult(fields, files);
-        assertThat(result.getSequenceToken()).isEqualTo(token());
+        assertThat(result.getToken()).isEqualTo(token());
     }
 
     @Test

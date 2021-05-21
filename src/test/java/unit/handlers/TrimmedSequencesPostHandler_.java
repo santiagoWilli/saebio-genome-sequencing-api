@@ -22,7 +22,7 @@ public class TrimmedSequencesPostHandler_ {
         when(trimResult.isValid()).thenReturn(true);
         dataAccess = mock(DataAccess.class);
         handler = new TrimmedSequencesPostHandler(dataAccess);
-        when(trimResult.getSequenceToken()).thenReturn("123e4567-e89b-12d3-a456-556642440000");
+        when(trimResult.getToken()).thenReturn("123e4567-e89b-12d3-a456-556642440000");
     }
 
     @Test

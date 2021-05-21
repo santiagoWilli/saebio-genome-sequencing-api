@@ -8,7 +8,7 @@ public abstract class RequestResult extends Multipart {
         super(fields, files);
     }
 
-    public String getSequenceToken() {
+    public String getToken() {
         return fields.get("token");
     }
 

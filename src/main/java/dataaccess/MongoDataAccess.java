@@ -45,7 +45,7 @@ public class MongoDataAccess implements DataAccess {
     @Override
     public UploadCode uploadTrimmedFiles(TrimRequestResult trimResult) {
         MongoCollection<Document> collection = database.getCollection("sequences");
-        if (collection.countDocuments(eq("genomeToolToken", trimResult.getSequenceToken())) < 1) {
+        if (collection.countDocuments(eq("genomeToolToken", trimResult.getToken())) < 1) {
             return UploadCode.NOT_FOUND;
         }
 
@@ -61,7 +61,7 @@ public class MongoDataAccess implements DataAccess {
                 return UploadCode.WRITE_FAILED;
             }
         }
-        collection.updateOne(eq("genomeToolToken", trimResult.getSequenceToken()), set("trimmedPair", trimmedIds));
+        collection.updateOne(eq("genomeToolToken", trimResult.getToken()), set("trimmedPair", trimmedIds));
         return UploadCode.OK;
     }
 
@@ -249,7 +249,7 @@ public class MongoDataAccess implements DataAccess {
     @Override
     public UploadCode uploadReportFile(ReportRequestResult reportResult) {
         MongoCollection<Document> collection = database.getCollection("reports");
-        if (collection.countDocuments(eq("genomeToolToken", reportResult.getSequenceToken())) < 1) {
+        if (collection.countDocuments(eq("genomeToolToken", reportResult.getToken())) < 1) {
             return UploadCode.NOT_FOUND;
         }
 
@@ -262,13 +262,16 @@ public class MongoDataAccess implements DataAccess {
             e.getStackTrace();
             return UploadCode.WRITE_FAILED;
         }
-        collection.updateOne(eq("genomeToolToken", reportResult.getSequenceToken()), set("file", id));
+        collection.updateOne(eq("genomeToolToken", reportResult.getToken()), set("file", id));
         return UploadCode.OK;
     }
 
     @Override
     public boolean setReportFileToFalse(String token) {
-        return false;
+        MongoCollection<Document> collection = database.getCollection("reports");
+        if (collection.countDocuments(eq("genomeToolToken", token)) < 1) return false;
+        collection.updateOne(eq("genomeToolToken", token), set("file", false));
+        return true;
     }
 
     private Document getStrain(String key) {

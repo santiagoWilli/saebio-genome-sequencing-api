@@ -18,7 +18,7 @@ public class ReportsResultPostHandler extends AbstractHandler<ReportRequestResul
     @Override
     protected Answer processRequest(ReportRequestResult result, Map<String, String> requestParams) {
         if (result.getStatusCode() == 5) {
-            if (dataAccess.setReportFileToFalse(result.getSequenceToken())) {
+            if (dataAccess.setReportFileToFalse(result.getToken())) {
                 return Answer.withMessage(200, "Report file updated to false");
             }
             return Answer.notFound();
