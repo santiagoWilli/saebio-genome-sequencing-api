@@ -1,6 +1,7 @@
-package handlers;
+package handlers.reports;
 
 import dataaccess.DataAccess;
+import handlers.AbstractHandler;
 import payloads.ReportRequestResult;
 import utils.Answer;
 
@@ -16,6 +17,10 @@ public class ReportsResultPostHandler extends AbstractHandler<ReportRequestResul
 
     @Override
     protected Answer processRequest(ReportRequestResult result, Map<String, String> requestParams) {
+        if (result.getStatusCode() == 5) {
+            dataAccess.setReportFileToFalse(result.getSequenceToken());
+            return Answer.withMessage(200, "Sequence trimmed files field updated to false");
+        }
         switch (dataAccess.uploadReportFile(result)) {
             case OK:
                 return Answer.withMessage(200, "Report file uploaded");

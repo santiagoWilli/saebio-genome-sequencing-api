@@ -34,4 +34,5 @@ public interface DataAccess {
     String getReferenceFileId(String referenceId);
 
     UploadCode uploadReportFile(ReportRequestResult reportResult);
+    boolean setReportFileToFalse(String token);
 }

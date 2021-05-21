@@ -266,6 +266,11 @@ public class MongoDataAccess implements DataAccess {
         return UploadCode.OK;
     }
 
+    @Override
+    public boolean setReportFileToFalse(String token) {
+        return false;
+    }
+
     private Document getStrain(String key) {
         MongoCollection<Document> collection = database.getCollection("strains");
         return collection.find(eq("keys", key)).first();

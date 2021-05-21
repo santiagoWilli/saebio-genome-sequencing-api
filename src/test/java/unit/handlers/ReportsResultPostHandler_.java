@@ -2,15 +2,14 @@ package unit.handlers;
 
 import dataaccess.DataAccess;
 import dataaccess.UploadCode;
-import handlers.ReportsResultPostHandler;
+import handlers.reports.ReportsResultPostHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import payloads.ReportRequestResult;
 import utils.Answer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class ReportsResultPostHandler_ {
     private ReportRequestResult reportResult;
@@ -27,20 +26,35 @@ public class ReportsResultPostHandler_ {
     }
 
     @Test
-    public void if_reportDoesNotExists_return_httpNotFound() {
+    public void if_successfulStatusCode_and_reportDoesNotExists_return_httpNotFound() {
+        when(reportResult.getStatusCode()).thenReturn(2);
         when(dataAccess.uploadReportFile(reportResult)).thenReturn(UploadCode.NOT_FOUND);
         assertThat(handler.process(reportResult, null)).isEqualTo(Answer.notFound());
+        verify(dataAccess, times(1)).uploadReportFile(reportResult);
+
     }
 
     @Test
-    public void if_reportFileIsSuccessfullyUploaded_return_httpOk() {
+    public void if_successfulStatusCode_and_reportFileIsSuccessfullyUploaded_return_httpOk() {
+        when(reportResult.getStatusCode()).thenReturn(2);
         when(dataAccess.uploadReportFile(reportResult)).thenReturn(UploadCode.OK);
         assertThat(handler.process(reportResult, null).getCode()).isEqualTo(200);
+        verify(dataAccess, times(1)).uploadReportFile(reportResult);
     }
 
     @Test
-    public void if_writeExceptionWhenUploadingTheReportFile_return_httpServerError() {
+    public void if_successfulStatusCode_and_writeExceptionWhenUploadingTheReportFile_return_httpServerError() {
+        when(reportResult.getStatusCode()).thenReturn(2);
         when(dataAccess.uploadReportFile(reportResult)).thenReturn(UploadCode.WRITE_FAILED);
         assertThat(handler.process(reportResult, null).getCode()).isEqualTo(500);
+        verify(dataAccess, times(1)).uploadReportFile(reportResult);
+    }
+
+    @Test
+    public void if_failureStatusCode_and_reportFound_httpOk() {
+        when(reportResult.getStatusCode()).thenReturn(5);
+        when(dataAccess.setReportFileToFalse(reportResult.getSequenceToken())).thenReturn(true);
+        assertThat(handler.process(reportResult, null).getCode()).isEqualTo(200);
+        verify(dataAccess, times(1)).setReportFileToFalse(reportResult.getSequenceToken());
     }
 }
