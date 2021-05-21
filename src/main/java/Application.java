@@ -4,6 +4,7 @@ import static spark.Spark.*;
 import dataaccess.Database;
 import dataaccess.MongoDataAccess;
 import genome.NullarborClient;
+import handlers.ReportsResultPostHandler;
 import handlers.references.*;
 import handlers.reports.*;
 import handlers.sequences.*;
@@ -63,6 +64,7 @@ public class Application {
 
             path("/reports", () -> {
                 post("", new ReportsPostHandler(new NullarborClient(options.genomeToolUrl), new MongoDataAccess()));
+                post("/result", new ReportsResultPostHandler(new MongoDataAccess()));
             });
         });
 

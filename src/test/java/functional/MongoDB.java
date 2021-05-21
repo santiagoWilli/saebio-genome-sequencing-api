@@ -14,6 +14,7 @@ import org.bson.types.ObjectId;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
@@ -152,5 +153,15 @@ public class MongoDB implements Database {
     public boolean strainExists(String key) {
         MongoCollection<Document> collection = database.getCollection("strains");
         return collection.find(eq("keys", key)).first() != null;
+    }
+
+    @Override
+    public String insertFakeReport(String token) {
+        MongoCollection<Document> collection = database.getCollection("reports");
+        Document document = new Document()
+                .append("name", "Fake report")
+                .append("genomeToolToken", token);
+        collection.insertOne(document);
+        return document.getObjectId("_id").toString();
     }
 }

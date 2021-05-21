@@ -663,6 +663,30 @@ public class Application_ {
         assertThat(report.get("file")).isNull();
     }
 
+    @SuppressWarnings("unchecked")
+    @Test
+    public void given_aSuccessfulStatus_when_postToReportsResult_then_uploadReportFile_and_associateItToItsReport() throws IOException {
+        final String token = token();
+        final String id = db.insertFakeReport(token);
+
+        given().
+                multiPart("status", 2).
+                multiPart("token", token).
+                multiPart("file", new File(testFolderPath + "informe.html")).
+        when().
+                post("/api/reports/result").
+        then().
+                statusCode(200);
+
+        Map<String, Object> sequence = db.get("reports", id);
+        assertThat(sequence.get("file")).isNotNull();
+        assertThat(sequence.get("file")).isNotEqualTo(false);
+        assertThat(sequence.get("file")).isOfAnyClassIn(LinkedHashMap.class);
+
+        Map<String, String> file = (Map<String, String>) sequence.get("file");
+        assertThat(file.containsKey("$oid"));
+    }
+
     @BeforeAll
     static void startApplication() throws IOException, InterruptedException {
         port = PORT;

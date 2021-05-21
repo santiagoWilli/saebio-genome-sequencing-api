@@ -25,4 +25,6 @@ public interface Database {
     String insertFakeStrain(String key);
     String insertFakeStrain(String key, String name);
     boolean strainExists(String id);
+
+    String insertFakeReport(String token);
 }

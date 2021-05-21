@@ -16,4 +16,8 @@ public class ReportRequestResult extends RequestResult implements Validable {
         }
         return true;
     }
+
+    public Map.Entry<String, File> getFile() {
+        return files.entrySet().iterator().next();
+    }
 }

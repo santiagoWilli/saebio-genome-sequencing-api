@@ -248,7 +248,22 @@ public class MongoDataAccess implements DataAccess {
 
     @Override
     public UploadCode uploadReportFile(ReportRequestResult reportResult) {
-        return null;
+        MongoCollection<Document> collection = database.getCollection("reports");
+        if (collection.countDocuments(eq("genomeToolToken", reportResult.getSequenceToken())) < 1) {
+            return UploadCode.NOT_FOUND;
+        }
+
+        GridFSBucket gridFSBucket = GridFSBuckets.create(database);
+        ObjectId id;
+
+        try (InputStream stream = new FileInputStream(reportResult.getFile().getValue())) {
+            id = gridFSBucket.uploadFromStream(reportResult.getFile().getKey(), stream);
+        } catch (IOException e) {
+            e.getStackTrace();
+            return UploadCode.WRITE_FAILED;
+        }
+        collection.updateOne(eq("genomeToolToken", reportResult.getSequenceToken()), set("file", id));
+        return UploadCode.OK;
     }
 
     private Document getStrain(String key) {
