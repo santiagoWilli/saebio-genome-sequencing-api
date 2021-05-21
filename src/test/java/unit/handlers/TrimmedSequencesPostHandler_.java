@@ -27,19 +27,19 @@ public class TrimmedSequencesPostHandler_ {
 
     @Test
     public void if_sequenceDoesNotExists_return_httpNotFound() {
-        when(dataAccess.uploadTrimmedFile(trimResult)).thenReturn(UploadCode.NOT_FOUND);
+        when(dataAccess.uploadTrimmedFiles(trimResult)).thenReturn(UploadCode.NOT_FOUND);
         assertThat(handler.process(trimResult, null)).isEqualTo(new Answer(404, notFoundJson()));
     }
 
     @Test
     public void if_trimmedSequenceIsSuccessfullyUploaded_return_httpOk() {
-        when(dataAccess.uploadTrimmedFile(trimResult)).thenReturn(UploadCode.OK);
+        when(dataAccess.uploadTrimmedFiles(trimResult)).thenReturn(UploadCode.OK);
         assertThat(handler.process(trimResult, null)).isEqualTo(new Answer(200, okJson()));
     }
 
     @Test
     public void if_writeExceptionWhenUploadingTheTrimmedSequence_return_httpServerError() {
-        when(dataAccess.uploadTrimmedFile(trimResult)).thenReturn(UploadCode.WRITE_FAILED);
+        when(dataAccess.uploadTrimmedFiles(trimResult)).thenReturn(UploadCode.WRITE_FAILED);
         assertThat(handler.process(trimResult, null)).isEqualTo(new Answer(500, errorJson()));
     }
 

@@ -43,7 +43,7 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
-    public UploadCode uploadTrimmedFile(TrimRequestResult trimResult) {
+    public UploadCode uploadTrimmedFiles(TrimRequestResult trimResult) {
         MongoCollection<Document> collection = database.getCollection("sequences");
         if (collection.countDocuments(eq("genomeToolToken", trimResult.getSequenceToken())) < 1) {
             return UploadCode.NOT_FOUND;
@@ -244,6 +244,11 @@ public class MongoDataAccess implements DataAccess {
         MongoCollection<Document> collection = database.getCollection("references");
         final Document document = collection.find(eq("_id", new ObjectId(referenceId))).first();
         return document.getObjectId("file").toString();
+    }
+
+    @Override
+    public UploadCode uploadReportFile(ReportRequestResult reportResult) {
+        return null;
     }
 
     private Document getStrain(String key) {

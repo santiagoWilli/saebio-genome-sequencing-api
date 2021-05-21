@@ -23,7 +23,7 @@ public class TrimmedSequencesPostHandler extends AbstractHandler<TrimRequestResu
             }
             return new Answer(404, "Could not find the sequence with the given token");
         }
-        switch (dataAccess.uploadTrimmedFile(result)) {
+        switch (dataAccess.uploadTrimmedFiles(result)) {
             case OK:
                 return new Answer(200, okJson());
             case NOT_FOUND:

@@ -10,7 +10,7 @@ import java.util.Set;
 
 public interface DataAccess {
     String createSequence(Sequence sequence, String genomeToolToken);
-    UploadCode uploadTrimmedFile(TrimRequestResult trimResult);
+    UploadCode uploadTrimmedFiles(TrimRequestResult trimResult);
     boolean setSequenceTrimToFalse(String token);
     String getAllSequences();
     String getSequence(String id);
@@ -32,4 +32,6 @@ public interface DataAccess {
 
     List<String> getSequenceTrimmedFilesIds(String sequenceId);
     String getReferenceFileId(String referenceId);
+
+    UploadCode uploadReportFile(ReportRequestResult reportResult);
 }
