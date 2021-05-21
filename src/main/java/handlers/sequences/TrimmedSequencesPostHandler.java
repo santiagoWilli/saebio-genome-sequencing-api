@@ -25,19 +25,11 @@ public class TrimmedSequencesPostHandler extends AbstractHandler<TrimRequestResu
         }
         switch (dataAccess.uploadTrimmedFiles(result)) {
             case OK:
-                return new Answer(200, okJson());
+                return Answer.withMessage(200, "Trimmed sequence uploaded");
             case NOT_FOUND:
-                return new Answer(404, errorJson("Could not find the sequence with the given token"));
+                return Answer.notFound();
             default:
-                return new Answer(500, errorJson("The upload encountered a fatal error"));
+                return Answer.serverError("The upload encountered a fatal error");
         }
-    }
-
-    private String okJson() {
-        return "{\"message\":\"Trimmed sequence uploaded\"}";
-    }
-
-    private String errorJson(String message) {
-        return "{\"message\":\"" + message + "\"}";
     }
 }

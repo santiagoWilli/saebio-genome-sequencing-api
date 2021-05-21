@@ -21,19 +21,19 @@ public class Answer {
     }
 
     public static Answer badRequest(String message) {
-        return new Answer(400, errorJson(message));
+        return new Answer(400, Json.message(message));
     }
 
     public static Answer serviceUnavailable(String message) {
-        return new Answer(503, errorJson(message));
+        return new Answer(503, Json.message(message));
     }
 
     public static Answer badGateway(String message) {
-        return new Answer(502, errorJson(message));
+        return new Answer(502, Json.message(message));
     }
 
     public static Answer serverError(String message) {
-        return new Answer(500, errorJson(message));
+        return new Answer(500, Json.message(message));
     }
 
     public static Answer notFound() {
@@ -42,6 +42,10 @@ public class Answer {
 
     public static Answer withFile(InputStream file, String mimeType) {
         return new Answer(new AnswerFile(file, mimeType));
+    }
+
+    public static Answer withMessage(int code, String message) {
+        return new Answer(code, Json.message(message));
     }
 
     public int getCode() {
@@ -58,10 +62,6 @@ public class Answer {
 
     public boolean hasFile() {
         return file != null;
-    }
-
-    private static String errorJson(String message) {
-        return "{\"message\":\"" + message + "\"}";
     }
 
     @Override

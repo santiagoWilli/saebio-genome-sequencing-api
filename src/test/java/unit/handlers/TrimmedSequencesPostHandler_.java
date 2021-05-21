@@ -28,30 +28,18 @@ public class TrimmedSequencesPostHandler_ {
     @Test
     public void if_sequenceDoesNotExists_return_httpNotFound() {
         when(dataAccess.uploadTrimmedFiles(trimResult)).thenReturn(UploadCode.NOT_FOUND);
-        assertThat(handler.process(trimResult, null)).isEqualTo(new Answer(404, notFoundJson()));
+        assertThat(handler.process(trimResult, null)).isEqualTo(Answer.notFound());
     }
 
     @Test
     public void if_trimmedSequenceIsSuccessfullyUploaded_return_httpOk() {
         when(dataAccess.uploadTrimmedFiles(trimResult)).thenReturn(UploadCode.OK);
-        assertThat(handler.process(trimResult, null)).isEqualTo(new Answer(200, okJson()));
+        assertThat(handler.process(trimResult, null).getCode()).isEqualTo(200);
     }
 
     @Test
     public void if_writeExceptionWhenUploadingTheTrimmedSequence_return_httpServerError() {
         when(dataAccess.uploadTrimmedFiles(trimResult)).thenReturn(UploadCode.WRITE_FAILED);
-        assertThat(handler.process(trimResult, null)).isEqualTo(new Answer(500, errorJson()));
-    }
-
-    private String notFoundJson() {
-        return "{\"message\":\"Could not find the sequence with the given token\"}";
-    }
-
-    private String okJson() {
-        return "{\"message\":\"Trimmed sequence uploaded\"}";
-    }
-
-    private String errorJson() {
-        return "{\"message\":\"The upload encountered a fatal error\"}";
+        assertThat(handler.process(trimResult, null).getCode()).isEqualTo(500);
     }
 }

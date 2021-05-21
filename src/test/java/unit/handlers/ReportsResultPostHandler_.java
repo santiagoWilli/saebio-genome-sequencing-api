@@ -32,7 +32,9 @@ public class ReportsResultPostHandler_ {
         assertThat(handler.process(reportResult, null)).isEqualTo(Answer.notFound());
     }
 
-    private String errorJson() {
-        return "{\"message\":\"The upload encountered a fatal error\"}";
+    @Test
+    public void if_reportFileIsSuccessfullyUploaded_return_httpOk() {
+        when(dataAccess.uploadReportFile(reportResult)).thenReturn(UploadCode.OK);
+        assertThat(handler.process(reportResult, null).getCode()).isEqualTo(200);
     }
 }

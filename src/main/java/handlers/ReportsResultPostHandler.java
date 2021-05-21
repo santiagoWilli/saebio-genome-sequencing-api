@@ -1,6 +1,7 @@
 package handlers;
 
 import dataaccess.DataAccess;
+import dataaccess.UploadCode;
 import payloads.ReportRequestResult;
 import utils.Answer;
 
@@ -15,7 +16,9 @@ public class ReportsResultPostHandler extends AbstractHandler<ReportRequestResul
     }
 
     @Override
-    protected Answer processRequest(ReportRequestResult payload, Map<String, String> requestParams) {
-        return Answer.notFound();
+    protected Answer processRequest(ReportRequestResult result, Map<String, String> requestParams) {
+        return dataAccess.uploadReportFile(result) == UploadCode.OK ?
+                Answer.withMessage(200, "Report file uploaded") :
+                Answer.notFound();
     }
 }
