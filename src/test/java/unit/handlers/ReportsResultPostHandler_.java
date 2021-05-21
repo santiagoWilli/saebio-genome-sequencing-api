@@ -57,4 +57,12 @@ public class ReportsResultPostHandler_ {
         assertThat(handler.process(reportResult, null).getCode()).isEqualTo(200);
         verify(dataAccess, times(1)).setReportFileToFalse(reportResult.getSequenceToken());
     }
+
+    @Test
+    public void if_failureStatusCode_and_reportNotFound_httpNotFound() {
+        when(reportResult.getStatusCode()).thenReturn(5);
+        when(dataAccess.setReportFileToFalse(reportResult.getSequenceToken())).thenReturn(false);
+        assertThat(handler.process(reportResult, null)).isEqualTo(Answer.notFound());
+        verify(dataAccess, times(1)).setReportFileToFalse(reportResult.getSequenceToken());
+    }
 }

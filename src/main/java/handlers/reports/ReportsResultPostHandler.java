@@ -18,8 +18,10 @@ public class ReportsResultPostHandler extends AbstractHandler<ReportRequestResul
     @Override
     protected Answer processRequest(ReportRequestResult result, Map<String, String> requestParams) {
         if (result.getStatusCode() == 5) {
-            dataAccess.setReportFileToFalse(result.getSequenceToken());
-            return Answer.withMessage(200, "Sequence trimmed files field updated to false");
+            if (dataAccess.setReportFileToFalse(result.getSequenceToken())) {
+                return Answer.withMessage(200, "Report file updated to false");
+            }
+            return Answer.notFound();
         }
         switch (dataAccess.uploadReportFile(result)) {
             case OK:
