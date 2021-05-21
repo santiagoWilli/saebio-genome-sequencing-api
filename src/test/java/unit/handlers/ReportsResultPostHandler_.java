@@ -37,4 +37,10 @@ public class ReportsResultPostHandler_ {
         when(dataAccess.uploadReportFile(reportResult)).thenReturn(UploadCode.OK);
         assertThat(handler.process(reportResult, null).getCode()).isEqualTo(200);
     }
+
+    @Test
+    public void if_writeExceptionWhenUploadingTheReportFile_return_httpServerError() {
+        when(dataAccess.uploadReportFile(reportResult)).thenReturn(UploadCode.WRITE_FAILED);
+        assertThat(handler.process(reportResult, null).getCode()).isEqualTo(500);
+    }
 }

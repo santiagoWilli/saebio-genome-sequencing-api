@@ -1,7 +1,6 @@
 package handlers;
 
 import dataaccess.DataAccess;
-import dataaccess.UploadCode;
 import payloads.ReportRequestResult;
 import utils.Answer;
 
@@ -17,8 +16,13 @@ public class ReportsResultPostHandler extends AbstractHandler<ReportRequestResul
 
     @Override
     protected Answer processRequest(ReportRequestResult result, Map<String, String> requestParams) {
-        return dataAccess.uploadReportFile(result) == UploadCode.OK ?
-                Answer.withMessage(200, "Report file uploaded") :
-                Answer.notFound();
+        switch (dataAccess.uploadReportFile(result)) {
+            case OK:
+                return Answer.withMessage(200, "Report file uploaded");
+            case NOT_FOUND:
+                return Answer.notFound();
+            default:
+                return Answer.serverError("The upload encountered a fatal error");
+        }
     }
 }
