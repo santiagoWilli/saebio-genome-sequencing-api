@@ -17,6 +17,8 @@ public class ReportsGetOneHandler extends AbstractHandler<EmptyPayload> {
 
     @Override
     protected Answer processRequest(EmptyPayload payload, Map<String, String> requestParams) {
-        return Answer.notFound();
+        String reportJson = dataAccess.getReport(requestParams.get(":id"));
+        if (reportJson.isEmpty()) return Answer.notFound();
+        return new Answer(200, reportJson);
     }
 }

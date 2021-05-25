@@ -30,5 +30,13 @@ public class ReportsGetOneHandler_ {
     public void ifReportNotFound_returnHttpNotFound() {
         when(dataAccess.getReport(PARAMS.get(":id"))).thenReturn("");
         assertThat(handler.process(new EmptyPayload(), PARAMS)).isEqualTo(Answer.notFound());
+        verify(dataAccess, times(1)).getReport(PARAMS.get(":id"));
+    }
+
+    @Test
+    public void ifReportFound_returnHttpOk_and_reportJson() {
+        when(dataAccess.getReport(PARAMS.get(":id"))).thenReturn("abc");
+        assertThat(handler.process(new EmptyPayload(), PARAMS)).isEqualTo(new Answer(200, "abc"));
+        verify(dataAccess, times(1)).getReport(PARAMS.get(":id"));
     }
 }
