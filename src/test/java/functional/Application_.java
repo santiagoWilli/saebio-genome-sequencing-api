@@ -80,6 +80,46 @@ public class Application_ {
         assertThat(sequence.get("trimmedPair")).isNull();
     }
 
+    @SuppressWarnings("unchecked")
+    @Test
+    public void given_aPairOfValidTrimmedFiles_when_postToSequences_then_statusCode200_and_sequenceCreatedWithItsTrimmedFiles() throws IOException {
+        db.insertFakeStrain("kp");
+        Map<String, Object> strain = db.get("strains", "keys", "kp");
+
+        final String token = token();
+        stubFor(post(urlEqualTo("/trim")).willReturn(aResponse()));
+
+        String response =
+                given().
+                        multiPart("file1", new File(testFolderPath + "Kp1_231120_R1_trimmed.fastq.gz")).
+                        multiPart("file2", new File(testFolderPath + "Kp1_231120_R2_trimmed.fastq.gz")).
+                when().
+                        post("/api/sequences").
+                then().
+                        statusCode(200).
+                        extract().
+                        asString();
+
+        verify(exactly(0), postRequestedFor(urlEqualTo("/trim")));
+
+        ObjectNode node = new ObjectMapper().readValue(response, ObjectNode.class);
+        String id = String.valueOf(node.get("id").asText());
+        Map<String, Object> sequence = db.get("sequences", id);
+
+        assertThat(sequence.get("strain")).isEqualTo(strain.get("_id"));
+        assertThat(sequence.get("code")).isEqualTo("1");
+        assertThat(sequence.get("originalFilenames")).isEqualTo(Arrays.asList("Kp1_231120_R1_trimmed.fastq.gz", "Kp1_231120_R2_trimmed.fastq.gz"));
+        assertThat(sequence.get("genomeToolToken")).isNull();
+        assertThat(sequence.get("sequenceDate").toString())
+                .isEqualTo(dateFormat(date(23, 11, 2020), "yyyy-MM-dd"));
+        assertThat(sequence.get("trimRequestDate")).isNull();
+        assertThat(sequence.get("trimmedPair")).isOfAnyClassIn(ArrayList.class);
+
+        ArrayList<Map<String, String>> trimmedPair = (ArrayList<Map<String, String>>) sequence.get("trimmedPair");
+        assertThat(trimmedPair.size()).isEqualTo(2);
+        for (Map<String, String> trimmedFile : trimmedPair) assertThat(trimmedFile.containsKey("$oid"));
+    }
+
     @Test
     public void given_aPairOfFilesWhichStrainKeysDoNotExist_when_postToSequences_then_httpBadRequest() {
         stubFor(post(urlEqualTo("/trim")));

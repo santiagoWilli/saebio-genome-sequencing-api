@@ -44,8 +44,28 @@ public class MongoDataAccess implements DataAccess {
 
     @Override
     public String createSequenceAlreadyTrimmed(Sequence sequence) {
-        return null;
-    }
+        MongoCollection<Document> collection = database.getCollection("sequences");
+        Document document = new Document("sequenceDate", formatDate(sequence.getDate()))
+                .append("strain", getStrain(sequence.getStrainKey()).getObjectId("_id"))
+                .append("code", sequence.getIsolateCode())
+                .append("originalFilenames", sequence.getOriginalFileNames());
+        collection.insertOne(document);
+
+        GridFSBucket gridFSBucket = GridFSBuckets.create(database);
+        List<ObjectId> trimmedIds = new ArrayList<>();
+
+        for (Map.Entry<String, File> entry : sequence.getFiles().entrySet()) {
+            try (InputStream stream = new FileInputStream(entry.getValue())) {
+                ObjectId id = gridFSBucket.uploadFromStream(entry.getKey(), stream);
+                trimmedIds.add(id);
+            } catch (IOException e) {
+                e.getStackTrace();
+                return null;
+            }
+        }
+        collection.updateOne(eq(document.getObjectId("_id")), set("trimmedPair", trimmedIds));
+
+        return document.getObjectId("_id").toString();    }
 
     @Override
     public UploadCode uploadTrimmedFiles(TrimRequestResult trimResult) {
