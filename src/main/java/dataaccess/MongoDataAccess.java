@@ -279,6 +279,11 @@ public class MongoDataAccess implements DataAccess {
         return findAllFromCollection("reports");
     }
 
+    @Override
+    public String getReport(String id) {
+        return null;
+    }
+
     private Document getStrain(String key) {
         MongoCollection<Document> collection = database.getCollection("strains");
         return collection.find(eq("keys", key)).first();
