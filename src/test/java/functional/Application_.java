@@ -809,6 +809,7 @@ public class Application_ {
         db.empty("sequences");
         db.empty("references");
         db.empty("strains");
+        db.empty("reports");
     }
 
     @BeforeEach

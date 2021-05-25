@@ -60,34 +60,34 @@ public class NullarborClient_ {
 
     @Test
     public void requestToSendAnalysisFiles_httpAccepted_returns_okCode_and_analysisToken() {
-        stubFor(post(urlEqualTo("/request_analysis"))
+        stubFor(post(urlEqualTo("/analysis"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody("{\"token\":\"" + token() + "\"}")));
         GenomeToolAnswer clientAnswer = client.requestToSendAnalysisFiles();
         assertThat(clientAnswer).isEqualTo(new GenomeToolAnswer(GenomeToolAnswer.Status.OK, token()));
-        verify(exactly(1), postRequestedFor(urlEqualTo("/request_analysis")));
+        verify(exactly(1), postRequestedFor(urlEqualTo("/analysis")));
     }
 
     @Test
     public void sendFile_httpAccepted_returns_okCode_and_analysisToken() throws FileNotFoundException {
-        stubFor(post(urlEqualTo("/analysis/" + token() + "/file")).willReturn(aResponse().withStatus(200)));
+        stubFor(patch(urlEqualTo("/analysis/" + token())).willReturn(aResponse().withStatus(200)));
 
         InputStream stream = new FileInputStream("test/resources/sequences/Kpneu231120_referencia.fa");
         GenomeToolAnswer clientAnswer = client.sendAnalysisFile(token(), stream, "name");
         assertThat(clientAnswer).isEqualTo(new GenomeToolAnswer(GenomeToolAnswer.Status.OK));
-        verify(exactly(1), postRequestedFor(urlEqualTo("/analysis/" + token() + "/file"))
+        verify(exactly(1), patchRequestedFor(urlEqualTo("/analysis/" + token()))
                 .withHeader("Content-Type", containing("multipart/form-data"))
                 .withRequestBodyPart(aMultipart().withName("file").build()));
     }
 
     @Test
     public void requestToStartAnalysis_httpAccepted_returns_okCode_and_analysisToken() {
-        stubFor(post(urlEqualTo("/analysis/" + token() + "/start")).willReturn(aResponse().withStatus(202)));
+        stubFor(post(urlEqualTo("/analysis/" + token())).willReturn(aResponse().withStatus(202)));
         GenomeToolAnswer clientAnswer = client.requestToStartAnalysis(token());
         assertThat(clientAnswer).isEqualTo(new GenomeToolAnswer(GenomeToolAnswer.Status.OK));
-        verify(exactly(1), postRequestedFor(urlEqualTo("/analysis/" + token() + "/start")));
+        verify(exactly(1), postRequestedFor(urlEqualTo("/analysis/" + token())));
     }
 
     @BeforeEach
