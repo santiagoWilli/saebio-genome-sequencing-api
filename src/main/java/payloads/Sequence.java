@@ -37,6 +37,7 @@ public class Sequence extends Isolate implements Validable {
         int i = 0;
         FileNameFields[] pair = new FileNameFields[2];
         for (String fileName : files.keySet()) pair[i++] = new FileNameFields(fileName);
+        if (pair[0].trimmed && !pair[1].trimmed || !pair[0].trimmed && pair[1].trimmed) return false;
         if (!pair[0].strain.equals(pair[1].strain) || !pair[0].date.equals(pair[1].date)) return false;
         return !pair[0].number.equals(pair[1].number);
     }
@@ -59,6 +60,7 @@ public class Sequence extends Isolate implements Validable {
 
     private final class FileNameFields {
         final String strain, date, number;
+        final boolean trimmed;
 
         FileNameFields(String fileName) {
             String[] fields = fileName.split("_");
@@ -66,6 +68,7 @@ public class Sequence extends Isolate implements Validable {
             date = fields[1];
             if (fields.length == 3) number = fields[2].substring(0, fields[2].indexOf("."));
             else number = fields[2];
+            trimmed = fields.length > 3;
         }
     }
 }

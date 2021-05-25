@@ -72,6 +72,14 @@ public class Sequence_ {
     }
 
     @Test
+    public void invalid_if_pairHasOneFileTrimmedAndAnotherThatIsNot() {
+        final String[][] notValid = {
+                {"Kp1_231120_R1.fastq.gz", "Kp1_231120_R2_trimmed.fastq.gz"},
+                {"Kp1_231120_R1_trimmed.fastq.gz", "Kp1_231120_R2.fastq.gz"}};
+        iterateThroughPairs(notValid, false);
+    }
+
+    @Test
     public void getDate_shouldReturn_aDateBasedOnPairFileNames() {
         Sequence sequence = getSequenceFrom(VALID_PAIRS[0]);
         assertThat(sequence.getDate()).isEqualTo(LocalDate.of(2020, 11, 23));
