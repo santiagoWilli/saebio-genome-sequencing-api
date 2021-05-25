@@ -740,6 +740,24 @@ public class Application_ {
         assertThat(sequenceJson.get("genomeToolToken")).isEqualTo(token);
     }
 
+    @Test
+    public void when_getToReportsIdFile_then_returnReportFile() throws IOException {
+        File file = new File(testFolderPath + "informe.html");
+        String id = db.insertFakeReportWithFile(file);
+
+        byte[] response =
+                when().
+                        get("/api/reports/" + id + "/file").
+                then().
+                        statusCode(200).
+                        contentType("text/html").
+                        header("Content-Disposition", "attachment; filename=file.html").
+                        extract().asByteArray();
+
+        InputStream responseStream = new ByteArrayInputStream(response);
+        assertThat(IOUtils.contentEquals(responseStream, new FileInputStream(file))).isTrue();
+    }
+
     @BeforeAll
     static void startApplication() throws IOException, InterruptedException {
         port = PORT;

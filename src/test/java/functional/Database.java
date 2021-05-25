@@ -27,4 +27,5 @@ public interface Database {
     boolean strainExists(String id);
 
     String insertFakeReport(String token);
+    String insertFakeReportWithFile(File file) throws FileNotFoundException;
 }
