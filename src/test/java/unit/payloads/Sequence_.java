@@ -28,6 +28,9 @@ public class Sequence_ {
     static final String[][] NOT_SEQUENCES = {
             {"Kp1_231120_R1.fastq.gz", "Kp1_231221_R2.fastq.gz"},
             {"Kp1_231120_R1.fq.gz", "Kp3_231120_R2.fq.gz"}};
+    static final String[][] TRIMMED_SEQUENCES = {
+            {"Kp1_231120_R1_trimmed.fastq.gz", "Kp1_231120_R2_trimmed.fastq.gz"},
+            {"Kp1_231120_R1_trimmed.fq.gz", "Kp1_231120_R2_trimmed.fq.gz"}};
 
     @Test
     public void invalid_if_notTwoFiles() {
@@ -64,6 +67,11 @@ public class Sequence_ {
     }
 
     @Test
+    public void valid_if_pairFormsATrimmedSequence() {
+        iterateThroughPairs(TRIMMED_SEQUENCES, true);
+    }
+
+    @Test
     public void getDate_shouldReturn_aDateBasedOnPairFileNames() {
         Sequence sequence = getSequenceFrom(VALID_PAIRS[0]);
         assertThat(sequence.getDate()).isEqualTo(LocalDate.of(2020, 11, 23));
@@ -84,7 +92,8 @@ public class Sequence_ {
     @Test
     public void getIsolateCode_shouldReturn_theNumbersRightNextToTheStrainKey() {
         Sequence sequence = getSequenceFrom(VALID_PAIRS[0]);
-        assertThat(sequence.getIsolateCode()).isEqualTo("1");    }
+        assertThat(sequence.getIsolateCode()).isEqualTo("1");
+    }
 
     private static void iterateThroughPairs(String[][] pairs, boolean expected) {
         for (String[] pair : pairs) {
