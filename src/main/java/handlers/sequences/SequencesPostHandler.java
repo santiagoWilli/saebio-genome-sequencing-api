@@ -27,7 +27,10 @@ public class SequencesPostHandler extends AbstractHandler<Sequence> {
         }
 
         if (sequence.isTrimmed()) {
-            return new Answer(200, Json.id(dataAccess.createSequenceAlreadyTrimmed(sequence)));
+            final String id = dataAccess.createSequenceAlreadyTrimmed(sequence);
+            return id != null ?
+                    new Answer(200, Json.id(id)) :
+                    Answer.serverError("Error de escritura al subir los ficheros");
         }
 
         GenomeToolAnswer toolAnswer = genomeTool.requestTrim(sequence);

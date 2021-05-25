@@ -1,6 +1,7 @@
 package unit.handlers;
 
 import dataaccess.DataAccess;
+import dataaccess.UploadCode;
 import genome.GenomeTool;
 import genome.GenomeToolAnswer;
 import utils.Answer;
@@ -87,12 +88,23 @@ public class SequencesPostHandler_ {
     }
 
     @Test
-    public void if_sequenceIsTrimmed_return_httpOk_and_sequenceId() {
+    public void if_sequenceIsTrimmed_andFilesUploaded_return_httpOk_and_sequenceId() {
         when(sequence.isTrimmed()).thenReturn(true);
         when(dataAccess.strainExists("kp")).thenReturn(true);
         String id = "507f1f77bcf86cd799439011";
         when(dataAccess.createSequenceAlreadyTrimmed(sequence)).thenReturn(id);
         assertThat(handler.process(sequence, null)).isEqualTo(new Answer(200, Json.id(id)));
+        verifyNoInteractions(genomeTool);
+        verify(dataAccess, times(1)).createSequenceAlreadyTrimmed(sequence);
+    }
+
+    @Test
+    public void if_writeExceptionWhenUploadingTheTrimmedSequence_return_httpServerError() {
+        when(sequence.isTrimmed()).thenReturn(true);
+        when(dataAccess.strainExists("kp")).thenReturn(true);
+        String id = "507f1f77bcf86cd799439011";
+        when(dataAccess.createSequenceAlreadyTrimmed(sequence)).thenReturn(null);
+        assertThat(handler.process(sequence, null).getCode()).isEqualTo(500);
         verifyNoInteractions(genomeTool);
         verify(dataAccess, times(1)).createSequenceAlreadyTrimmed(sequence);
     }
