@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import payloads.EmptyPayload;
 import utils.Answer;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.Map;
 
@@ -32,5 +34,21 @@ public class ReportsGetFileHandler_ {
         when(dataAccess.getReport(PARAMS.get(":id"))).thenReturn("");
         assertThat(handler.process(new EmptyPayload(), PARAMS)).isEqualTo(Answer.notFound());
         verify(dataAccess, times(1)).getReport(PARAMS.get(":id"));
+    }
+
+    @Test
+    public void ifReportFound_returnHttpOk_and_file() throws IOException {
+        String fileId = "6075d6a71a62381d13c70a6f";
+        when(dataAccess.getReport(PARAMS.get(":id"))).thenReturn("{\"_id\": {\"$oid\": \"1\"}, \"file\": {\"$oid\": \""+fileId+"\"}}");
+        when(dataAccess.getFileStream(fileId)).thenReturn(new FileInputStream("test/resources/sequences/informe.html"));
+
+        Answer answer = handler.process(new EmptyPayload(), PARAMS);
+
+        verify(dataAccess, times(1)).getReport(PARAMS.get(":id"));
+        verify(dataAccess, times(1)).getFileStream(fileId);
+
+        assertThat(answer.getCode()).isEqualTo(200);
+        assertThat(answer.hasFile()).isTrue();
+        assertThat(answer.getFile().getMimeType()).isEqualTo("text/html");
     }
 }
