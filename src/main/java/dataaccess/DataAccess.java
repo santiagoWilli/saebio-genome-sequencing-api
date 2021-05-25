@@ -10,6 +10,7 @@ import java.util.Set;
 
 public interface DataAccess {
     String createSequence(Sequence sequence, String genomeToolToken);
+    String createSequenceAlreadyTrimmed(Sequence sequence);
     UploadCode uploadTrimmedFiles(TrimRequestResult trimResult);
     boolean setSequenceTrimToFalse(String token);
     String getAllSequences();

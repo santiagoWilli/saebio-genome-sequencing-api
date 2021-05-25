@@ -34,6 +34,7 @@ public class SequencesPostHandler_ {
 
     @Test
     public void serviceUnavailable_if_genomeToolAnswerIsApiDown() {
+        when(sequence.isTrimmed()).thenReturn(false);
         when(dataAccess.strainExists("kp")).thenReturn(true);
         when(toolAnswer.getStatus()).thenReturn(GenomeToolAnswer.Status.API_DOWN);
         assertThat(handler.process(sequence, null)).isEqualTo(Answer.serviceUnavailable("Genome reporter tool is down"));
@@ -43,6 +44,7 @@ public class SequencesPostHandler_ {
 
     @Test
     public void badGateway_if_genomeToolAnswerIsServerError() {
+        when(sequence.isTrimmed()).thenReturn(false);
         when(dataAccess.strainExists("kp")).thenReturn(true);
         when(toolAnswer.getStatus()).thenReturn(GenomeToolAnswer.Status.SERVER_ERROR);
         assertThat(handler.process(sequence, null)).isEqualTo(Answer.badGateway("Genome reporter tool encountered an internal error"));
@@ -52,18 +54,19 @@ public class SequencesPostHandler_ {
 
     @Test
     public void if_genomeToolAnswerIsOk_return_httpAccepted_and_sequenceId() {
+        when(sequence.isTrimmed()).thenReturn(false);
         when(dataAccess.strainExists("kp")).thenReturn(true);
-        String token = "123e4567-e89b-12d3-a456-556642440000";
         String id = "507f1f77bcf86cd799439011";
         when(toolAnswer.getStatus()).thenReturn(GenomeToolAnswer.Status.OK);
-        when(toolAnswer.getMessage()).thenReturn(token);
-        when(dataAccess.createSequence(sequence, token)).thenReturn(id);
+        when(toolAnswer.getMessage()).thenReturn(token());
+        when(dataAccess.createSequence(sequence, token())).thenReturn(id);
         assertThat(handler.process(sequence, null)).isEqualTo(new Answer(202, Json.id(id)));
-        verify(dataAccess, times(1)).createSequence(sequence, token);
+        verify(dataAccess, times(1)).createSequence(sequence, token());
     }
 
     @Test
     public void serverError_if_genomeToolAnswerIsExceptionEncountered() {
+        when(sequence.isTrimmed()).thenReturn(false);
         when(dataAccess.strainExists("kp")).thenReturn(true);
         String exception = "Error";
         when(toolAnswer.getStatus()).thenReturn(GenomeToolAnswer.Status.EXCEPTION_ENCOUNTERED);
@@ -75,10 +78,26 @@ public class SequencesPostHandler_ {
 
     @Test
     public void if_sequenceStrainKeyDoesNotExist_return_httpBadRequest() {
+        when(sequence.isTrimmed()).thenReturn(false);
         when(dataAccess.strainExists("kp")).thenReturn(false);
         assertThat(handler.process(sequence, null).getCode()).isEqualTo(400);
         verifyNoInteractions(genomeTool);
         verify(dataAccess, times(1)).strainExists("kp");
         verifyNoMoreInteractions(dataAccess);
+    }
+
+    @Test
+    public void if_sequenceIsTrimmed_return_httpOk_and_sequenceId() {
+        when(sequence.isTrimmed()).thenReturn(true);
+        when(dataAccess.strainExists("kp")).thenReturn(true);
+        String id = "507f1f77bcf86cd799439011";
+        when(dataAccess.createSequenceAlreadyTrimmed(sequence)).thenReturn(id);
+        assertThat(handler.process(sequence, null)).isEqualTo(new Answer(200, Json.id(id)));
+        verifyNoInteractions(genomeTool);
+        verify(dataAccess, times(1)).createSequenceAlreadyTrimmed(sequence);
+    }
+
+    private static String token() {
+        return "123e4567-e89b-12d3-a456-556642440000";
     }
 }

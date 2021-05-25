@@ -26,6 +26,10 @@ public class SequencesPostHandler extends AbstractHandler<Sequence> {
             return Answer.badRequest(sequence.getStrainKey() + " strain does not exist");
         }
 
+        if (sequence.isTrimmed()) {
+            return new Answer(200, Json.id(dataAccess.createSequenceAlreadyTrimmed(sequence)));
+        }
+
         GenomeToolAnswer toolAnswer = genomeTool.requestTrim(sequence);
         switch (toolAnswer.getStatus()) {
             case OK:

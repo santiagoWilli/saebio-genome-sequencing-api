@@ -43,6 +43,11 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
+    public String createSequenceAlreadyTrimmed(Sequence sequence) {
+        return null;
+    }
+
+    @Override
     public UploadCode uploadTrimmedFiles(TrimRequestResult trimResult) {
         MongoCollection<Document> collection = database.getCollection("sequences");
         if (collection.countDocuments(eq("genomeToolToken", trimResult.getToken())) < 1) {

@@ -24,6 +24,10 @@ public class Sequence extends Isolate implements Validable {
         return files.keySet().stream().sorted().collect(Collectors.toList());
     }
 
+    public boolean isTrimmed() {
+        return files.keySet().iterator().next().contains("_trimmed");
+    }
+
     @Override
     public boolean isValid() {
         if (files.size() != 2) return false;
