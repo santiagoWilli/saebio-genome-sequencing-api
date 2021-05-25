@@ -281,7 +281,10 @@ public class MongoDataAccess implements DataAccess {
 
     @Override
     public String getReport(String id) {
-        return null;
+        if (!ObjectId.isValid(id)) return "";
+        MongoCollection<Document> collection = database.getCollection("reports");
+        final Document document = collection.find(eq("_id", new ObjectId(id))).first();
+        return document == null ? "" : document.toJson();
     }
 
     private Document getStrain(String key) {

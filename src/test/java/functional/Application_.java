@@ -721,6 +721,25 @@ public class Application_ {
         assertThat(reports.size()).isEqualTo(amount);
     }
 
+    @SuppressWarnings("unchecked")
+    @Test
+    public void when_getToReportsId_then_returnReportWithGivenIdAsJson() throws IOException {
+        final String token = token();
+        final String id = db.insertFakeReport(token);
+
+        String response =
+                when().
+                        get("/api/reports/" + id).
+                then().
+                        statusCode(200).
+                        extract().asString();
+
+        Map<String, Object> sequenceJson = new ObjectMapper().readValue(response, new TypeReference<HashMap<String,Object>>(){});
+        assertThat(((Map<String, String>) sequenceJson.get("_id")).get("$oid"))
+                .isEqualTo(id);
+        assertThat(sequenceJson.get("genomeToolToken")).isEqualTo(token);
+    }
+
     @BeforeAll
     static void startApplication() throws IOException, InterruptedException {
         port = PORT;
