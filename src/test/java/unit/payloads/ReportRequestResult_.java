@@ -42,25 +42,34 @@ public class ReportRequestResult_ {
     }
 
     @Test
-    public void invalid_if_successStatus_and_hasNoFile() {
+    public void invalid_if_successStatus_and_hasLessThanTwoFiles() {
         fields.put("status", "2");
         fields.put("token", token());
+        assertThat(result.isValid()).isEqualTo(false);
+        files.put("index.html", mock(File.class));
         assertThat(result.isValid()).isEqualTo(false);
     }
 
     @Test
-    public void valid_if_successStatus_and_hasHtmlFile() {
+    public void valid_if_successStatus_and_hasHtmlFile_and_referenceFile() {
         fields.put("status", "2");
         fields.put("token", token());
         files.put("index.html", mock(File.class));
+        files.put("ref.fa", mock(File.class));
         assertThat(result.isValid()).isEqualTo(true);
     }
 
     @Test
-    public void valid_if_successStatus_and_hasFileButNotHtml() {
+    public void invalid_if_successStatus_and_twoFilesButNotTheRequiredOnes() {
         fields.put("status", "2");
         fields.put("token", token());
-        files.put("index.fa", mock(File.class));
+        files.put("index.html", mock(File.class));
+        files.put("sequence.fastq", mock(File.class));
+        assertThat(result.isValid()).isEqualTo(false);
+
+        files.clear();
+        files.put("index.php", mock(File.class));
+        files.put("ref.fa", mock(File.class));
         assertThat(result.isValid()).isEqualTo(false);
     }
 
