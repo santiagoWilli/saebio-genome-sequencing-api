@@ -150,10 +150,11 @@ public class MongoDB implements Database {
     }
 
     @Override
-    public String insertFakeReport(String token) {
+    public String insertFakeReport(String token, String strainId) {
         MongoCollection<Document> collection = database.getCollection("reports");
         Document document = new Document()
                 .append("name", "Fake report")
+                .append("strain", new ObjectId(strainId))
                 .append("genomeToolToken", token);
         collection.insertOne(document);
         return document.getObjectId("_id").toString();
