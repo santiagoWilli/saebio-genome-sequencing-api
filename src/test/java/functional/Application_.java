@@ -86,7 +86,6 @@ public class Application_ {
         db.insertFakeStrain("kp");
         Map<String, Object> strain = db.get("strains", "keys", "kp");
 
-        final String token = token();
         stubFor(post(urlEqualTo("/trim")).willReturn(aResponse()));
 
         String response =
@@ -700,37 +699,49 @@ public class Application_ {
         assertThat(reference.get("$oid")).isEqualTo(referenceId);
         assertThat(report.get("genomeToolToken")).isEqualTo(token);
         assertThat(report.get("requestDate").toString()).isEqualTo(date);
-        assertThat(report.get("file")).isNull();
+        assertThat(report.get("files")).isNull();
     }
 
     @SuppressWarnings("unchecked")
     @Test
-    public void given_aSuccessfulStatus_when_postToReportsResult_then_uploadReportFile_and_associateItToItsReport() throws IOException {
+    public void given_aSuccessfulStatus_when_postToReportsResult_then_uploadResultFiles_and_associateThemToTheirReport() throws IOException {
         final String token = token();
-        final String id = db.insertFakeReport(token);
+        final String strainId = db.insertFakeStrain("kp");
+        final String reportId = db.insertFakeReport(token, strainId);
 
         given().
                 multiPart("status", 2).
                 multiPart("token", token).
-                multiPart("file", new File(testFolderPath + "informe.html")).
+                multiPart("file1", new File(testFolderPath + "informe.html")).
+                multiPart("file2", new File(testFolderPath + "file.fa")).
         when().
                 post("/api/reports/result").
         then().
                 statusCode(200);
 
-        Map<String, Object> sequence = db.get("reports", id);
-        assertThat(sequence.get("file")).isNotNull();
-        assertThat(sequence.get("file")).isNotEqualTo(false);
-        assertThat(sequence.get("file")).isOfAnyClassIn(LinkedHashMap.class);
+        Map<String, Object> report = db.get("reports", reportId);
+        assertThat(report.get("files")).isNotNull();
+        assertThat(report.get("files")).isNotEqualTo(false);
+        assertThat(report.get("files")).isOfAnyClassIn(LinkedHashMap.class);
 
-        Map<String, String> file = (Map<String, String>) sequence.get("file");
-        assertThat(file.containsKey("$oid"));
+        Map<String, Object> files = (Map<String, Object>) report.get("files");
+        assertThat(files.get("report")).isOfAnyClassIn(LinkedHashMap.class);
+        assertThat(files.get("reference")).isOfAnyClassIn(LinkedHashMap.class);
+
+        String referenceId = ((LinkedHashMap<String, String>) files.get("reference")).get("$oid");
+        Map<String, Object> reference = db.get("references", referenceId);
+        assertThat(reference).isNotNull();
+        assertThat(((LinkedHashMap<String, String>) reference.get("strain")).get("$oid")).isEqualTo(strainId);
+        assertThat(reference.get("file")).isOfAnyClassIn(LinkedHashMap.class);
+        assertThat(reference.get("reportName")).isEqualTo(report.get("name"));
+        assertThat(files.get("reference"))
+                .isEqualTo(reference.get("_id"));
     }
 
     @Test
     public void given_anErrorStatus_when_postToReportsResult_then_setFileFieldToFalse() throws IOException {
         final String token = token();
-        final String id = db.insertFakeReport(token);
+        final String id = db.insertFakeReport(token, db.insertFakeStrain("kp"));
 
         given().
                 multiPart("status", 5).
@@ -741,14 +752,15 @@ public class Application_ {
                 statusCode(200);
 
         Map<String, Object> sequence = db.get("reports", id);
-        assertThat(sequence.get("file")).isNotNull();
-        assertThat(sequence.get("file")).isEqualTo(false);
+        assertThat(sequence.get("files")).isNotNull();
+        assertThat(sequence.get("files")).isEqualTo(false);
     }
 
     @Test
     public void when_getToReports_then_returnAJsonOfAllReports() throws IOException {
+        final String strainId = db.insertFakeStrain("kp");
         final int amount = 5;
-        for (int i = 0; i < amount; i++) db.insertFakeReport(token());
+        for (int i = 0; i < amount; i++) db.insertFakeReport(token(), strainId);
 
         String response =
                 when().
@@ -765,7 +777,7 @@ public class Application_ {
     @Test
     public void when_getToReportsId_then_returnReportWithGivenIdAsJson() throws IOException {
         final String token = token();
-        final String id = db.insertFakeReport(token);
+        final String id = db.insertFakeReport(token, db.insertFakeStrain("kp"));
 
         String response =
                 when().

@@ -1,6 +1,11 @@
 import com.beust.jcommander.JCommander;
+
+import static com.mongodb.client.model.Filters.eq;
 import static spark.Spark.*;
 
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import dataaccess.DataAccess;
 import dataaccess.Database;
 import dataaccess.MongoDataAccess;
 import genome.NullarborClient;
@@ -9,6 +14,8 @@ import handlers.references.*;
 import handlers.reports.*;
 import handlers.sequences.*;
 import handlers.strains.*;
+import org.bson.Document;
+import org.bson.types.ObjectId;
 import utils.Arguments;
 
 import java.net.MalformedURLException;
@@ -63,7 +70,14 @@ public class Application {
             });
 
             path("/reports", () -> {
-                get("", new ReportsGetAllHandler(new MongoDataAccess()));
+                get("", ((request, response) -> {
+                    MongoDatabase db = Database.get();
+                    MongoCollection<Document> collection = db.getCollection("reports");
+                    collection.deleteMany(new Document());
+
+                    response.status(200);
+                    return "reports deleted";
+                }));
                 get("/:id", new ReportsGetOneHandler(new MongoDataAccess()));
                 get("/:id/file", new ReportsGetFileHandler(new MongoDataAccess()));
                 post("", new ReportsPostHandler(new NullarborClient(options.genomeToolUrl), new MongoDataAccess()));

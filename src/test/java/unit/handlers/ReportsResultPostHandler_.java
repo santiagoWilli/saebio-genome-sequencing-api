@@ -28,26 +28,26 @@ public class ReportsResultPostHandler_ {
     @Test
     public void if_successfulStatusCode_and_reportDoesNotExists_return_httpNotFound() {
         when(reportResult.getStatusCode()).thenReturn(2);
-        when(dataAccess.uploadReportFile(reportResult)).thenReturn(UploadCode.NOT_FOUND);
+        when(dataAccess.uploadReportFiles(reportResult)).thenReturn(UploadCode.NOT_FOUND);
         assertThat(handler.process(reportResult, null)).isEqualTo(Answer.notFound());
-        verify(dataAccess, times(1)).uploadReportFile(reportResult);
+        verify(dataAccess, times(1)).uploadReportFiles(reportResult);
 
     }
 
     @Test
     public void if_successfulStatusCode_and_reportFileIsSuccessfullyUploaded_return_httpOk() {
         when(reportResult.getStatusCode()).thenReturn(2);
-        when(dataAccess.uploadReportFile(reportResult)).thenReturn(UploadCode.OK);
+        when(dataAccess.uploadReportFiles(reportResult)).thenReturn(UploadCode.OK);
         assertThat(handler.process(reportResult, null).getCode()).isEqualTo(200);
-        verify(dataAccess, times(1)).uploadReportFile(reportResult);
+        verify(dataAccess, times(1)).uploadReportFiles(reportResult);
     }
 
     @Test
     public void if_successfulStatusCode_and_writeExceptionWhenUploadingTheReportFile_return_httpServerError() {
         when(reportResult.getStatusCode()).thenReturn(2);
-        when(dataAccess.uploadReportFile(reportResult)).thenReturn(UploadCode.WRITE_FAILED);
+        when(dataAccess.uploadReportFiles(reportResult)).thenReturn(UploadCode.WRITE_FAILED);
         assertThat(handler.process(reportResult, null).getCode()).isEqualTo(500);
-        verify(dataAccess, times(1)).uploadReportFile(reportResult);
+        verify(dataAccess, times(1)).uploadReportFiles(reportResult);
     }
 
     @Test

@@ -23,7 +23,7 @@ public class ReportsResultPostHandler extends AbstractHandler<ReportRequestResul
             }
             return Answer.notFound();
         }
-        switch (dataAccess.uploadReportFile(result)) {
+        switch (dataAccess.uploadReportFiles(result)) {
             case OK:
                 return Answer.withMessage(200, "Report file uploaded");
             case NOT_FOUND:

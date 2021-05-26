@@ -272,22 +272,36 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
-    public UploadCode uploadReportFile(ReportRequestResult reportResult) {
-        MongoCollection<Document> collection = database.getCollection("reports");
-        if (collection.countDocuments(eq("genomeToolToken", reportResult.getToken())) < 1) {
+    public UploadCode uploadReportFiles(ReportRequestResult reportResult) {
+        MongoCollection<Document> reportsCollection = database.getCollection("reports");
+        if (reportsCollection.countDocuments(eq("genomeToolToken", reportResult.getToken())) < 1) {
             return UploadCode.NOT_FOUND;
         }
 
         GridFSBucket gridFSBucket = GridFSBuckets.create(database);
-        ObjectId id;
+        ObjectId reportFileId, referenceFileId;
 
-        try (InputStream stream = new FileInputStream(reportResult.getReport().getValue())) {
-            id = gridFSBucket.uploadFromStream(reportResult.getReport().getKey(), stream);
+        try (InputStream reportStream = new FileInputStream(reportResult.getReport().getValue());
+             InputStream referenceStream = new FileInputStream(reportResult.getReference().getValue())) {
+            reportFileId = gridFSBucket.uploadFromStream(reportResult.getReport().getKey(), reportStream);
+            referenceFileId = gridFSBucket.uploadFromStream(reportResult.getReference().getKey(), referenceStream);
         } catch (IOException e) {
             e.getStackTrace();
             return UploadCode.WRITE_FAILED;
         }
-        collection.updateOne(eq("genomeToolToken", reportResult.getToken()), set("file", id));
+
+        Document report = reportsCollection.find(eq("genomeToolToken", reportResult.getToken())).first();
+        MongoCollection<Document> collection = database.getCollection("references");
+        Document reference = new Document()
+                .append("strain", report.getObjectId("strain"))
+                .append("reportName", report.getString("name"))
+                .append("file", referenceFileId);
+        collection.insertOne(reference);
+
+        reportsCollection.updateOne(eq("genomeToolToken", reportResult.getToken()),
+                set("files", new Document()
+                        .append("report", reportFileId)
+                        .append("reference", reference.getObjectId("_id"))));
         return UploadCode.OK;
     }
 

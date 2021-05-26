@@ -34,7 +34,7 @@ public interface DataAccess {
     List<String> getSequenceTrimmedFilesIds(String sequenceId);
     String getReferenceFileId(String referenceId);
 
-    UploadCode uploadReportFile(ReportRequestResult reportResult);
+    UploadCode uploadReportFiles(ReportRequestResult reportResult);
     boolean setReportFileToFalse(String token);
     String getAllReports();
     String getReport(String id);
