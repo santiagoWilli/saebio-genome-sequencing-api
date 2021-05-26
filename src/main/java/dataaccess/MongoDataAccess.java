@@ -281,8 +281,8 @@ public class MongoDataAccess implements DataAccess {
         GridFSBucket gridFSBucket = GridFSBuckets.create(database);
         ObjectId id;
 
-        try (InputStream stream = new FileInputStream(reportResult.getFile().getValue())) {
-            id = gridFSBucket.uploadFromStream(reportResult.getFile().getKey(), stream);
+        try (InputStream stream = new FileInputStream(reportResult.getReport().getValue())) {
+            id = gridFSBucket.uploadFromStream(reportResult.getReport().getKey(), stream);
         } catch (IOException e) {
             e.getStackTrace();
             return UploadCode.WRITE_FAILED;

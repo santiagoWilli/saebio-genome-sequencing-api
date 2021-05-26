@@ -73,6 +73,20 @@ public class ReportRequestResult_ {
         assertThat(result.isValid()).isEqualTo(false);
     }
 
+    @Test
+    public void getReport_shouldReturn_htmlFile() {
+        files.put("index.html", mock(File.class));
+        files.put("ref.fa", mock(File.class));
+        assertThat(result.getReport().getKey()).endsWith(".html");
+    }
+
+    @Test
+    public void getReference_shouldReturn_fastaFile() {
+        files.put("index.html", mock(File.class));
+        files.put("ref.fa", mock(File.class));
+        assertThat(result.getReference().getKey()).endsWith(".fa");
+    }
+
     private String token() {
         return "123e4567-e89b-12d3-a456-556642440000";
     }

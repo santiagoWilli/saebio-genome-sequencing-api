@@ -23,7 +23,17 @@ public class ReportRequestResult extends RequestResult implements Validable {
         return true;
     }
 
-    public Map.Entry<String, File> getFile() {
-        return files.entrySet().iterator().next();
+    public Map.Entry<String, File> getReport() {
+        return getMapEntryWithExtension(".html");
+    }
+
+    public Map.Entry<String, File> getReference() {
+        return getMapEntryWithExtension(".fa");
+    }
+
+    private Map.Entry<String, File> getMapEntryWithExtension(String extension) {
+        Iterator<Map.Entry<String, File>> iterator = files.entrySet().iterator();
+        Map.Entry<String, File> file = iterator.next();
+        return file.getKey().endsWith(extension) ? file : iterator.next();
     }
 }
