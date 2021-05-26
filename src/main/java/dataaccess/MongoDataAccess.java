@@ -309,7 +309,7 @@ public class MongoDataAccess implements DataAccess {
     public boolean setReportFileToFalse(String token) {
         MongoCollection<Document> collection = database.getCollection("reports");
         if (collection.countDocuments(eq("genomeToolToken", token)) < 1) return false;
-        collection.updateOne(eq("genomeToolToken", token), set("file", false));
+        collection.updateOne(eq("genomeToolToken", token), set("files", false));
         return true;
     }
 
