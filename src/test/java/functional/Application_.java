@@ -810,6 +810,15 @@ public class Application_ {
         assertThat(IOUtils.contentEquals(responseStream, new FileInputStream(file))).isTrue();
     }
 
+    @Test
+    public void when_getToReportsIdFile_and_fileDoesNotExist_then_returnReportFile() {
+        String id = db.insertFakeReport(token(), db.insertFakeStrain("kp"));
+        when().
+                get("/api/reports/" + id + "/file").
+        then().
+                statusCode(404);
+    }
+
     @BeforeAll
     static void startApplication() throws IOException, InterruptedException {
         port = PORT;

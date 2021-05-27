@@ -37,9 +37,9 @@ public class ReportsGetFileHandler_ {
     }
 
     @Test
-    public void ifReportFound_returnHttpOk_and_file() throws IOException {
+    public void ifReportFound_and_fileExists_returnHttpOk_and_file() throws IOException {
         String fileId = "6075d6a71a62381d13c70a6f";
-        when(dataAccess.getReport(PARAMS.get(":id"))).thenReturn("json}");
+        when(dataAccess.getReport(PARAMS.get(":id"))).thenReturn("json");
         when(dataAccess.getReportFileId(PARAMS.get(":id"))).thenReturn(fileId);
         when(dataAccess.getFileStream(fileId)).thenReturn(new FileInputStream("test/resources/sequences/informe.html"));
 
@@ -52,5 +52,17 @@ public class ReportsGetFileHandler_ {
         assertThat(answer.getCode()).isEqualTo(200);
         assertThat(answer.hasFile()).isTrue();
         assertThat(answer.getFile().getMimeType()).isEqualTo("text/html");
+    }
+
+    @Test
+    public void ifReportFound_and_fileDoesNotExists_returnHttpNotFound() {
+        when(dataAccess.getReport(PARAMS.get(":id"))).thenReturn("json}");
+        when(dataAccess.getReportFileId(PARAMS.get(":id"))).thenReturn(null);
+
+        assertThat(handler.process(new EmptyPayload(), PARAMS).getCode()).isEqualTo(404);
+
+        verify(dataAccess, times(1)).getReport(PARAMS.get(":id"));
+        verify(dataAccess, times(1)).getReportFileId(PARAMS.get(":id"));
+        verifyNoMoreInteractions(dataAccess);
     }
 }
