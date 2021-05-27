@@ -326,6 +326,14 @@ public class MongoDataAccess implements DataAccess {
         return document == null ? "" : document.toJson();
     }
 
+    @Override
+    public String getReportFileId(String id) {
+        MongoCollection<Document> collection = database.getCollection("reports");
+        final Document document = collection.find(eq("_id", new ObjectId(id))).first();
+        final ObjectId fileId = document != null ? document.get("files", Document.class).getObjectId("report") : null;
+        return fileId == null ? null : fileId.toString();
+    }
+
     private Document getStrain(String key) {
         MongoCollection<Document> collection = database.getCollection("strains");
         return collection.find(eq("keys", key)).first();

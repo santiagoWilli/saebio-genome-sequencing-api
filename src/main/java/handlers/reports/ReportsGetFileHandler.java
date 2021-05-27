@@ -22,15 +22,11 @@ public class ReportsGetFileHandler extends AbstractHandler<EmptyPayload> {
 
     @Override
     protected Answer processRequest(EmptyPayload payload, Map<String, String> requestParams) {
-        String reportJson = dataAccess.getReport(requestParams.get(":id"));
-        if (reportJson.isEmpty()) return Answer.notFound();
+        if (dataAccess.getReport(requestParams.get(":id")).isEmpty()) return Answer.notFound();
 
-        Map<String, Object> report;
+        final String fileId = dataAccess.getReportFileId(requestParams.get(":id"));
         try {
-            report = new ObjectMapper().readValue(reportJson, new TypeReference<HashMap<String,Object>>(){});
-            Map<String, String> file = (Map<String, String>) report.get("file");
-            InputStream fileStream = dataAccess.getFileStream(file.get("$oid"));
-
+            InputStream fileStream = dataAccess.getFileStream(fileId);
             return Answer.withFile(fileStream, "text/html");
         } catch (IOException e) {
             return Answer.serverError(e.getMessage());

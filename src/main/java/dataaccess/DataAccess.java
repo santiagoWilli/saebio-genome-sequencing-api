@@ -38,4 +38,5 @@ public interface DataAccess {
     boolean setReportFileToFalse(String token);
     String getAllReports();
     String getReport(String id);
+    String getReportFileId(String id);
 }

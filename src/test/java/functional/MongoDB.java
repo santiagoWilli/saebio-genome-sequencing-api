@@ -106,7 +106,13 @@ public class MongoDB implements Database {
 
     @Override
     public String insertFakeReferenceWithFile(File file) throws FileNotFoundException {
-        return insertFakeWithFile(file, "references");
+        GridFSBucket gridFSBucket = GridFSBuckets.create(database);
+        ObjectId id = gridFSBucket.uploadFromStream(file.getName(), new FileInputStream(file));
+
+        MongoCollection<Document> collection = database.getCollection("references");
+        Document document = new Document("file", id);
+        collection.insertOne(document);
+        return document.getObjectId("_id").toString();
     }
 
 
@@ -162,15 +168,11 @@ public class MongoDB implements Database {
 
     @Override
     public String insertFakeReportWithFile(File file) throws FileNotFoundException {
-        return insertFakeWithFile(file, "reports");
-    }
-
-    private String insertFakeWithFile(File file, String collectionName) throws FileNotFoundException {
         GridFSBucket gridFSBucket = GridFSBuckets.create(database);
         ObjectId id = gridFSBucket.uploadFromStream(file.getName(), new FileInputStream(file));
 
-        MongoCollection<Document> collection = database.getCollection(collectionName);
-        Document document = new Document("file", id);
+        MongoCollection<Document> collection = database.getCollection("reports");
+        Document document = new Document("files", new Document("report", id));
         collection.insertOne(document);
         return document.getObjectId("_id").toString();
     }
