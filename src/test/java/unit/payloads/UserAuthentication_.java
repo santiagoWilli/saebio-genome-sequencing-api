@@ -27,6 +27,13 @@ public class UserAuthentication_ {
     }
 
     @Test
+    public void invalid_if_hasNoUsername() {
+        parameters.put("something", new String[]{"what is this?"});
+        parameters.put("password", new String[]{"anyPass"});
+        assertThat(authentication.isValid()).isFalse();
+    }
+
+    @Test
     public void getUsername_should_returnTheUsername() {
         parameters.put("username", new String[]{"name"});
         assertThat(authentication.getUsername()).isEqualTo("name");
