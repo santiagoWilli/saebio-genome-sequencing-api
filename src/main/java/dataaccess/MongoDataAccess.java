@@ -335,6 +335,11 @@ public class MongoDataAccess implements DataAccess {
         return fileId == null ? null : fileId.toString();
     }
 
+    @Override
+    public String login(UserAuthentication authentication) throws UserNotFoundException, InvalidPasswordException {
+        return null;
+    }
+
     private Document getStrain(String key) {
         MongoCollection<Document> collection = database.getCollection("strains");
         return collection.find(eq("keys", key)).first();
