@@ -6,6 +6,7 @@ import handlers.LoginHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import payloads.UserAuthentication;
+import utils.Answer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -34,5 +35,13 @@ public class LoginHandler_ {
     public void if_passwordNotValid_return_480() throws InvalidPasswordException, UserNotFoundException {
         when(dataAccess.login(authentication)).thenThrow(InvalidPasswordException.class);
         assertThat(handler.process(authentication, null).getCode()).isEqualTo(480);
+    }
+
+    @Test
+    public void if_credentialsAreValid_return_http200_and_token() throws InvalidPasswordException, UserNotFoundException {
+        when(dataAccess.login(authentication)).thenReturn("hash");
+        Answer answer = handler.process(authentication, null);
+        assertThat(answer.getCode()).isEqualTo(200);
+        assertThat(answer.getBody()).contains("\"token\":");
     }
 }

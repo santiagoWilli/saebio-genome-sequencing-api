@@ -8,4 +8,8 @@ public class Json {
     public static String message(String message) {
         return "{\"message\":\"" + message + "\"}";
     }
+
+    public static String custom(String field, String value) {
+        return "{\"" + field + "\":\"" + value + "\"}";
+    }
 }
