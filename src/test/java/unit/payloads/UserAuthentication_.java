@@ -14,6 +14,13 @@ public class UserAuthentication_ {
     private UserAuthentication authentication;
 
     @Test
+    public void valid_if_hasUsernameAndPassword() {
+        parameters.put("username", new String[]{"name"});
+        parameters.put("password", new String[]{"anyPass"});
+        assertThat(authentication.isValid()).isTrue();
+    }
+
+    @Test
     public void getUsername_should_returnTheUsername() {
         parameters.put("username", new String[]{"name"});
         assertThat(authentication.getUsername()).isEqualTo("name");
