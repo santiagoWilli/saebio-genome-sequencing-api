@@ -9,7 +9,7 @@ public class UserAuthentication extends RequestParameters implements Validable {
 
     @Override
     public boolean isValid() {
-        return true;
+        return parameters.keySet().size() > 1;
     }
 
     public String getUsername() {
