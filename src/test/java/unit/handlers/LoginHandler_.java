@@ -26,20 +26,20 @@ public class LoginHandler_ {
     }
 
     @Test
-    public void if_userNotFound_return_470() throws UserNotFoundException, InvalidPasswordException {
+    public void if_userNotFound_return_470() throws UserNotFoundException {
         when(dataAccess.login(authentication)).thenThrow(UserNotFoundException.class);
         assertThat(handler.process(authentication, null).getCode()).isEqualTo(470);
     }
 
     @Test
-    public void if_passwordNotValid_return_480() throws InvalidPasswordException, UserNotFoundException {
-        when(dataAccess.login(authentication)).thenThrow(InvalidPasswordException.class);
+    public void if_passwordNotValid_return_480() throws UserNotFoundException {
+        when(dataAccess.login(authentication)).thenReturn(false);
         assertThat(handler.process(authentication, null).getCode()).isEqualTo(480);
     }
 
     @Test
-    public void if_credentialsAreValid_return_http200_and_token() throws InvalidPasswordException, UserNotFoundException {
-        when(dataAccess.login(authentication)).thenReturn("hash");
+    public void if_credentialsAreValid_return_http200_and_token() throws UserNotFoundException {
+        when(dataAccess.login(authentication)).thenReturn(true);
         Answer answer = handler.process(authentication, null);
         assertThat(answer.getCode()).isEqualTo(200);
         assertThat(answer.getBody()).contains("\"token\":");

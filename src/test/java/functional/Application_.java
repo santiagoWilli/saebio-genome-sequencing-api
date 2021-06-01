@@ -11,11 +11,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.*;
 
 import java.io.*;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.zip.ZipEntry;
@@ -26,12 +31,14 @@ public class Application_ {
     private static final int DB_PORT = 7017;
     private static final int WIREMOCK_PORT = 7717;
     private static final String testFolderPath = "test/resources/sequences/";
+    private static RequestSpecification requestSpec;
     private static Database db;
     private WireMockServer mockServer;
 
     @Test
     public void given_notAPair_when_postToSequences_then_statusCode400() {
         given().
+                spec(requestSpec).
                 multiPart("file1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
         when().
                 post("/api/sequences").
@@ -54,6 +61,7 @@ public class Application_ {
 
         String response =
             given().
+                    spec(requestSpec).
                     multiPart("file1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
                     multiPart("file2", new File(testFolderPath + "Kp1_231120_R2.fastq.gz")).
             when().
@@ -90,6 +98,7 @@ public class Application_ {
 
         String response =
                 given().
+                        spec(requestSpec).
                         multiPart("file1", new File(testFolderPath + "Kp1_231120_R1_trimmed.fastq.gz")).
                         multiPart("file2", new File(testFolderPath + "Kp1_231120_R2_trimmed.fastq.gz")).
                 when().
@@ -124,6 +133,7 @@ public class Application_ {
         stubFor(post(urlEqualTo("/trim")));
 
         given().
+                spec(requestSpec).
                 multiPart("file1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
                 multiPart("file2", new File(testFolderPath + "Kp1_231120_R2.fastq.gz")).
         when().
@@ -137,6 +147,7 @@ public class Application_ {
     @Test
     public void given_aRequestWithoutRequiredFields_when_postToSequencesTrimmed_then_badRequest() {
         given().
+                spec(requestSpec).
                 multiPart("status", 5).
                 multiPart("message", "Internal error encountered.").
         when().
@@ -145,6 +156,7 @@ public class Application_ {
                 statusCode(400);
 
         given().
+                spec(requestSpec).
                 multiPart("status", 2).
                 multiPart("token", "123e4567-e89b-12d3-a456-556642440000").
         when().
@@ -153,6 +165,7 @@ public class Application_ {
                 statusCode(400);
 
         given().
+                spec(requestSpec).
                 multiPart("status", 2).
                 multiPart("file1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
                 multiPart("file2", new File(testFolderPath + "Kp1_231120_R2.fastq.gz")).
@@ -162,6 +175,7 @@ public class Application_ {
                 statusCode(400);
 
         given().
+                spec(requestSpec).
                 multiPart("token", "123e4567-e89b-12d3-a456-556642440000").
                 multiPart("file1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
                 multiPart("file2", new File(testFolderPath + "Kp1_231120_R2.fastq.gz")).
@@ -177,6 +191,7 @@ public class Application_ {
         db.insertFakeSequence(token);
 
         given().
+                spec(requestSpec).
                 multiPart("status", 5).
                 multiPart("message", "Internal error encountered.").
                 multiPart("token", token).
@@ -194,6 +209,7 @@ public class Application_ {
         final String token = token();
 
         given().
+                spec(requestSpec).
                 multiPart("status", 2).
                 multiPart("token", token).
                 multiPart("file1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
@@ -211,6 +227,7 @@ public class Application_ {
         db.insertFakeSequence(token);
 
         given().
+                spec(requestSpec).
                 multiPart("status", 2).
                 multiPart("token", token).
                 multiPart("file1", new File(testFolderPath + "Kp1_231120_R1.fastq.gz")).
@@ -236,6 +253,8 @@ public class Application_ {
         insertFakeSequences(amount);
 
         String response =
+            given().
+                    spec(requestSpec).
             when().
                     get("/api/sequences").
             then().
@@ -255,6 +274,8 @@ public class Application_ {
         String id = ((Map<String, String>) sequence.get("_id")).get("$oid");
 
         String response =
+                given().
+                        spec(requestSpec).
                 when().
                         get("/api/sequences/" + id).
                 then().
@@ -272,11 +293,15 @@ public class Application_ {
 
     @Test
     public void when_getToSequencesId_and_notFound_then_returnHttp404() {
+        given().
+                spec(requestSpec).
         when().
                 get("/api/sequences/6075d61d1a62381d13c70a6e").
         then().
                 statusCode(404);
 
+        given().
+                spec(requestSpec).
         when().
                 get("/api/sequences/6075d61d1a62381d13c70").
         then().
@@ -295,6 +320,8 @@ public class Application_ {
         String id = ((Map<String, String>) sequence.get("_id")).get("$oid");
 
         byte[] response =
+                given().
+                        spec(requestSpec).
                 when().
                         get("/api/sequences/" + id + "/trimmed").
                 then().
@@ -330,6 +357,7 @@ public class Application_ {
 
         String response =
                 given().
+                        spec(requestSpec).
                         multiPart("file", new File(testFolderPath + "Kpneu231120_referencia.fa")).
                 when().
                         post("/api/references").
@@ -354,6 +382,7 @@ public class Application_ {
     @Test
     public void given_aFileWhichStrainKeyDoesNotExist_when_postToReferences_then_httpBadRequest() {
         given().
+                spec(requestSpec).
                 multiPart("file", new File(testFolderPath + "Kpneu231120_referencia.fa")).
         when().
                 post("/api/references").
@@ -367,6 +396,8 @@ public class Application_ {
         insertFakeReferences(amount);
 
         String response =
+                given().
+                        spec(requestSpec).
                 when().
                         get("/api/references").
                 then().
@@ -383,6 +414,8 @@ public class Application_ {
         String id = db.insertFakeReferenceWithFile(file);
 
         byte[] response =
+                given().
+                        spec(requestSpec).
                 when().
                         get("/api/references/" + id).
                 then().
@@ -400,6 +433,8 @@ public class Application_ {
         for (int i = 0; i < 5; i++) db.insertFakeStrain("key" + i, "name" + i);
 
         String response =
+                given().
+                        spec(requestSpec).
                 when().
                         get("/api/strains").
                 then().
@@ -416,6 +451,7 @@ public class Application_ {
         String key = "newKey";
 
         given().
+                spec(requestSpec).
                 param("key", key).
                 param("name", "anyName").
         when().
@@ -434,6 +470,7 @@ public class Application_ {
 
         String response =
                 given().
+                        spec(requestSpec).
                         param("key", "kneu").
                         param("name", "klebsi").
                 when().
@@ -452,6 +489,7 @@ public class Application_ {
 
         String response =
                 given().
+                        spec(requestSpec).
                         param("key", "kneu").
                         param("key", "kaer").
                         param("name", "klebsiella aerogenes").
@@ -471,6 +509,8 @@ public class Application_ {
         String id = db.insertFakeStrain(key);
         assertThat(db.strainExists(key)).isTrue();
 
+        given().
+                spec(requestSpec).
         when().
                 delete("/api/strains/" + id).
         then().
@@ -486,6 +526,8 @@ public class Application_ {
         db.insertFakeSequence(token(), id);
         assertThat(db.strainExists(key)).isTrue();
 
+        given().
+                spec(requestSpec).
         when().
                 delete("/api/strains/" + id).
         then().
@@ -496,6 +538,8 @@ public class Application_ {
 
     @Test
     public void given_anIdThatDoesNotExist_when_deleteToStrainsId_then_returnHttpNotFound() {
+        given().
+                spec(requestSpec).
         when().
                 delete("/api/strains/1234").
         then().
@@ -507,6 +551,7 @@ public class Application_ {
         String id = db.insertFakeStrain("kp");
 
         given().
+                spec(requestSpec).
                 param("key", "kp").
                 param("key", "kneu").
         when().
@@ -523,6 +568,7 @@ public class Application_ {
         String id = db.insertFakeStrain("kp");
 
         given().
+                spec(requestSpec).
                 param("key", "kpn").
                 param("key", "kneu").
         when().
@@ -537,6 +583,7 @@ public class Application_ {
     @Test
     public void given_idDoesNotExist_when_patchToStrainsId_then_returnHttpNotFound() {
         given().
+                spec(requestSpec).
                 param("key", "kneu").
         when().
                 patch("/api/strains/6075d61d1a62381d13c70a6e").
@@ -547,6 +594,7 @@ public class Application_ {
     @Test
     public void given_noSequences_when_postToReports_then_returnHttpBadRequest() {
         given().
+                spec(requestSpec).
                 param("reference", "1").
         when().
                 post("/api/reports").
@@ -557,6 +605,7 @@ public class Application_ {
     @Test
     public void given_noReference_or_multipleReferences_when_postToReports_then_returnHttpBadRequest() {
         given().
+                spec(requestSpec).
                 param("sequences", "1", "2").
         when().
                 post("/api/reports").
@@ -564,6 +613,7 @@ public class Application_ {
                 statusCode(400);
 
         given().
+                spec(requestSpec).
                 param("sequences", "1", "2").
                 param("reference", "1", "2").
         when().
@@ -589,6 +639,7 @@ public class Application_ {
         stubFor(post(urlEqualTo("/analysis")));
 
         given().
+                spec(requestSpec).
                 param("sequences", sequenceIds[0], sequenceIds[1], sequenceIds[2], sequenceIds[3]).
                 param("reference", referenceId).
         when().
@@ -618,6 +669,7 @@ public class Application_ {
         stubFor(post(urlEqualTo("/analysis/" + token)).willReturn(aResponse()));
 
         given().
+                spec(requestSpec).
                 param("sequences", sequenceIds[0], sequenceIds[1], sequenceIds[2]).
                 param("reference", referenceId).
         when().
@@ -661,6 +713,7 @@ public class Application_ {
 
         String response =
                 given().
+                        spec(requestSpec).
                         param("sequences", sequenceIds[0], sequenceIds[1], sequenceIds[2], sequenceIds[3]).
                         param("reference", referenceId).
                 when().
@@ -710,6 +763,7 @@ public class Application_ {
         final String reportId = db.insertFakeReport(token, strainId);
 
         given().
+                spec(requestSpec).
                 multiPart("status", 2).
                 multiPart("token", token).
                 multiPart("file1", new File(testFolderPath + "informe.html")).
@@ -744,6 +798,7 @@ public class Application_ {
         final String id = db.insertFakeReport(token, db.insertFakeStrain("kp"));
 
         given().
+                spec(requestSpec).
                 multiPart("status", 5).
                 multiPart("token", token).
         when().
@@ -763,6 +818,8 @@ public class Application_ {
         for (int i = 0; i < amount; i++) db.insertFakeReport(token(), strainId);
 
         String response =
+                given().
+                        spec(requestSpec).
                 when().
                         get("/api/reports").
                 then().
@@ -780,6 +837,8 @@ public class Application_ {
         final String id = db.insertFakeReport(token, db.insertFakeStrain("kp"));
 
         String response =
+                given().
+                        spec(requestSpec).
                 when().
                         get("/api/reports/" + id).
                 then().
@@ -798,6 +857,8 @@ public class Application_ {
         String id = db.insertFakeReportWithFile(file);
 
         byte[] response =
+                given().
+                        spec(requestSpec).
                 when().
                         get("/api/reports/" + id + "/file").
                 then().
@@ -813,6 +874,8 @@ public class Application_ {
     @Test
     public void when_getToReportsIdFile_and_fileDoesNotExist_then_returnReportFile() {
         String id = db.insertFakeReport(token(), db.insertFakeStrain("kp"));
+        given().
+                spec(requestSpec).
         when().
                 get("/api/reports/" + id + "/file").
         then().
@@ -820,7 +883,7 @@ public class Application_ {
     }
 
     @BeforeAll
-    static void startApplication() throws IOException, InterruptedException {
+    static void startApplication() throws IOException, InterruptedException, InvalidKeySpecException, NoSuchAlgorithmException {
         port = PORT;
         ProcessBuilder process = new ProcessBuilder(
                 "test/start_application.sh",
@@ -835,6 +898,8 @@ public class Application_ {
             System.out.println("Waiting for the application... (attemps left "+attemptsLeft+")");
             Thread.sleep(1000);
         }
+
+        authSetup();
     }
 
     @BeforeAll
@@ -842,6 +907,26 @@ public class Application_ {
         ProcessBuilder process = new ProcessBuilder("test/start_db.sh", String.valueOf(DB_PORT));
         process.start();
         db = new MongoDB(DB_PORT);
+    }
+
+    private static void authSetup() throws InvalidKeySpecException, NoSuchAlgorithmException {
+        db.createUser();
+
+        Response body =
+                given().
+                        param("username", "test").
+                        param("password", "password").
+                when().
+                        post("/api/login").
+                then().
+                        statusCode(200).extract().response();
+
+        String token = body.path("token").toString();
+        String Authorization = "Bearer " + token;
+
+        RequestSpecBuilder builder = new RequestSpecBuilder();
+        builder.addHeader("Authorization", Authorization);
+        requestSpec = builder.build();
     }
 
     private static boolean theApplicationIsRunning() {

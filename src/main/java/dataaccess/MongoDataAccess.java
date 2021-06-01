@@ -9,8 +9,11 @@ import dataaccess.exceptions.*;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import payloads.*;
+import utils.EncryptedPassword;
 
 import java.io.*;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -336,8 +339,19 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
-    public String login(UserAuthentication authentication) throws UserNotFoundException, InvalidPasswordException {
-        return null;
+    public boolean login(UserAuthentication authentication) throws UserNotFoundException {
+        MongoCollection<Document> collection = database.getCollection("users");
+        final Document user = collection.find(eq("username", authentication.getUsername())).first();
+        if (user == null) throw new UserNotFoundException();
+        try {
+            String securedPassword = user.getString("password");
+            String securedSalt = user.getString("salt");
+            EncryptedPassword password = new EncryptedPassword(authentication.getPassword(), securedSalt);
+            return password.getHash().equals(securedPassword);
+        } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     private Document getStrain(String key) {

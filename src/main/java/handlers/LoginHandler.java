@@ -1,10 +1,10 @@
 package handlers;
 
 import dataaccess.DataAccess;
-import dataaccess.exceptions.InvalidPasswordException;
 import dataaccess.exceptions.UserNotFoundException;
 import payloads.UserAuthentication;
 import utils.Answer;
+import utils.JWT;
 import utils.Json;
 
 import java.util.Map;
@@ -20,12 +20,11 @@ public class LoginHandler extends AbstractHandler<UserAuthentication> {
     @Override
     protected Answer processRequest(UserAuthentication authentication, Map<String, String> requestParams) {
         try {
-            dataAccess.login(authentication);
-            return new Answer(200, Json.custom("token", "hash"));
+            return dataAccess.login(authentication) ?
+                    new Answer(200, Json.custom("token", JWT.generate())) :
+                    Answer.withMessage(480, "Password not valid");
         } catch (UserNotFoundException e) {
             return Answer.withMessage(470, "User not found");
-        } catch (InvalidPasswordException e) {
-            return Answer.withMessage(480, "Password not valid");
         }
     }
 }

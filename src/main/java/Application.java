@@ -5,12 +5,13 @@ import static spark.Spark.*;
 import dataaccess.Database;
 import dataaccess.MongoDataAccess;
 import genome.NullarborClient;
-import handlers.reports.ReportsResultPostHandler;
+import handlers.LoginHandler;
 import handlers.references.*;
 import handlers.reports.*;
 import handlers.sequences.*;
 import handlers.strains.*;
 import utils.Arguments;
+import utils.JWT;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -40,6 +41,14 @@ public class Application {
         Database.setHost(options.dbHost);
 
         path("/api", () -> {
+            before("/*", (request, response) -> {
+                if (request.uri().endsWith("/login")) return;
+                String jwt = request.headers("Authorization");
+                if (jwt == null || jwt.isEmpty()) halt(401);
+                jwt = jwt.replace("Bearer ", "");
+                if (!JWT.verify(jwt)) halt(401);
+            });
+
             get("/alive", (request, response) -> "I am alive!");
 
             path("/sequences", () -> {
@@ -70,6 +79,8 @@ public class Application {
                 post("", new ReportsPostHandler(new NullarborClient(options.genomeToolUrl), new MongoDataAccess()));
                 post("/result", new ReportsResultPostHandler(new MongoDataAccess()));
             });
+
+            post("/login", new LoginHandler(new MongoDataAccess()));
         });
 
         exception(Exception.class, (exception, request, response) -> System.out.println(" -ERROR: " + exception.getMessage()));

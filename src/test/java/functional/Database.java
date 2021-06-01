@@ -3,6 +3,8 @@ package functional;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Collection;
 import java.util.Map;
 
@@ -28,4 +30,6 @@ public interface Database {
 
     String insertFakeReport(String token, String strainId);
     String insertFakeReportWithFile(File file) throws FileNotFoundException;
+
+    void createUser() throws InvalidKeySpecException, NoSuchAlgorithmException;
 }

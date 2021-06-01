@@ -11,13 +11,14 @@ import com.mongodb.client.gridfs.GridFSBuckets;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import utils.EncryptedPassword;
 
 import java.io.*;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Updates.set;
 
 public class MongoDB implements Database {
     private final MongoDatabase database;
@@ -175,5 +176,16 @@ public class MongoDB implements Database {
         Document document = new Document("files", new Document("report", id));
         collection.insertOne(document);
         return document.getObjectId("_id").toString();
+    }
+
+    @Override
+    public void createUser() throws InvalidKeySpecException, NoSuchAlgorithmException {
+        MongoCollection<Document> collection = database.getCollection("users");
+        EncryptedPassword password = new EncryptedPassword("password");
+        Document document = new Document()
+                .append("username", "test")
+                .append("password", password.getHash())
+                .append("salt", password.getSalt());
+        collection.insertOne(document);
     }
 }
