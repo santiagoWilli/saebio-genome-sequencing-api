@@ -42,11 +42,11 @@ public class Application {
 
         path("/api", () -> {
             before("/*", (request, response) -> {
-                if (request.uri().endsWith("/login")) return;
+                if (request.uri().endsWith("/login") || request.uri().endsWith("/alive")) return;
                 String jwt = request.headers("Authorization");
-                if (jwt == null || jwt.isEmpty()) halt(401);
+                if (jwt == null || jwt.isEmpty()) halt(401, "Authorization required");
                 jwt = jwt.replace("Bearer ", "");
-                if (!JWT.verify(jwt)) halt(401);
+                if (!JWT.verify(jwt)) halt(401, "Authorization not valid");
             });
 
             get("/alive", (request, response) -> "I am alive!");
