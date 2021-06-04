@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import payloads.UserAuthentication;
 import utils.Answer;
+import utils.JWT;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -43,5 +44,6 @@ public class LoginHandler_ {
         Answer answer = handler.process(authentication, null);
         assertThat(answer.getCode()).isEqualTo(200);
         assertThat(answer.getBody()).contains("\"token\":");
+        assertThat(answer.getBody()).contains("\"expiresAfter\":" + "\"" + JWT.LEEWAY + "\"");
     }
 }

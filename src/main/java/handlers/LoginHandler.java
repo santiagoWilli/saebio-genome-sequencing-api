@@ -7,6 +7,7 @@ import utils.Answer;
 import utils.JWT;
 import utils.Json;
 
+import java.util.AbstractMap;
 import java.util.Map;
 
 public class LoginHandler extends AbstractHandler<UserAuthentication> {
@@ -21,7 +22,9 @@ public class LoginHandler extends AbstractHandler<UserAuthentication> {
     protected Answer processRequest(UserAuthentication authentication, Map<String, String> requestParams) {
         try {
             return dataAccess.login(authentication) ?
-                    new Answer(200, Json.custom("token", JWT.generate())) :
+                    new Answer(200, Json.custom(Map.ofEntries(
+                            new AbstractMap.SimpleEntry<>("token", JWT.generate()),
+                            new AbstractMap.SimpleEntry<>("expiresAfter", String.valueOf(JWT.LEEWAY))))) :
                     Answer.withMessage(480, "Password not valid");
         } catch (UserNotFoundException e) {
             return Answer.withMessage(470, "User not found");

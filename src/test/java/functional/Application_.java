@@ -921,6 +921,7 @@ public class Application_ {
                 then().
                         statusCode(200).extract().response();
 
+        System.out.println(body.asPrettyString());
         String token = body.path("token").toString();
         String Authorization = "Bearer " + token;
 
