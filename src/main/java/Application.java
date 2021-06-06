@@ -98,11 +98,15 @@ public class Application {
                     return "OK";
                 });
 
-        before((request, response) -> response.header("Access-Control-Allow-Origin", "*"));
+        before((request, response) -> {
+            response.header("Access-Control-Allow-Origin", "*");
+            response.header("Access-Control-Request-Method", "GET,PATCH,POST,DELETE,OPTIONS");
+            response.header("Access-Control-Allow-Headers", "Content-Type,Authorization,X-Requested-With,Content-Length,Accept,Origin");
+        });
     }
 
     private static void handleAuthorization() {
-        before("/*", (request, response) -> {
+        before((request, response) -> {
             if (request.uri().endsWith("/login") || request.uri().endsWith("/alive")) return;
             String jwt = request.headers("Authorization");
             if (jwt == null || jwt.isEmpty()) halt(401, "Authorization required");
