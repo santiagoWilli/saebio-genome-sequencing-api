@@ -200,11 +200,14 @@ public class MongoDataAccess implements DataAccess {
         MongoCollection<Document> collection = database.getCollection("strains");
         if (!ObjectId.isValid(id) || collection.countDocuments(eq("_id", new ObjectId(id))) < 1) return false;
         for (String key : keys.getKeys()) {
-            if (collection.countDocuments(eq("keys", key)) > 0) throw new UniquenessViolationException("Strain key already exists");
+            if (collection.countDocuments(eq("keys", key)) > 0) {
+                Document document = collection.find(eq("keys", key)).first();
+                if (!document.getObjectId("_id").toString().equals(id)) throw new UniquenessViolationException("Strain key already exists");
+            }
         }
         collection.updateOne(
                 eq("_id", new ObjectId(id)),
-                pushEach("keys", keys.getKeys())
+                set("keys", keys.getKeys())
         );
         return true;
     }

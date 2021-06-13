@@ -548,11 +548,12 @@ public class Application_ {
 
     @Test
     public void given_keys_and_anyKeyAlreadyExists_when_patchToStrainsId_then_returnHttpConflict_and_strainKeysAreNotModified() throws IOException {
+        db.insertFakeStrain("no", "test");
         String id = db.insertFakeStrain("kp");
 
         given().
                 spec(requestSpec).
-                param("key", "kp").
+                param("key", "no").
                 param("key", "kneu").
         when().
                 patch("/api/strains/" + id).
@@ -564,11 +565,12 @@ public class Application_ {
     }
 
     @Test
-    public void given_keys_and_keysDoNotExist_when_patchToStrainsId_then_keysAreAddedToStrainKeys_and_returnHttpOk() throws IOException {
+    public void given_keys_and_keysDoNotExistInOtherStrains_when_patchToStrainsId_then_keysAreAddedToStrainKeys_and_returnHttpOk() throws IOException {
         String id = db.insertFakeStrain("kp");
 
         given().
                 spec(requestSpec).
+                param("key", "kp").
                 param("key", "kpn").
                 param("key", "kneu").
         when().
