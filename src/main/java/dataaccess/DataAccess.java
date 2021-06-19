@@ -15,6 +15,8 @@ public interface DataAccess {
     boolean setSequenceTrimToFalse(String token);
     String getAllSequences();
     String getSequence(String id);
+    boolean sequenceAlreadyExists(Sequence sequence);
+
     String getFileName(String id);
     InputStream getFileStream(String id) throws IOException;
 

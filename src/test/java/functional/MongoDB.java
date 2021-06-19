@@ -66,6 +66,16 @@ public class MongoDB implements Database {
     }
 
     @Override
+    public void insertFakeRepeatedSequence(String strainId, String code, String date) {
+        MongoCollection<Document> collection = database.getCollection("sequences");
+        collection.insertOne(new Document()
+                .append("strain", new ObjectId(strainId))
+                .append("code", code)
+                .append("sequenceDate", date)
+        );
+    }
+
+    @Override
     public String insertFakeSequenceWithTrimmedFiles(String token, Collection<File> files, String strainId) throws FileNotFoundException {
         MongoCollection<Document> collection = database.getCollection("sequences");
 

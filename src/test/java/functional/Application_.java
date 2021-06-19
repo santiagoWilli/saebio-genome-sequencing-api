@@ -129,6 +129,25 @@ public class Application_ {
     }
 
     @Test
+    public void given_aPairOfValidFiles_and_sequenceAlreadyExists_when_postToSequences_then_statusCode409() throws IOException {
+        String id = db.insertFakeStrain("kp");
+        db.insertFakeRepeatedSequence(id, "1", "2020-11-23");
+
+        stubFor(post(urlEqualTo("/trim")).willReturn(aResponse()));
+
+        given().
+                spec(requestSpec).
+                multiPart("file1", new File(testFolderPath + "Kp1_231120_R1_trimmed.fastq.gz")).
+                multiPart("file2", new File(testFolderPath + "Kp1_231120_R2_trimmed.fastq.gz")).
+        when().
+                post("/api/sequences").
+        then().
+                statusCode(409);
+
+        verify(exactly(0), postRequestedFor(urlEqualTo("/trim")));
+    }
+
+    @Test
     public void given_aPairOfFilesWhichStrainKeysDoNotExist_when_postToSequences_then_httpBadRequest() {
         stubFor(post(urlEqualTo("/trim")));
 

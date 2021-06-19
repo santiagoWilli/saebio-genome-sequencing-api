@@ -26,6 +26,10 @@ public class SequencesPostHandler extends AbstractHandler<Sequence> {
             return Answer.badRequest(sequence.getStrainKey() + " strain does not exist");
         }
 
+        if (dataAccess.sequenceAlreadyExists(sequence)) {
+            return Answer.withMessage(409, "Sequence already exists");
+        }
+
         if (sequence.isTrimmed()) {
             final String id = dataAccess.createSequenceAlreadyTrimmed(sequence);
             return id != null ?

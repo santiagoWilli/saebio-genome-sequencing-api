@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Aggregates.*;
+import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Projections.*;
 import static com.mongodb.client.model.Updates.*;
@@ -118,6 +119,20 @@ public class MongoDataAccess implements DataAccess {
                 project(fields(exclude("strain.keys")))
         )).into(new ArrayList<>());
         return result.size() < 1 ? "" : result.get(0).toJson();
+    }
+
+    @Override
+    public boolean sequenceAlreadyExists(Sequence sequence) {
+        MongoCollection<Document> collection = database.getCollection("sequences");
+
+        final ObjectId strainId = getStrain(sequence.getStrainKey()).getObjectId("_id");
+
+        return collection.countDocuments(
+                and(
+                    eq("strain", strainId),
+                    eq("code", sequence.getIsolateCode()),
+                    eq("sequenceDate", formatDate(sequence.getDate()))
+                )) > 0;
     }
 
     @Override

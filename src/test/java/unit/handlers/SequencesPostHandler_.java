@@ -40,6 +40,7 @@ public class SequencesPostHandler_ {
         when(toolAnswer.getStatus()).thenReturn(GenomeToolAnswer.Status.API_DOWN);
         assertThat(handler.process(sequence, null)).isEqualTo(Answer.serviceUnavailable("Genome reporter tool is down"));
         verify(dataAccess, times(1)).strainExists("kp");
+        verify(dataAccess, times(1)).sequenceAlreadyExists(sequence);
         verifyNoMoreInteractions(dataAccess);
     }
 
@@ -50,6 +51,7 @@ public class SequencesPostHandler_ {
         when(toolAnswer.getStatus()).thenReturn(GenomeToolAnswer.Status.SERVER_ERROR);
         assertThat(handler.process(sequence, null)).isEqualTo(Answer.badGateway("Genome reporter tool encountered an internal error"));
         verify(dataAccess, times(1)).strainExists("kp");
+        verify(dataAccess, times(1)).sequenceAlreadyExists(sequence);
         verifyNoMoreInteractions(dataAccess);
     }
 
@@ -74,6 +76,7 @@ public class SequencesPostHandler_ {
         when(toolAnswer.getMessage()).thenReturn(exception);
         assertThat(handler.process(sequence, null)).isEqualTo(Answer.serverError(exception));
         verify(dataAccess, times(1)).strainExists("kp");
+        verify(dataAccess, times(1)).sequenceAlreadyExists(sequence);
         verifyNoMoreInteractions(dataAccess);
     }
 
@@ -107,6 +110,17 @@ public class SequencesPostHandler_ {
         assertThat(handler.process(sequence, null).getCode()).isEqualTo(500);
         verifyNoInteractions(genomeTool);
         verify(dataAccess, times(1)).createSequenceAlreadyTrimmed(sequence);
+    }
+
+    @Test
+    public void if_sequenceExists_return_http409() {
+        when(dataAccess.strainExists("kp")).thenReturn(true);
+        when(dataAccess.sequenceAlreadyExists(sequence)).thenReturn(true);
+        assertThat(handler.process(sequence, null).getCode()).isEqualTo(409);
+        verifyNoInteractions(genomeTool);
+        verify(dataAccess, times(1)).strainExists("kp");
+        verify(dataAccess, times(1)).sequenceAlreadyExists(sequence);
+        verifyNoMoreInteractions(dataAccess);
     }
 
     private static String token() {
