@@ -17,6 +17,8 @@ public interface Database {
 
     void insertFakeRepeatedSequence(String strainId, String code, String date);
 
+    void insertFakeRepeatedReference(String strainId, String code);
+
     String insertFakeSequenceWithTrimmedFiles(String token, Collection<File> files, String strainId) throws FileNotFoundException;
 
     void empty(String collection);

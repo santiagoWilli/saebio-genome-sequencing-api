@@ -23,6 +23,10 @@ public class ReferencesPostHandler extends AbstractHandler<Reference> {
             return Answer.badRequest(reference.getStrainKey() + " strain does not exist");
         }
 
+        if (dataAccess.referenceAlreadyExists(reference)) {
+            return Answer.withMessage(409, "Reference already exists");
+        }
+
         try {
             return new Answer(200, Json.id(dataAccess.uploadReference(reference)));
         } catch (IOException e) {

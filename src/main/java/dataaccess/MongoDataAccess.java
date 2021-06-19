@@ -181,6 +181,19 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
+    public boolean referenceAlreadyExists(Reference reference) {
+        MongoCollection<Document> collection = database.getCollection("references");
+
+        final ObjectId strainId = getStrain(reference.getStrainKey()).getObjectId("_id");
+
+        return collection.countDocuments(
+                and(
+                        eq("strain", strainId),
+                        eq("code", reference.getIsolateCode())
+                )) > 0;
+    }
+
+    @Override
     public String getAllStrains() {
         return findAllFromCollection("strains");
     }

@@ -41,12 +41,21 @@ public class ReferencesPostHandler_ {
         assertThat(handler.process(reference, null)).isEqualTo(new Answer(200, Json.id("1234")));
     }
 
-
     @Test
     public void if_referenceStrainKeyDoesNotExist_return_httpBadRequest() {
         when(dataAccess.strainExists("kp")).thenReturn(false);
         assertThat(handler.process(reference, null).getCode()).isEqualTo(400);
         verify(dataAccess, times(1)).strainExists("kp");
+        verifyNoMoreInteractions(dataAccess);
+    }
+    @Test
+
+    public void if_referenceAlreadyExists_return_httpConflict() {
+        when(dataAccess.strainExists("kp")).thenReturn(true);
+        when(dataAccess.referenceAlreadyExists(reference)).thenReturn(true);
+        assertThat(handler.process(reference, null).getCode()).isEqualTo(409);
+        verify(dataAccess, times(1)).strainExists("kp");
+        verify(dataAccess, times(1)).referenceAlreadyExists(reference);
         verifyNoMoreInteractions(dataAccess);
     }
 }

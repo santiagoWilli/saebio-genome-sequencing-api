@@ -399,6 +399,20 @@ public class Application_ {
     }
 
     @Test
+    public void given_aValidFile_and_referenceAlreadyExists_when_postToReferences_then_statusCode409() throws IOException {
+        String id = db.insertFakeStrain("kpneu");
+        db.insertFakeRepeatedReference(id, "231120");
+
+        given().
+                spec(requestSpec).
+                multiPart("file", new File(testFolderPath + "Kpneu231120_referencia.fa")).
+        when().
+                post("/api/references").
+        then().
+                statusCode(409);
+    }
+
+    @Test
     public void given_aFileWhichStrainKeyDoesNotExist_when_postToReferences_then_httpBadRequest() {
         given().
                 spec(requestSpec).
