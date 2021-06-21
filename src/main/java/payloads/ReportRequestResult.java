@@ -31,9 +31,16 @@ public class ReportRequestResult extends RequestResult implements Validable {
         return getMapEntryWithExtension(".fa");
     }
 
+    public Map.Entry<String, File> getLog() {
+        return getMapEntryWithExtension(".log");
+    }
+
     private Map.Entry<String, File> getMapEntryWithExtension(String extension) {
-        Iterator<Map.Entry<String, File>> iterator = files.entrySet().iterator();
-        Map.Entry<String, File> file = iterator.next();
-        return file.getKey().endsWith(extension) ? file : iterator.next();
+        System.out.println(files.entrySet());
+        for (Map.Entry<String, File> file : files.entrySet()) {
+            System.out.println(file.getKey());
+            if (file.getKey().endsWith(extension)) return file;
+        }
+        return null;
     }
 }

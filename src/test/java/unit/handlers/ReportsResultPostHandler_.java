@@ -53,16 +53,16 @@ public class ReportsResultPostHandler_ {
     @Test
     public void if_failureStatusCode_and_reportFound_httpOk() {
         when(reportResult.getStatusCode()).thenReturn(5);
-        when(dataAccess.setReportFileToFalse(reportResult.getToken())).thenReturn(true);
+        when(dataAccess.setReportFileToFalse(reportResult)).thenReturn(true);
         assertThat(handler.process(reportResult, null).getCode()).isEqualTo(200);
-        verify(dataAccess, times(1)).setReportFileToFalse(reportResult.getToken());
+        verify(dataAccess, times(1)).setReportFileToFalse(reportResult);
     }
 
     @Test
     public void if_failureStatusCode_and_reportNotFound_httpNotFound() {
         when(reportResult.getStatusCode()).thenReturn(5);
-        when(dataAccess.setReportFileToFalse(reportResult.getToken())).thenReturn(false);
+        when(dataAccess.setReportFileToFalse(reportResult)).thenReturn(false);
         assertThat(handler.process(reportResult, null)).isEqualTo(Answer.notFound());
-        verify(dataAccess, times(1)).setReportFileToFalse(reportResult.getToken());
+        verify(dataAccess, times(1)).setReportFileToFalse(reportResult);
     }
 }

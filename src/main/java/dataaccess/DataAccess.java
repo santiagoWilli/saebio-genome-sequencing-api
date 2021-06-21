@@ -38,7 +38,7 @@ public interface DataAccess {
     String getReferenceFileId(String referenceId);
 
     UploadCode uploadReportFiles(ReportRequestResult reportResult);
-    boolean setReportFileToFalse(String token);
+    boolean setReportFileToFalse(ReportRequestResult reportResult);
     String getAllReports();
     String getReport(String id);
     String getReportFileId(String id);

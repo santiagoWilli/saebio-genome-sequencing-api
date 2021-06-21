@@ -828,6 +828,26 @@ public class Application_ {
     }
 
     @Test
+    public void given_anErrorStatusAndLogFile_when_postToReportsResult_then_setFileFieldToFalseAndAppendLog() throws IOException {
+        final String token = token();
+        final String id = db.insertFakeReport(token, db.insertFakeStrain("kp"));
+
+        given().
+                spec(requestSpec).
+                multiPart("status", 5).
+                multiPart("token", token).
+                multiPart("file", new File(testFolderPath + "nullarbor.log")).
+        when().
+                post("/api/reports/result").
+        then().
+                statusCode(200);
+
+        Map<String, Object> sequence = db.get("reports", id);
+        assertThat(sequence.get("files")).isEqualTo(false);
+        assertThat(sequence.get("log")).isOfAnyClassIn(LinkedHashMap.class);
+    }
+
+    @Test
     public void given_anErrorStatus_when_postToReportsResult_then_setFileFieldToFalse() throws IOException {
         final String token = token();
         final String id = db.insertFakeReport(token, db.insertFakeStrain("kp"));
@@ -842,8 +862,8 @@ public class Application_ {
                 statusCode(200);
 
         Map<String, Object> sequence = db.get("reports", id);
-        assertThat(sequence.get("files")).isNotNull();
         assertThat(sequence.get("files")).isEqualTo(false);
+        assertThat(sequence.get("log")).isNull();
     }
 
     @Test

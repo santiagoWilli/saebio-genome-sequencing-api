@@ -77,6 +77,7 @@ public class ReportRequestResult_ {
     public void getReport_shouldReturn_htmlFile() {
         files.put("index.html", mock(File.class));
         files.put("ref.fa", mock(File.class));
+        files.put("log.log", mock(File.class));
         assertThat(result.getReport().getKey()).endsWith(".html");
     }
 
@@ -84,7 +85,16 @@ public class ReportRequestResult_ {
     public void getReference_shouldReturn_fastaFile() {
         files.put("index.html", mock(File.class));
         files.put("ref.fa", mock(File.class));
+        files.put("log.log", mock(File.class));
         assertThat(result.getReference().getKey()).endsWith(".fa");
+    }
+
+    @Test
+    public void getLog_shouldReturn_logFile() {
+        files.put("index.html", mock(File.class));
+        files.put("ref.fa", mock(File.class));
+        files.put("log.log", mock(File.class));
+        assertThat(result.getLog().getKey()).endsWith(".log");
     }
 
     private String token() {

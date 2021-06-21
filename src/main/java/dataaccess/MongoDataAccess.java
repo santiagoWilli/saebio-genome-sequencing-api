@@ -340,10 +340,22 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
-    public boolean setReportFileToFalse(String token) {
+    public boolean setReportFileToFalse(ReportRequestResult reportResult) {
         MongoCollection<Document> collection = database.getCollection("reports");
-        if (collection.countDocuments(eq("genomeToolToken", token)) < 1) return false;
-        collection.updateOne(eq("genomeToolToken", token), set("files", false));
+        if (collection.countDocuments(eq("genomeToolToken", reportResult.getToken())) < 1) return false;
+
+        GridFSBucket gridFSBucket = GridFSBuckets.create(database);
+        ObjectId logId;
+        if (reportResult.getLog() != null) {
+            try (InputStream logStream = new FileInputStream(reportResult.getLog().getValue())) {
+                logId = gridFSBucket.uploadFromStream(reportResult.getLog().getKey(), logStream);
+                collection.updateOne(eq("genomeToolToken", reportResult.getToken()), set("log", logId));
+            } catch (IOException e) {
+                e.getStackTrace();
+            }
+        }
+
+        collection.updateOne(eq("genomeToolToken", reportResult.getToken()), set("files", false));
         return true;
     }
 
