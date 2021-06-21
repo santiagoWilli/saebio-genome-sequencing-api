@@ -72,6 +72,7 @@ public class Application {
                 get("", new ReportsGetAllHandler(new MongoDataAccess()));
                 get("/:id", new ReportsGetOneHandler(new MongoDataAccess()));
                 get("/:id/file", new ReportsGetFileHandler(new MongoDataAccess()));
+                get("/:id/log", new ReportsGetLogHandler(new MongoDataAccess()));
                 post("", new ReportsPostHandler(new NullarborClient(options.genomeToolUrl), new MongoDataAccess()));
                 post("/result", new ReportsResultPostHandler(new MongoDataAccess()));
             });

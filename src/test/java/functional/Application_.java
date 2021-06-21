@@ -927,7 +927,7 @@ public class Application_ {
     }
 
     @Test
-    public void when_getToReportsIdFile_and_fileDoesNotExist_then_returnReportFile() {
+    public void when_getToReportsIdFile_and_fileDoesNotExist_then_returnHttp404() {
         String id = db.insertFakeReport(token(), db.insertFakeStrain("kp"));
         given().
                 spec(requestSpec).
@@ -935,6 +935,26 @@ public class Application_ {
                 get("/api/reports/" + id + "/file").
         then().
                 statusCode(404);
+    }
+
+    @Test
+    public void when_getToReportsIdLog_then_returnLogFile() throws IOException {
+        File file = new File(testFolderPath + "nullarbor.log");
+        String id = db.insertFakeReportWithLog(file);
+
+        byte[] response =
+                given().
+                        spec(requestSpec).
+                when().
+                        get("/api/reports/" + id + "/log").
+                then().
+                        statusCode(200).
+                        contentType("text/plain").
+                        header("Content-Disposition", "attachment; filename=file.log").
+                        extract().asByteArray();
+
+        InputStream responseStream = new ByteArrayInputStream(response);
+        assertThat(IOUtils.contentEquals(responseStream, new FileInputStream(file))).isTrue();
     }
 
     @BeforeAll

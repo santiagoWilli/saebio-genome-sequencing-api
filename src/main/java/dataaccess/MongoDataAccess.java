@@ -382,6 +382,14 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
+    public String getReportLogId(String id) {
+        MongoCollection<Document> collection = database.getCollection("reports");
+        final Document report = collection.find(eq("_id", new ObjectId(id))).first();
+        final ObjectId fileId = report != null ? report.getObjectId("log") : null;
+        return fileId == null ? null : fileId.toString();
+    }
+
+    @Override
     public boolean login(UserAuthentication authentication) throws UserNotFoundException {
         MongoCollection<Document> collection = database.getCollection("users");
         final Document user = collection.find(eq("username", authentication.getUsername())).first();

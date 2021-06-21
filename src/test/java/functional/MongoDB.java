@@ -198,6 +198,17 @@ public class MongoDB implements Database {
     }
 
     @Override
+    public String insertFakeReportWithLog(File file) throws FileNotFoundException {
+        GridFSBucket gridFSBucket = GridFSBuckets.create(database);
+        ObjectId id = gridFSBucket.uploadFromStream(file.getName(), new FileInputStream(file));
+
+        MongoCollection<Document> collection = database.getCollection("reports");
+        Document document = new Document("log", id);
+        collection.insertOne(document);
+        return document.getObjectId("_id").toString();
+    }
+
+    @Override
     public void createUser() throws InvalidKeySpecException, NoSuchAlgorithmException {
         MongoCollection<Document> collection = database.getCollection("users");
         EncryptedPassword password = new EncryptedPassword("password");

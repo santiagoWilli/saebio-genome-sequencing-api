@@ -35,6 +35,7 @@ public interface Database {
 
     String insertFakeReport(String token, String strainId);
     String insertFakeReportWithFile(File file) throws FileNotFoundException;
+    String insertFakeReportWithLog(File file) throws FileNotFoundException;
 
     void createUser() throws InvalidKeySpecException, NoSuchAlgorithmException;
 }
