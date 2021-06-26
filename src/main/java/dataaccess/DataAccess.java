@@ -23,6 +23,7 @@ public interface DataAccess {
 
     String uploadReference(Reference reference) throws IOException;
     String getAllReferences();
+    String getAllReferences(String strainId);
     String getReference(String id);
     boolean referenceAlreadyExists(Reference reference);
 

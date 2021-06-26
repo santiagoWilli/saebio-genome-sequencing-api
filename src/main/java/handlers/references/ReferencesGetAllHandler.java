@@ -16,6 +16,8 @@ public class ReferencesGetAllHandler extends AbstractHandler<EmptyPayload> {
 
     @Override
     protected Answer processRequest(EmptyPayload payload, RequestParams requestParams) {
-        return new Answer(200, dataAccess.getAllReferences());
+        return new Answer(200, requestParams.query().get("strain") == null ?
+                dataAccess.getAllReferences() :
+                dataAccess.getAllReferences(requestParams.query().get("strain")[0]));
     }
 }

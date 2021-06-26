@@ -179,6 +179,11 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
+    public String getAllReferences(String strainId) {
+        return findAllFromCollectionWithGivenStrain("references", strainId);
+    }
+
+    @Override
     public String getReference(String id) {
         if (!ObjectId.isValid(id)) return "";
         MongoCollection<Document> collection = database.getCollection("references");

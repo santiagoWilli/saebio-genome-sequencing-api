@@ -464,6 +464,28 @@ public class Application_ {
     }
 
     @Test
+    public void when_getToReferencesSpecifyingAFilter_then_returnAJsonOfAllReferencesThatPassTheFilter() throws IOException {
+        String anyStrainId = db.insertFakeStrain("no", "not this one");
+        String wantedStrainId = db.insertFakeStrain("yes", "this one!");
+        int amount = 5;
+        insertFakeReferences(amount, wantedStrainId);
+        insertFakeReferences(10, anyStrainId);
+
+        String response =
+                given().
+                        spec(requestSpec).
+                        queryParam("strain", wantedStrainId).
+                when().
+                        get("/api/references").
+                then().
+                        statusCode(200).
+                        extract().asString();
+
+        List<Object> references = Arrays.asList(new ObjectMapper().readValue(response, Object[].class));
+        assertThat(references.size()).isEqualTo(amount);
+    }
+
+    @Test
     public void when_getToReferencesId_then_returnReferenceFile() throws IOException {
         File file = new File(testFolderPath + "Kpneu231120_referencia.fa");
         String id = db.insertFakeReferenceWithFile(file);
@@ -1095,5 +1117,9 @@ public class Application_ {
 
     private void insertFakeReferences(int amount) {
         for (int i = 0; i < amount; i++) db.insertFakeReference();
+    }
+
+    private void insertFakeReferences(int amount, String strainId) {
+        for (int i = 0; i < amount; i++) db.insertFakeReference(strainId);
     }
 }

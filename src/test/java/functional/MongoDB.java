@@ -125,6 +125,13 @@ public class MongoDB implements Database {
     }
 
     @Override
+    public void insertFakeReference(String strainId) {
+        MongoCollection<Document> collection = database.getCollection("references");
+        collection.insertOne(new Document()
+                .append("strain", new ObjectId(strainId)));
+    }
+
+    @Override
     public String insertFakeReferenceWithFile(File file) throws FileNotFoundException {
         GridFSBucket gridFSBucket = GridFSBuckets.create(database);
         ObjectId id = gridFSBucket.uploadFromStream(file.getName(), new FileInputStream(file));

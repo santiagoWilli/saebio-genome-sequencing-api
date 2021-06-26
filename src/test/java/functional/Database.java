@@ -25,6 +25,7 @@ public interface Database {
 
     boolean referenceExists(String id);
     void insertFakeReference();
+    void insertFakeReference(String strainId);
     String insertFakeReferenceWithFile(File file) throws FileNotFoundException;
 
     String insertFakeReferenceWithFile(File file, String strainId) throws FileNotFoundException;
