@@ -284,6 +284,28 @@ public class Application_ {
         assertThat(sequences.size()).isEqualTo(amount);
     }
 
+    @Test
+    public void when_getToSequencesSpecifyingAFilter_then_returnAJsonOfAllSequencesThatPassTheFilter() throws IOException {
+        String anyStrainId = db.insertFakeStrain("no", "not this one");
+        String wantedStrainId = db.insertFakeStrain("yes", "this one!");
+        int amount = 5;
+        insertFakeSequences(amount, wantedStrainId);
+        insertFakeSequences(10, anyStrainId);
+
+        String response =
+            given().
+                    spec(requestSpec).
+                    queryParam("strain", wantedStrainId).
+            when().
+                    get("/api/sequences").
+            then().
+                    statusCode(200).
+                    extract().asString();
+
+        List<Object> sequences = Arrays.asList(new ObjectMapper().readValue(response, Object[].class));
+        assertThat(sequences.size()).isEqualTo(amount);
+    }
+
     @SuppressWarnings("unchecked")
     @Test
     public void when_getToSequencesId_then_returnSequenceWithGivenIdAsJson() throws IOException {
@@ -1065,6 +1087,10 @@ public class Application_ {
 
     private void insertFakeSequences(int amount) {
         for (int i = 0; i < amount; i++) db.insertFakeSequence(token());
+    }
+
+    private void insertFakeSequences(int amount, String strainId) {
+        for (int i = 0; i < amount; i++) db.insertFakeSequence(token(), strainId);
     }
 
     private void insertFakeReferences(int amount) {

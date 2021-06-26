@@ -7,6 +7,7 @@ import com.mongodb.client.gridfs.model.GridFSFile;
 import com.mongodb.client.model.IndexOptions;
 import dataaccess.exceptions.*;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import payloads.*;
 import utils.EncryptedPassword;
@@ -105,6 +106,11 @@ public class MongoDataAccess implements DataAccess {
     @Override
     public String getAllSequences() {
         return findAllFromCollection("sequences");
+    }
+
+    @Override
+    public String getAllSequences(String strainId) {
+        return findAllFromCollectionWithGivenStrain("sequences", strainId);
     }
 
     @Override
@@ -411,14 +417,23 @@ public class MongoDataAccess implements DataAccess {
     }
 
     private String findAllFromCollection(String collectionName) {
+        return findAllFromCollection(collectionName, null);
+    }
+
+    private String findAllFromCollection(String collectionName, Bson filter) {
         MongoCollection<Document> collection = database.getCollection(collectionName);
         List<String> documents = new ArrayList<>();
-        try (MongoCursor<Document> cursor = collection.find().iterator()) {
+        try (MongoCursor<Document> cursor = collection.find(filter == null ? new Document() : filter).iterator()) {
             while (cursor.hasNext()) {
                 documents.add(cursor.next().toJson());
             }
         }
         return "[" + String.join(", ", documents) + "]";
+    }
+
+    private String findAllFromCollectionWithGivenStrain(String collectionName, String strainId) {
+        if (!ObjectId.isValid(strainId)) return "[]";
+        return findAllFromCollection(collectionName, eq("strain", new ObjectId(strainId)));
     }
 
     private static String formatDate(LocalDate date) {

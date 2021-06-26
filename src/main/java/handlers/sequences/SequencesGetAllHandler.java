@@ -16,6 +16,7 @@ public class SequencesGetAllHandler extends AbstractHandler<EmptyPayload> {
 
     @Override
     protected Answer processRequest(EmptyPayload payload, RequestParams requestParams) {
-        return new Answer(200, dataAccess.getAllSequences());
+        if (requestParams.query().get("strain") == null) return new Answer(200, dataAccess.getAllSequences());
+        return new Answer(200, dataAccess.getAllSequences(requestParams.query().get("strain")[0]));
     }
 }

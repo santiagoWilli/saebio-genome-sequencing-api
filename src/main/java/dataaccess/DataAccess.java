@@ -14,6 +14,7 @@ public interface DataAccess {
     UploadCode uploadTrimmedFiles(TrimRequestResult trimResult);
     boolean setSequenceTrimToFalse(String token);
     String getAllSequences();
+    String getAllSequences(String strainId);
     String getSequence(String id);
     boolean sequenceAlreadyExists(Sequence sequence);
 
