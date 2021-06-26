@@ -2,10 +2,9 @@ package handlers;
 
 import payloads.Validable;
 import utils.Answer;
-
-import java.util.Map;
+import utils.RequestParams;
 
 @FunctionalInterface
 interface RequestHandler<V extends Validable> {
-    Answer process(V payload, Map<String, String> requestParams);
+    Answer process(V payload, RequestParams requestParams);
 }

@@ -6,6 +6,7 @@ import dataaccess.DataAccess;
 import handlers.AbstractHandler;
 import payloads.EmptyPayload;
 import utils.Answer;
+import utils.RequestParams;
 
 import java.io.*;
 import java.nio.file.*;
@@ -21,8 +22,8 @@ public class SequencesGetTrimmedPairHandler extends AbstractHandler<EmptyPayload
     }
 
     @Override
-    protected Answer processRequest(EmptyPayload payload, Map<String, String> requestParams) {
-        String sequenceJson = dataAccess.getSequence(requestParams.get(":id"));
+    protected Answer processRequest(EmptyPayload payload, RequestParams requestParams) {
+        String sequenceJson = dataAccess.getSequence(requestParams.path().get(":id"));
         if (sequenceJson.isEmpty()) return Answer.notFound();
 
         Map<String, Object> sequence;

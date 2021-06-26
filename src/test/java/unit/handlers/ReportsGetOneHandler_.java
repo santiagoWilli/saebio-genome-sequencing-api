@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import payloads.EmptyPayload;
 import utils.Answer;
+import utils.RequestParams;
 
 import java.util.AbstractMap;
 import java.util.Map;
@@ -29,14 +30,14 @@ public class ReportsGetOneHandler_ {
     @Test
     public void ifReportNotFound_returnHttpNotFound() {
         when(dataAccess.getReport(PARAMS.get(":id"))).thenReturn("");
-        assertThat(handler.process(new EmptyPayload(), PARAMS)).isEqualTo(Answer.notFound());
+        assertThat(handler.process(new EmptyPayload(), new RequestParams(PARAMS, null))).isEqualTo(Answer.notFound());
         verify(dataAccess, times(1)).getReport(PARAMS.get(":id"));
     }
 
     @Test
     public void ifReportFound_returnHttpOk_and_reportJson() {
         when(dataAccess.getReport(PARAMS.get(":id"))).thenReturn("abc");
-        assertThat(handler.process(new EmptyPayload(), PARAMS)).isEqualTo(new Answer(200, "abc"));
+        assertThat(handler.process(new EmptyPayload(), new RequestParams(PARAMS, null))).isEqualTo(new Answer(200, "abc"));
         verify(dataAccess, times(1)).getReport(PARAMS.get(":id"));
     }
 }

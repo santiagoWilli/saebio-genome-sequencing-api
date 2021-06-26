@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import payloads.EmptyPayload;
 import utils.Answer;
+import utils.RequestParams;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -31,7 +32,7 @@ public class ReferencesGetOneHandler_ {
     @Test
     public void ifReferenceNotFound_returnHttpNotFound() {
         when(dataAccess.getReference(PARAMS.get(":id"))).thenReturn("");
-        assertThat(handler.process(new EmptyPayload(), PARAMS)).isEqualTo(Answer.notFound());
+        assertThat(handler.process(new EmptyPayload(), new RequestParams(PARAMS, null))).isEqualTo(Answer.notFound());
     }
 
     @Test
@@ -40,7 +41,7 @@ public class ReferencesGetOneHandler_ {
         when(dataAccess.getReference(PARAMS.get(":id"))).thenReturn("{\"_id\": {\"$oid\": \"1\"}, \"file\": {\"$oid\": \""+fileId+"\"}}");
         when(dataAccess.getFileStream(fileId)).thenReturn(new FileInputStream("test/resources/sequences/Kpneu231120_referencia.fa"));
 
-        Answer answer = handler.process(new EmptyPayload(), PARAMS);
+        Answer answer = handler.process(new EmptyPayload(), new RequestParams(PARAMS, null));
         assertThat(answer.getCode()).isEqualTo(200);
         assertThat(answer.hasFile()).isTrue();
         assertThat(answer.getFile().getMimeType()).isEqualTo("text/x-fasta");

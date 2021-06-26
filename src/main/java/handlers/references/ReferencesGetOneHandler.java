@@ -6,6 +6,7 @@ import dataaccess.DataAccess;
 import handlers.AbstractHandler;
 import payloads.EmptyPayload;
 import utils.Answer;
+import utils.RequestParams;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,8 +22,8 @@ public class ReferencesGetOneHandler extends AbstractHandler<EmptyPayload> {
     }
 
     @Override
-    protected Answer processRequest(EmptyPayload payload, Map<String, String> requestParams) {
-        String referenceJson = dataAccess.getReference(requestParams.get(":id"));
+    protected Answer processRequest(EmptyPayload payload, RequestParams requestParams) {
+        String referenceJson = dataAccess.getReference(requestParams.path().get(":id"));
         if (referenceJson.isEmpty()) return Answer.notFound();
 
         Map<String, Object> reference;

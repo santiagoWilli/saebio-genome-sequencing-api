@@ -4,6 +4,7 @@ import handlers.AbstractHandler;
 import utils.Answer;
 import org.junit.jupiter.api.Test;
 import payloads.Validable;
+import utils.RequestParams;
 
 import java.util.Map;
 
@@ -15,7 +16,7 @@ public class AbstractHandler_ {
         Validable payload = () -> false;
         AbstractHandler<Validable> handler = new AbstractHandler<>(Validable.class) {
             @Override
-            protected Answer processRequest(Validable payload, Map<String, String> requestParams) {
+            protected Answer processRequest(Validable payload, RequestParams requestParams) {
                 return null;
             }
         };

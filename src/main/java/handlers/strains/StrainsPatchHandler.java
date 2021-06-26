@@ -5,8 +5,7 @@ import dataaccess.exceptions.UniquenessViolationException;
 import handlers.AbstractHandler;
 import payloads.StrainKeys;
 import utils.Answer;
-
-import java.util.Map;
+import utils.RequestParams;
 
 public class StrainsPatchHandler extends AbstractHandler<StrainKeys> {
     private final DataAccess dataAccess;
@@ -17,9 +16,9 @@ public class StrainsPatchHandler extends AbstractHandler<StrainKeys> {
     }
 
     @Override
-    protected Answer processRequest(StrainKeys keys, Map<String, String> requestParams) {
+    protected Answer processRequest(StrainKeys keys, RequestParams requestParams) {
         try {
-            return dataAccess.updateStrainKeys(requestParams.get(":id"), keys) ?
+            return dataAccess.updateStrainKeys(requestParams.path().get(":id"), keys) ?
                     new Answer(200, "Strain keys updated") :
                     Answer.notFound();
         } catch (UniquenessViolationException e) {

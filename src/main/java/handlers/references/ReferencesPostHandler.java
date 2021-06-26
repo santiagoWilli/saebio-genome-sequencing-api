@@ -5,9 +5,9 @@ import handlers.AbstractHandler;
 import payloads.Reference;
 import utils.Answer;
 import utils.Json;
+import utils.RequestParams;
 
 import java.io.IOException;
-import java.util.Map;
 
 public class ReferencesPostHandler extends AbstractHandler<Reference> {
     private final DataAccess dataAccess;
@@ -18,7 +18,7 @@ public class ReferencesPostHandler extends AbstractHandler<Reference> {
     }
 
     @Override
-    protected Answer processRequest(Reference reference, Map<String, String> requestParams) {
+    protected Answer processRequest(Reference reference, RequestParams requestParams) {
         if (!dataAccess.strainExists(reference.getStrainKey())) {
             return Answer.badRequest(reference.getStrainKey() + " strain does not exist");
         }

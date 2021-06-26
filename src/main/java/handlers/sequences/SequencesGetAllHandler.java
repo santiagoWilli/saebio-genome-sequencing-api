@@ -4,8 +4,7 @@ import dataaccess.DataAccess;
 import handlers.AbstractHandler;
 import payloads.EmptyPayload;
 import utils.Answer;
-
-import java.util.Map;
+import utils.RequestParams;
 
 public class SequencesGetAllHandler extends AbstractHandler<EmptyPayload> {
     private final DataAccess dataAccess;
@@ -16,7 +15,7 @@ public class SequencesGetAllHandler extends AbstractHandler<EmptyPayload> {
     }
 
     @Override
-    protected Answer processRequest(EmptyPayload payload, Map<String, String> requestParams) {
+    protected Answer processRequest(EmptyPayload payload, RequestParams requestParams) {
         return new Answer(200, dataAccess.getAllSequences());
     }
 }

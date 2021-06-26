@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import payloads.EmptyPayload;
 import utils.Answer;
+import utils.RequestParams;
 
 import java.util.AbstractMap;
 import java.util.Map;
@@ -31,18 +32,18 @@ public class StrainsDeleteHandler_ {
     @Test
     public void ifDataAccessReturnsFalse_returnHttpNotFound() throws DocumentPointsToStrainException {
         when(dataAccess.deleteStrain(PARAMS.get(":id"))).thenReturn(false);
-        assertThat(handler.process(new EmptyPayload(), PARAMS)).isEqualTo(Answer.notFound());
+        assertThat(handler.process(new EmptyPayload(), new RequestParams(PARAMS, null))).isEqualTo(Answer.notFound());
     }
 
     @Test
     public void ifDataAccessReturnsTrue_returnHttpOk() throws DocumentPointsToStrainException {
         when(dataAccess.deleteStrain(PARAMS.get(":id"))).thenReturn(true);
-        assertThat(handler.process(new EmptyPayload(), PARAMS).getCode()).isEqualTo(200);
+        assertThat(handler.process(new EmptyPayload(), new RequestParams(PARAMS, null)).getCode()).isEqualTo(200);
     }
 
     @Test
     public void ifDataAccessThrowsException_returnHttpConflict() throws DocumentPointsToStrainException {
         when(dataAccess.deleteStrain(PARAMS.get(":id"))).thenThrow(DocumentPointsToStrainException.class);
-        assertThat(handler.process(new EmptyPayload(), PARAMS).getCode()).isEqualTo(409);
+        assertThat(handler.process(new EmptyPayload(), new RequestParams(PARAMS, null)).getCode()).isEqualTo(409);
     }
 }

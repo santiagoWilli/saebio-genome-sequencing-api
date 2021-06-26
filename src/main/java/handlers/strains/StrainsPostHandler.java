@@ -6,8 +6,7 @@ import handlers.AbstractHandler;
 import payloads.Strain;
 import utils.Answer;
 import utils.Json;
-
-import java.util.Map;
+import utils.RequestParams;
 
 public class StrainsPostHandler extends AbstractHandler<Strain> {
     private final DataAccess dataAccess;
@@ -18,7 +17,7 @@ public class StrainsPostHandler extends AbstractHandler<Strain> {
     }
 
     @Override
-    protected Answer processRequest(Strain strain, Map<String, String> requestParams) {
+    protected Answer processRequest(Strain strain, RequestParams requestParams) {
         try {
             return new Answer(200, Json.id(dataAccess.createStrain(strain)));
         } catch (UniquenessViolationException e) {

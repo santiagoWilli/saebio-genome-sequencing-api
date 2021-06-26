@@ -7,9 +7,9 @@ import handlers.AbstractHandler;
 import payloads.ReportRequest;
 import utils.Answer;
 import utils.Json;
+import utils.RequestParams;
 
 import java.io.IOException;
-import java.util.Map;
 
 public class ReportsPostHandler extends AbstractHandler<ReportRequest> {
     private final GenomeTool genomeTool;
@@ -22,7 +22,7 @@ public class ReportsPostHandler extends AbstractHandler<ReportRequest> {
     }
 
     @Override
-    protected Answer processRequest(ReportRequest reportRequest, Map<String, String> requestParams) {
+    protected Answer processRequest(ReportRequest reportRequest, RequestParams requestParams) {
         try {
             if (!dataAccess.referenceAndSequencesShareTheSameStrain(reportRequest.getReference(), reportRequest.getSequences()))
                 return new Answer(409, "Reference and sequences must share the same strain");

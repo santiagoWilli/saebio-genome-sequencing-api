@@ -4,8 +4,7 @@ import dataaccess.DataAccess;
 import handlers.AbstractHandler;
 import payloads.ReportRequestResult;
 import utils.Answer;
-
-import java.util.Map;
+import utils.RequestParams;
 
 public class ReportsResultPostHandler extends AbstractHandler<ReportRequestResult> {
     private final DataAccess dataAccess;
@@ -16,7 +15,7 @@ public class ReportsResultPostHandler extends AbstractHandler<ReportRequestResul
     }
 
     @Override
-    protected Answer processRequest(ReportRequestResult result, Map<String, String> requestParams) {
+    protected Answer processRequest(ReportRequestResult result, RequestParams requestParams) {
         if (result.getStatusCode() == 5) {
             if (dataAccess.setReportFileToFalse(result)) {
                 return Answer.withMessage(200, "Report file updated to false");

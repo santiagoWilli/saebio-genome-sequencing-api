@@ -5,8 +5,7 @@ import dataaccess.exceptions.DocumentPointsToStrainException;
 import handlers.AbstractHandler;
 import payloads.EmptyPayload;
 import utils.Answer;
-
-import java.util.Map;
+import utils.RequestParams;
 
 public class StrainsDeleteHandler extends AbstractHandler<EmptyPayload> {
     private final DataAccess dataAccess;
@@ -17,9 +16,9 @@ public class StrainsDeleteHandler extends AbstractHandler<EmptyPayload> {
     }
 
     @Override
-    protected Answer processRequest(EmptyPayload payload, Map<String, String> requestParams) {
+    protected Answer processRequest(EmptyPayload payload, RequestParams requestParams) {
         try {
-            return dataAccess.deleteStrain(requestParams.get(":id")) ?
+            return dataAccess.deleteStrain(requestParams.path().get(":id")) ?
                     new Answer(200, "Strain deleted") :
                     Answer.notFound();
         } catch (DocumentPointsToStrainException e) {

@@ -7,8 +7,7 @@ import handlers.AbstractHandler;
 import payloads.Sequence;
 import utils.Answer;
 import utils.Json;
-
-import java.util.Map;
+import utils.RequestParams;
 
 public class SequencesPostHandler extends AbstractHandler<Sequence> {
     private final GenomeTool genomeTool;
@@ -21,7 +20,7 @@ public class SequencesPostHandler extends AbstractHandler<Sequence> {
     }
 
     @Override
-    protected Answer processRequest(Sequence sequence, Map<String, String> requestParams) {
+    protected Answer processRequest(Sequence sequence, RequestParams requestParams) {
         if (!dataAccess.strainExists(sequence.getStrainKey())) {
             return Answer.badRequest(sequence.getStrainKey() + " strain does not exist");
         }

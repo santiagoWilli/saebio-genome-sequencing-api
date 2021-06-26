@@ -6,6 +6,7 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 import utils.Answer;
+import utils.RequestParams;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.HttpServletResponse;
@@ -23,7 +24,7 @@ public abstract class AbstractHandler<V extends Validable> implements RequestHan
     }
 
     @Override
-    public final Answer process(V payload, Map<String, String> requestParams) {
+    public final Answer process(V payload, RequestParams requestParams) {
         if (payload != null && !payload.isValid()) {
             return Answer.badRequest("Cuerpo de la petición no válido");
         } else {
@@ -31,7 +32,7 @@ public abstract class AbstractHandler<V extends Validable> implements RequestHan
         }
     }
 
-    protected abstract Answer processRequest(V payload, Map<String, String> requestParams);
+    protected abstract Answer processRequest(V payload, RequestParams requestParams);
 
     @Override
     public Object handle(Request request, Response response) throws IOException {
@@ -63,7 +64,7 @@ public abstract class AbstractHandler<V extends Validable> implements RequestHan
                 payload = payloadClass.getConstructor(Map.class).newInstance(request.queryMap().toMap());
             }
 
-            Answer answer = process(payload, request.params());
+            Answer answer = process(payload, new RequestParams(request.params(), request.queryMap().toMap()));
             deleteTempFiles(uuid);
 
             response.status(answer.getCode());

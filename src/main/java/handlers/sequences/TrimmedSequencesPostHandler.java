@@ -4,8 +4,7 @@ import dataaccess.DataAccess;
 import handlers.AbstractHandler;
 import payloads.TrimRequestResult;
 import utils.Answer;
-
-import java.util.Map;
+import utils.RequestParams;
 
 public class TrimmedSequencesPostHandler extends AbstractHandler<TrimRequestResult> {
     private final DataAccess dataAccess;
@@ -16,7 +15,7 @@ public class TrimmedSequencesPostHandler extends AbstractHandler<TrimRequestResu
     }
 
     @Override
-    protected Answer processRequest(TrimRequestResult result, Map<String, String> requestParams) {
+    protected Answer processRequest(TrimRequestResult result, RequestParams requestParams) {
         if (result.getStatusCode() == 5) {
             if (dataAccess.setSequenceTrimToFalse(result.getToken())) {
                 return new Answer(200, "Sequence trimmed files field updated to false");

@@ -6,6 +6,7 @@ import payloads.UserAuthentication;
 import utils.Answer;
 import utils.JWT;
 import utils.Json;
+import utils.RequestParams;
 
 import java.util.AbstractMap;
 import java.util.Map;
@@ -19,7 +20,7 @@ public class LoginHandler extends AbstractHandler<UserAuthentication> {
     }
 
     @Override
-    protected Answer processRequest(UserAuthentication authentication, Map<String, String> requestParams) {
+    protected Answer processRequest(UserAuthentication authentication, RequestParams requestParams) {
         try {
             return dataAccess.login(authentication) ?
                     new Answer(200, Json.custom(Map.ofEntries(

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import payloads.EmptyPayload;
 import utils.Answer;
+import utils.RequestParams;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -32,7 +33,7 @@ public class ReportsGetFileHandler_ {
     @Test
     public void ifReportNotFound_returnHttpNotFound() {
         when(dataAccess.getReport(PARAMS.get(":id"))).thenReturn("");
-        assertThat(handler.process(new EmptyPayload(), PARAMS)).isEqualTo(Answer.notFound());
+        assertThat(handler.process(new EmptyPayload(), new RequestParams(PARAMS, null))).isEqualTo(Answer.notFound());
         verify(dataAccess, times(1)).getReport(PARAMS.get(":id"));
     }
 
@@ -43,7 +44,7 @@ public class ReportsGetFileHandler_ {
         when(dataAccess.getReportFileId(PARAMS.get(":id"))).thenReturn(fileId);
         when(dataAccess.getFileStream(fileId)).thenReturn(new FileInputStream("test/resources/sequences/informe.html"));
 
-        Answer answer = handler.process(new EmptyPayload(), PARAMS);
+        Answer answer = handler.process(new EmptyPayload(), new RequestParams(PARAMS, null));
 
         verify(dataAccess, times(1)).getReport(PARAMS.get(":id"));
         verify(dataAccess, times(1)).getReportFileId(PARAMS.get(":id"));
@@ -59,7 +60,7 @@ public class ReportsGetFileHandler_ {
         when(dataAccess.getReport(PARAMS.get(":id"))).thenReturn("json}");
         when(dataAccess.getReportFileId(PARAMS.get(":id"))).thenReturn(null);
 
-        assertThat(handler.process(new EmptyPayload(), PARAMS).getCode()).isEqualTo(404);
+        assertThat(handler.process(new EmptyPayload(), new RequestParams(PARAMS, null)).getCode()).isEqualTo(404);
 
         verify(dataAccess, times(1)).getReport(PARAMS.get(":id"));
         verify(dataAccess, times(1)).getReportFileId(PARAMS.get(":id"));

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import payloads.EmptyPayload;
 import utils.Answer;
+import utils.RequestParams;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -32,7 +33,7 @@ public class SequencesGetTrimmedPairHandler_ {
     @Test
     public void ifSequenceNotFound_returnHttpNotFound() {
         when(dataAccess.getSequence(PARAMS.get(":id"))).thenReturn("");
-        assertThat(handler.process(new EmptyPayload(), PARAMS)).isEqualTo(Answer.notFound());
+        assertThat(handler.process(new EmptyPayload(), new RequestParams(PARAMS, null))).isEqualTo(Answer.notFound());
     }
 
     @Test
@@ -45,7 +46,7 @@ public class SequencesGetTrimmedPairHandler_ {
         when(dataAccess.getFileStream(trimmedId1)).thenReturn(new FileInputStream("test/resources/sequences/Kp1_231120_R1.fastq.gz"));
         when(dataAccess.getFileStream(trimmedId2)).thenReturn(new FileInputStream("test/resources/sequences/Kp1_231120_R1.fastq.gz"));
 
-        Answer answer = handler.process(new EmptyPayload(), PARAMS);
+        Answer answer = handler.process(new EmptyPayload(), new RequestParams(PARAMS, null));
         assertThat(answer.getCode()).isEqualTo(200);
         assertThat(answer.hasFile()).isTrue();
         assertThat(answer.getFile().getMimeType()).isEqualTo("application/zip");
@@ -55,7 +56,7 @@ public class SequencesGetTrimmedPairHandler_ {
     public void ifSequenceFound_and_doesNotHaveItsTrimmedPairYet_returnHttp210_and_notice() {
         when(dataAccess.getSequence(PARAMS.get(":id"))).thenReturn("{\"_id\": {\"$oid\": \"1\"}}");
 
-        Answer answer = handler.process(new EmptyPayload(), PARAMS);
+        Answer answer = handler.process(new EmptyPayload(), new RequestParams(PARAMS, null));
         assertThat(answer.getCode()).isEqualTo(210);
         assertThat(answer.hasFile()).isFalse();
         assertThat(answer.getBody()).contains("The sequence does not have its trimmed pair yet");
@@ -65,7 +66,7 @@ public class SequencesGetTrimmedPairHandler_ {
     public void ifSequenceFound_and_trimmedPairIsSetToFalse_returnHttp211_and_notice() {
         when(dataAccess.getSequence(PARAMS.get(":id"))).thenReturn("{\"_id\": {\"$oid\": \"1\"}, \"trimmedPair\": false}");
 
-        Answer answer = handler.process(new EmptyPayload(), PARAMS);
+        Answer answer = handler.process(new EmptyPayload(), new RequestParams(PARAMS, null));
         assertThat(answer.getCode()).isEqualTo(211);
         assertThat(answer.hasFile()).isFalse();
         assertThat(answer.getBody()).contains("The sequence does not have a trimmed pair due to an internal error");
