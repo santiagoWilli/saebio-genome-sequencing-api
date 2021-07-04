@@ -16,7 +16,8 @@ public class JWT {
     public static String generate() throws JWTCreationException {
         Algorithm algorithm = Algorithm.HMAC256(SECRET);
         return com.auth0.jwt.JWT.create()
-                .withIssuedAt(new Date())
+                .withIssuedAt(new Date(System.currentTimeMillis()))
+                .withExpiresAt(new Date(System.currentTimeMillis() + LEEWAY * 1000))
                 .sign(algorithm);
     }
 
@@ -24,7 +25,10 @@ public class JWT {
         try {
             Algorithm algorithm = Algorithm.HMAC256(SECRET);
             JWTVerifier verifier = com.auth0.jwt.JWT.require(algorithm)
-                    .acceptLeeway(LEEWAY) // 2 hours
+                    .withClaimPresence("iat")
+                    .withClaimPresence("exp")
+                    .acceptLeeway(60)
+                    .acceptExpiresAt(LEEWAY)
                     .build();
             verifier.verify(token);
             return true;
