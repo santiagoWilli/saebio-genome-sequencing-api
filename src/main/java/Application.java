@@ -41,10 +41,9 @@ public class Application {
         Database.setDatabaseName(options.database);
         Database.setHost(options.dbHost);
 
-        enableCORS();
+        handleAuthAndCORS();
 
         path("/api", () -> {
-            handleAuthorization();
 
             get("/alive", (request, response) -> "I am alive!");
 
@@ -84,31 +83,31 @@ public class Application {
         exception(Exception.class, (exception, request, response) -> System.out.println(" -ERROR: " + exception.getMessage()));
     }
 
-    private static void enableCORS() {
-        options("/*",
-                (request, response) -> {
-                    String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");
-                    if (accessControlRequestHeaders != null) {
-                        response.header("Access-Control-Allow-Headers", accessControlRequestHeaders);
-                    }
+    private static void handleAuthAndCORS() {
+        options("/*", (request, response) -> {
+            String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");
+            if (accessControlRequestHeaders != null) {
+                response.header("Access-Control-Allow-Headers", accessControlRequestHeaders);
+            }
 
-                    String accessControlRequestMethod = request.headers("Access-Control-Request-Method");
-                    if (accessControlRequestMethod != null) {
-                        response.header("Access-Control-Allow-Methods", accessControlRequestMethod);
-                    }
+            String accessControlRequestMethod = request.headers("Access-Control-Request-Method");
+            if (accessControlRequestMethod != null) {
+                response.header("Access-Control-Allow-Methods", accessControlRequestMethod);
+            }
 
-                    return "OK";
-                });
+            return "OK";
+        });
 
-        before("/*", (request, response) -> {
+        before((request, response) -> {
             response.header("Access-Control-Allow-Origin", "*");
             response.header("Access-Control-Request-Method", "GET,PATCH,POST,DELETE,OPTIONS");
             response.header("Access-Control-Allow-Headers", "Content-Type,Authorization,X-Requested-With,Content-Length,Accept,Origin");
-        });
-    }
 
-    private static void handleAuthorization() {
-        before("/*", (request, response) -> {
+            if (request.requestMethod().equals("OPTIONS")) {
+                response.status(200);
+                return;
+            }
+
             if (request.uri().endsWith("/login") ||
                 request.uri().endsWith("/alive") ||
                 request.ip().equals(genomeToolUrlIp())) return;
