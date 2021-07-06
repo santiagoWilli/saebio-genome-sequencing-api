@@ -6,6 +6,7 @@ import com.mongodb.client.gridfs.GridFSBuckets;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import com.mongodb.client.model.IndexOptions;
 import dataaccess.exceptions.*;
+import org.apache.commons.io.FileUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -19,6 +20,8 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Filters.and;
@@ -317,18 +320,17 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
-    public UploadCode uploadReportFiles(ReportRequestResult reportResult) {
+    public UploadCode uploadReportFiles(ReportRequestResult reportResult) throws IOException {
         MongoCollection<Document> reportsCollection = database.getCollection("reports");
         if (reportsCollection.countDocuments(eq("genomeToolToken", reportResult.getToken())) < 1) {
             return UploadCode.NOT_FOUND;
         }
 
         GridFSBucket gridFSBucket = GridFSBuckets.create(database);
-        ObjectId reportFileId, referenceFileId;
+        ObjectId referenceFileId;
 
-        try (InputStream reportStream = new FileInputStream(reportResult.getReport().getValue());
-             InputStream referenceStream = new FileInputStream(reportResult.getReference().getValue())) {
-            reportFileId = gridFSBucket.uploadFromStream(reportResult.getReport().getKey(), reportStream);
+        // upload the reference
+        try (InputStream referenceStream = new FileInputStream(reportResult.getReference().getValue())) {
             referenceFileId = gridFSBucket.uploadFromStream(reportResult.getReference().getKey(), referenceStream);
         } catch (IOException e) {
             e.getStackTrace();
@@ -343,10 +345,41 @@ public class MongoDataAccess implements DataAccess {
                 .append("file", referenceFileId);
         collection.insertOne(reference);
 
+        Document filesDoc = new Document()
+                .append("reference", reference.getObjectId("_id"));
+
+        // unzip the report files and save them to the DB
+        String uuid = UUID.randomUUID().toString();
+        File unzipDir = new File("temp/" + uuid); // folder where files will be unzipped
+        List<String> toBeAvoided = Arrays.asList("nullarbor.css", "report.pdf"); // nullarbor-api zips the report folder
+        byte[] buffer = new byte[1024];
+        ZipInputStream zis = new ZipInputStream(new FileInputStream(reportResult.getReportFiles().getValue()));
+        ZipEntry zipEntry = zis.getNextEntry();
+        while (zipEntry != null) {
+            File unzippedFile = new File(unzipDir, zipEntry.getName());
+            if (zipEntry.isDirectory()) {
+                if (!unzippedFile.isDirectory() && !unzippedFile.mkdirs()) {
+                    throw new IOException("Failed to create directory " + unzippedFile);
+                }
+            }
+            else if (!toBeAvoided.contains(getName(zipEntry))) {
+                FileOutputStream fos = new FileOutputStream(unzippedFile);
+                int len;
+                while ((len = zis.read(buffer)) > 0) fos.write(buffer, 0, len);
+                fos.close();
+
+                InputStream inputStream = new FileInputStream(unzippedFile);
+                ObjectId fileId = gridFSBucket.uploadFromStream(getName(zipEntry), inputStream);
+                filesDoc.append(getName(zipEntry).equals("index.html") ? "report" : getName(zipEntry), fileId);
+            }
+            zipEntry = zis.getNextEntry();
+        }
+        zis.closeEntry();
+        zis.close();
+        FileUtils.deleteDirectory(new File("temp/" + uuid));
+
         reportsCollection.updateOne(eq("genomeToolToken", reportResult.getToken()),
-                set("files", new Document()
-                        .append("report", reportFileId)
-                        .append("reference", reference.getObjectId("_id"))));
+                set("files", filesDoc));
         return UploadCode.OK;
     }
 
@@ -384,7 +417,7 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
-    public String getReportFileId(String id) {
+    public String getReportHTMLFileId(String id) {
         MongoCollection<Document> collection = database.getCollection("reports");
         final Document document = collection.find(eq("_id", new ObjectId(id))).first();
         final Document filesDoc = document != null ? document.get("files", Document.class) : null;
@@ -449,5 +482,16 @@ public class MongoDataAccess implements DataAccess {
     private static String formatDate(LocalDateTime date, String pattern) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
         return date.format(formatter);
+    }
+
+    /**
+     * nullarbor-api sends the report folder as a zip, so every file within it
+     * will have a name like "report/file.extension"
+     *
+     * @param zipEntry the ZipEntry of the result zip
+     * @return the name of zipEntry without "report/"
+     */
+    private static String getName(ZipEntry zipEntry) {
+        return zipEntry.getName().split("/")[1];
     }
 }

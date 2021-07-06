@@ -216,6 +216,16 @@ public class MongoDB implements Database {
     }
 
     @Override
+    public InputStream getFileStream(String id) throws IOException {
+        GridFSBucket gridFSBucket = GridFSBuckets.create(database);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(1024 * 8);
+        gridFSBucket.downloadToStream(new ObjectId(id), outputStream);
+        InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+        outputStream.close();
+        return inputStream;
+    }
+
+    @Override
     public void createUser() throws InvalidKeySpecException, NoSuchAlgorithmException {
         MongoCollection<Document> collection = database.getCollection("users");
         EncryptedPassword password = new EncryptedPassword("password");

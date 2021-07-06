@@ -41,13 +41,13 @@ public class ReportsGetFileHandler_ {
     public void ifReportFound_and_fileExists_returnHttpOk_and_file() throws IOException {
         String fileId = "6075d6a71a62381d13c70a6f";
         when(dataAccess.getReport(PARAMS.get(":id"))).thenReturn("json");
-        when(dataAccess.getReportFileId(PARAMS.get(":id"))).thenReturn(fileId);
+        when(dataAccess.getReportHTMLFileId(PARAMS.get(":id"))).thenReturn(fileId);
         when(dataAccess.getFileStream(fileId)).thenReturn(new FileInputStream("test/resources/sequences/informe.html"));
 
         Answer answer = handler.process(new EmptyPayload(), new RequestParams(PARAMS, null));
 
         verify(dataAccess, times(1)).getReport(PARAMS.get(":id"));
-        verify(dataAccess, times(1)).getReportFileId(PARAMS.get(":id"));
+        verify(dataAccess, times(1)).getReportHTMLFileId(PARAMS.get(":id"));
         verify(dataAccess, times(1)).getFileStream(fileId);
 
         assertThat(answer.getCode()).isEqualTo(200);
@@ -58,12 +58,12 @@ public class ReportsGetFileHandler_ {
     @Test
     public void ifReportFound_and_fileDoesNotExists_returnHttpNotFound() {
         when(dataAccess.getReport(PARAMS.get(":id"))).thenReturn("json}");
-        when(dataAccess.getReportFileId(PARAMS.get(":id"))).thenReturn(null);
+        when(dataAccess.getReportHTMLFileId(PARAMS.get(":id"))).thenReturn(null);
 
         assertThat(handler.process(new EmptyPayload(), new RequestParams(PARAMS, null)).getCode()).isEqualTo(404);
 
         verify(dataAccess, times(1)).getReport(PARAMS.get(":id"));
-        verify(dataAccess, times(1)).getReportFileId(PARAMS.get(":id"));
+        verify(dataAccess, times(1)).getReportHTMLFileId(PARAMS.get(":id"));
         verifyNoMoreInteractions(dataAccess);
     }
 }

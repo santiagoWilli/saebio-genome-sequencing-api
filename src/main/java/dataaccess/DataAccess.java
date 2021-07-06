@@ -39,11 +39,11 @@ public interface DataAccess {
     List<String> getSequenceTrimmedFilesIds(String sequenceId);
     String getReferenceFileId(String referenceId);
 
-    UploadCode uploadReportFiles(ReportRequestResult reportResult);
+    UploadCode uploadReportFiles(ReportRequestResult reportResult) throws IOException;
     boolean setReportFileToFalse(ReportRequestResult reportResult);
     String getAllReports();
     String getReport(String id);
-    String getReportFileId(String id);
+    String getReportHTMLFileId(String id);
     String getReportLogId(String id);
 
     boolean login(UserAuthentication authentication) throws UserNotFoundException;

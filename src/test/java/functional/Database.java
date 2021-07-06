@@ -1,8 +1,6 @@
 package functional;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Collection;
@@ -37,6 +35,8 @@ public interface Database {
     String insertFakeReport(String token, String strainId);
     String insertFakeReportWithFile(File file) throws FileNotFoundException;
     String insertFakeReportWithLog(File file) throws FileNotFoundException;
+
+    InputStream getFileStream(String id) throws IOException;
 
     void createUser() throws InvalidKeySpecException, NoSuchAlgorithmException;
 }

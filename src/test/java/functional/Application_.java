@@ -802,8 +802,6 @@ public class Application_ {
                         extract().
                         asString();
 
-        System.out.println(response);
-
         verify(exactly(1), postRequestedFor(urlEqualTo("/analysis")));
         verify(exactly(9), patchRequestedFor(urlEqualTo("/analysis/" + token)));
         verify(exactly(1), postRequestedFor(urlEqualTo("/analysis/" + token)));
@@ -845,7 +843,7 @@ public class Application_ {
                 spec(requestSpec).
                 multiPart("status", 2).
                 multiPart("token", token).
-                multiPart("file1", new File(testFolderPath + "informe.html")).
+                multiPart("file1", new File(testFolderPath + "files.zip")).
                 multiPart("file2", new File(testFolderPath + "file.fa")).
         when().
                 post("/api/reports/result").
@@ -860,6 +858,18 @@ public class Application_ {
         Map<String, Object> files = (Map<String, Object>) report.get("files");
         assertThat(files.get("report")).isOfAnyClassIn(LinkedHashMap.class);
         assertThat(files.get("reference")).isOfAnyClassIn(LinkedHashMap.class);
+
+        List<String> filesInZip = Arrays.asList("core.newick", "assembly.csv", "core.csv", "databases.csv",
+                "identification.csv", "jobinfo.csv", "mlst.csv", "pan.csv", "reference.csv", "resistome.csv",
+                "seqdata.csv", "snpdist.csv", "tools.csv", "virulome.csv");
+
+        assertThat(files.size()).isEqualTo(filesInZip.size() + 2); // + 1 reference + 1 HTML report
+
+        for (String fileName : filesInZip) {
+            LinkedHashMap<String, String> fileBson = (LinkedHashMap<String, String>) files.get(fileName);
+            File file = new File(testFolderPath + "report/" + fileName);
+            assertThat(IOUtils.contentEquals(db.getFileStream(fileBson.get("$oid")), new FileInputStream(file))).isTrue();
+        }
 
         String referenceId = ((LinkedHashMap<String, String>) files.get("reference")).get("$oid");
         Map<String, Object> reference = db.get("references", referenceId);

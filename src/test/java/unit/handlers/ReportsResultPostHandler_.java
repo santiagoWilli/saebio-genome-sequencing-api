@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import payloads.ReportRequestResult;
 import utils.Answer;
 
+import java.io.IOException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -26,7 +28,7 @@ public class ReportsResultPostHandler_ {
     }
 
     @Test
-    public void if_successfulStatusCode_and_reportDoesNotExists_return_httpNotFound() {
+    public void if_successfulStatusCode_and_reportDoesNotExists_return_httpNotFound() throws IOException {
         when(reportResult.getStatusCode()).thenReturn(2);
         when(dataAccess.uploadReportFiles(reportResult)).thenReturn(UploadCode.NOT_FOUND);
         assertThat(handler.process(reportResult, null)).isEqualTo(Answer.notFound());
@@ -35,7 +37,7 @@ public class ReportsResultPostHandler_ {
     }
 
     @Test
-    public void if_successfulStatusCode_and_reportFileIsSuccessfullyUploaded_return_httpOk() {
+    public void if_successfulStatusCode_and_reportFileIsSuccessfullyUploaded_return_httpOk() throws IOException {
         when(reportResult.getStatusCode()).thenReturn(2);
         when(dataAccess.uploadReportFiles(reportResult)).thenReturn(UploadCode.OK);
         assertThat(handler.process(reportResult, null).getCode()).isEqualTo(200);
@@ -43,7 +45,7 @@ public class ReportsResultPostHandler_ {
     }
 
     @Test
-    public void if_successfulStatusCode_and_writeExceptionWhenUploadingTheReportFile_return_httpServerError() {
+    public void if_successfulStatusCode_and_writeExceptionWhenUploadingTheReportFile_return_httpServerError() throws IOException {
         when(reportResult.getStatusCode()).thenReturn(2);
         when(dataAccess.uploadReportFiles(reportResult)).thenReturn(UploadCode.WRITE_FAILED);
         assertThat(handler.process(reportResult, null).getCode()).isEqualTo(500);

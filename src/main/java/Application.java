@@ -19,9 +19,10 @@ import java.net.URL;
 
 public class Application {
     private static JCommander jCommander;
+    private static Arguments options;
 
     public static void main(String[] args) {
-        Arguments options = new Arguments();
+        options = new Arguments();
         jCommander = JCommander.newBuilder()
                 .addObject(options)
                 .build();
@@ -108,7 +109,9 @@ public class Application {
 
     private static void handleAuthorization() {
         before("/*", (request, response) -> {
-            if (request.uri().endsWith("/login") || request.uri().endsWith("/alive")) return;
+            if (request.uri().endsWith("/login") ||
+                request.uri().endsWith("/alive") ||
+                request.ip().equals(genomeToolUrlIp())) return;
             String jwt = request.headers("Authorization");
             if (jwt == null || jwt.isEmpty()) halt(401, "Authorization required");
             jwt = jwt.replace("Bearer ", "");
@@ -126,5 +129,9 @@ public class Application {
         System.out.println(message + "\n" + " --help para obtener ayuda.");
         stop();
         System.exit(1);
+    }
+
+    private static String genomeToolUrlIp() {
+        return options.genomeToolUrl.split("//")[1].split(":")[0];
     }
 }

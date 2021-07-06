@@ -1,7 +1,6 @@
 package payloads;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.Map;
 
 public class ReportRequestResult extends RequestResult implements Validable {
@@ -17,14 +16,14 @@ public class ReportRequestResult extends RequestResult implements Validable {
             String[] filenames = new String[2];
             int i = 0;
             for (String filename : files.keySet()) filenames[i++] = filename;
-            return filenames[0].endsWith(".html") && filenames[1].endsWith(".fa") ||
-                    filenames[1].endsWith(".html") && filenames[0].endsWith(".fa");
+            return filenames[0].endsWith(".zip") && filenames[1].endsWith(".fa") ||
+                    filenames[1].endsWith(".zip") && filenames[0].endsWith(".fa");
         }
         return true;
     }
 
-    public Map.Entry<String, File> getReport() {
-        return getMapEntryWithExtension(".html");
+    public Map.Entry<String, File> getReportFiles() {
+        return getMapEntryWithExtension(".zip");
     }
 
     public Map.Entry<String, File> getReference() {
@@ -36,9 +35,7 @@ public class ReportRequestResult extends RequestResult implements Validable {
     }
 
     private Map.Entry<String, File> getMapEntryWithExtension(String extension) {
-        System.out.println(files.entrySet());
         for (Map.Entry<String, File> file : files.entrySet()) {
-            System.out.println(file.getKey());
             if (file.getKey().endsWith(extension)) return file;
         }
         return null;

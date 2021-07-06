@@ -46,15 +46,15 @@ public class ReportRequestResult_ {
         fields.put("status", "2");
         fields.put("token", token());
         assertThat(result.isValid()).isEqualTo(false);
-        files.put("index.html", mock(File.class));
+        files.put("index.zip", mock(File.class));
         assertThat(result.isValid()).isEqualTo(false);
     }
 
     @Test
-    public void valid_if_successStatus_and_hasHtmlFile_and_referenceFile() {
+    public void valid_if_successStatus_and_hasZipFile_and_referenceFile() {
         fields.put("status", "2");
         fields.put("token", token());
-        files.put("index.html", mock(File.class));
+        files.put("index.zip", mock(File.class));
         files.put("ref.fa", mock(File.class));
         assertThat(result.isValid()).isEqualTo(true);
     }
@@ -63,7 +63,7 @@ public class ReportRequestResult_ {
     public void invalid_if_successStatus_and_twoFilesButNotTheRequiredOnes() {
         fields.put("status", "2");
         fields.put("token", token());
-        files.put("index.html", mock(File.class));
+        files.put("index.zip", mock(File.class));
         files.put("sequence.fastq", mock(File.class));
         assertThat(result.isValid()).isEqualTo(false);
 
@@ -74,16 +74,16 @@ public class ReportRequestResult_ {
     }
 
     @Test
-    public void getReport_shouldReturn_htmlFile() {
-        files.put("index.html", mock(File.class));
+    public void getReport_shouldReturn_zipFile() {
+        files.put("index.zip", mock(File.class));
         files.put("ref.fa", mock(File.class));
         files.put("log.log", mock(File.class));
-        assertThat(result.getReport().getKey()).endsWith(".html");
+        assertThat(result.getReportFiles().getKey()).endsWith(".zip");
     }
 
     @Test
     public void getReference_shouldReturn_fastaFile() {
-        files.put("index.html", mock(File.class));
+        files.put("index.zip", mock(File.class));
         files.put("ref.fa", mock(File.class));
         files.put("log.log", mock(File.class));
         assertThat(result.getReference().getKey()).endsWith(".fa");
@@ -91,7 +91,7 @@ public class ReportRequestResult_ {
 
     @Test
     public void getLog_shouldReturn_logFile() {
-        files.put("index.html", mock(File.class));
+        files.put("index.zip", mock(File.class));
         files.put("ref.fa", mock(File.class));
         files.put("log.log", mock(File.class));
         assertThat(result.getLog().getKey()).endsWith(".log");

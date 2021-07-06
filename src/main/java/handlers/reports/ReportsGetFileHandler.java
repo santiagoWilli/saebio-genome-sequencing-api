@@ -20,7 +20,7 @@ public class ReportsGetFileHandler extends AbstractHandler<EmptyPayload> {
     @Override
     protected Answer processRequest(EmptyPayload payload, RequestParams requestParams) {
         if (dataAccess.getReport(requestParams.path().get(":id")).isEmpty()) return Answer.notFound();
-        final String fileId = dataAccess.getReportFileId(requestParams.path().get(":id"));
+        final String fileId = dataAccess.getReportHTMLFileId(requestParams.path().get(":id"));
         if (fileId == null) return Answer.notFound();
         try {
             InputStream fileStream = dataAccess.getFileStream(fileId);
