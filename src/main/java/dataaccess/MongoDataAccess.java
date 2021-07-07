@@ -370,7 +370,7 @@ public class MongoDataAccess implements DataAccess {
 
                 InputStream inputStream = new FileInputStream(unzippedFile);
                 ObjectId fileId = gridFSBucket.uploadFromStream(getName(zipEntry), inputStream);
-                filesDoc.append(getName(zipEntry).equals("index.html") ? "report" : getName(zipEntry), fileId);
+                filesDoc.append(getName(zipEntry).equals("index.html") ? "report" : getName(zipEntry).replace(".", ""), fileId);
             }
             zipEntry = zis.getNextEntry();
         }
@@ -418,16 +418,16 @@ public class MongoDataAccess implements DataAccess {
 
     @Override
     public String getReportHTMLFileId(String id) {
-        MongoCollection<Document> collection = database.getCollection("reports");
-        final Document document = collection.find(eq("_id", new ObjectId(id))).first();
-        final Document filesDoc = document != null ? document.get("files", Document.class) : null;
-        final ObjectId fileId = filesDoc != null ? filesDoc.getObjectId("report") : null;
-        return fileId == null ? null : fileId.toString();
+        return getReportFileId(id, "report");
     }
 
     @Override
     public String getReportFileId(String id, String filename) {
-        return null;
+        MongoCollection<Document> collection = database.getCollection("reports");
+        final Document document = collection.find(eq("_id", new ObjectId(id))).first();
+        final Document filesDoc = document != null ? document.get("files", Document.class) : null;
+        final ObjectId fileId = filesDoc != null ? filesDoc.getObjectId(filename) : null;
+        return fileId == null ? null : fileId.toString();
     }
 
     @Override

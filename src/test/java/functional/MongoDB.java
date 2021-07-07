@@ -194,12 +194,12 @@ public class MongoDB implements Database {
     }
 
     @Override
-    public String insertFakeReportWithFile(File file) throws FileNotFoundException {
+    public String insertFakeReportWithFile(String field, File file) throws FileNotFoundException {
         GridFSBucket gridFSBucket = GridFSBuckets.create(database);
         ObjectId id = gridFSBucket.uploadFromStream(file.getName(), new FileInputStream(file));
 
         MongoCollection<Document> collection = database.getCollection("reports");
-        Document document = new Document("files", new Document("report", id));
+        Document document = new Document("files", new Document(field, id));
         collection.insertOne(document);
         return document.getObjectId("_id").toString();
     }

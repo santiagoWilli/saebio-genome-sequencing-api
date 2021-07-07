@@ -21,15 +21,21 @@ public class ReportsGetFileHandler extends AbstractHandler<EmptyPayload> {
         if (dataAccess.getReport(requestParams.path().get(":id")).isEmpty()) return Answer.notFound();
 
         final String filename = requestParams.path().get(":file");
-        final String fileId = filename.equals("report") ?
-                dataAccess.getReportHTMLFileId(requestParams.path().get(":id")) :
-                dataAccess.getReportFileId(requestParams.path().get(":id"), filename);
+        String fileId, mimeType;
+        if (filename.equals("report")) {
+            fileId = dataAccess.getReportHTMLFileId(requestParams.path().get(":id"));
+            mimeType = "text/html";
+        } else if (filename.equals("log")) {
+            fileId = dataAccess.getReportLogId(requestParams.path().get(":id"));
+            mimeType = "text/plain";
+        } else {
+            fileId = dataAccess.getReportFileId(requestParams.path().get(":id"), filename);
+            mimeType = filename.endsWith("csv") ? "text/csv" : "text/x-nh";
+        }
+
         if (fileId == null) return Answer.notFound();
 
         try {
-            final String mimeType = filename.equals("report") ?
-                    "text/html" :
-                    filename.endsWith("csv") ? "text/csv" : "text/x-nh";
             return Answer.withFile(dataAccess.getFileStream(fileId), mimeType);
         } catch (IOException e) {
             return Answer.serverError(e.getMessage());

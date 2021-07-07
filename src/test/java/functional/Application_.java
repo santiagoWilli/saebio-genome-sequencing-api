@@ -866,7 +866,7 @@ public class Application_ {
         assertThat(files.size()).isEqualTo(filesInZip.size() + 2); // + 1 reference + 1 HTML report
 
         for (String fileName : filesInZip) {
-            LinkedHashMap<String, String> fileBson = (LinkedHashMap<String, String>) files.get(fileName);
+            LinkedHashMap<String, String> fileBson = (LinkedHashMap<String, String>) files.get(fileName.replace(".", ""));
             File file = new File(testFolderPath + "report/" + fileName);
             assertThat(IOUtils.contentEquals(db.getFileStream(fileBson.get("$oid")), new FileInputStream(file))).isTrue();
         }
@@ -961,19 +961,40 @@ public class Application_ {
     }
 
     @Test
-    public void when_getToReportsIdFile_then_returnReportFile() throws IOException {
+    public void given_fileIsReport_when_getToReportsIdFile_then_returnReportHTMLFile() throws IOException {
         File file = new File(testFolderPath + "informe.html");
-        String id = db.insertFakeReportWithFile(file);
+        String id = db.insertFakeReportWithFile("report", file);
 
         byte[] response =
                 given().
                         spec(requestSpec).
                 when().
-                        get("/api/reports/" + id + "/file").
+                        get("/api/reports/" + id + "/report").
                 then().
                         statusCode(200).
                         contentType("text/html").
                         header("Content-Disposition", "attachment; filename=file.html").
+                        extract().asByteArray();
+
+        InputStream responseStream = new ByteArrayInputStream(response);
+        assertThat(IOUtils.contentEquals(responseStream, new FileInputStream(file))).isTrue();
+    }
+
+    @Test
+    public void given_fileIsNotReport_when_getToReportsIdFile_then_returnAskedForFile() throws IOException {
+        String filename = "resistome.csv";
+        File file = new File(testFolderPath + "report/" + filename);
+        String id = db.insertFakeReportWithFile(filename.replace(".", ""), file);
+
+        byte[] response =
+                given().
+                        spec(requestSpec).
+                when().
+                        get("/api/reports/" + id + "/" + filename.replace(".", "")).
+                then().
+                        statusCode(200).
+                        contentType("text/csv").
+                        header("Content-Disposition", "attachment; filename=file.csv").
                         extract().asByteArray();
 
         InputStream responseStream = new ByteArrayInputStream(response);
@@ -986,7 +1007,7 @@ public class Application_ {
         given().
                 spec(requestSpec).
         when().
-                get("/api/reports/" + id + "/file").
+                get("/api/reports/" + id + "/report").
         then().
                 statusCode(404);
     }
