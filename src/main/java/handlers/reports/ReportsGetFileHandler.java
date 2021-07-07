@@ -7,7 +7,6 @@ import utils.Answer;
 import utils.RequestParams;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 public class ReportsGetFileHandler extends AbstractHandler<EmptyPayload> {
     private final DataAccess dataAccess;
@@ -20,11 +19,18 @@ public class ReportsGetFileHandler extends AbstractHandler<EmptyPayload> {
     @Override
     protected Answer processRequest(EmptyPayload payload, RequestParams requestParams) {
         if (dataAccess.getReport(requestParams.path().get(":id")).isEmpty()) return Answer.notFound();
-        final String fileId = dataAccess.getReportHTMLFileId(requestParams.path().get(":id"));
+
+        final String filename = requestParams.path().get(":file");
+        final String fileId = filename.equals("report") ?
+                dataAccess.getReportHTMLFileId(requestParams.path().get(":id")) :
+                dataAccess.getReportFileId(requestParams.path().get(":id"), filename);
         if (fileId == null) return Answer.notFound();
+
         try {
-            InputStream fileStream = dataAccess.getFileStream(fileId);
-            return Answer.withFile(fileStream, "text/html");
+            final String mimeType = filename.equals("report") ?
+                    "text/html" :
+                    filename.endsWith("csv") ? "text/csv" : "text/x-nh";
+            return Answer.withFile(dataAccess.getFileStream(fileId), mimeType);
         } catch (IOException e) {
             return Answer.serverError(e.getMessage());
         }

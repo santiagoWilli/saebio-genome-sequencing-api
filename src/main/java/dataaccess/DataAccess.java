@@ -44,6 +44,7 @@ public interface DataAccess {
     String getAllReports();
     String getReport(String id);
     String getReportHTMLFileId(String id);
+    String getReportFileId(String id, String filename);
     String getReportLogId(String id);
 
     boolean login(UserAuthentication authentication) throws UserNotFoundException;

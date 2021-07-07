@@ -9,6 +9,8 @@ public class FileExtension {
             new AbstractMap.SimpleEntry<>("text/x-fasta", ".fa"),
             new AbstractMap.SimpleEntry<>("text/html", ".html"),
             new AbstractMap.SimpleEntry<>("text/plain", ".log"),
+            new AbstractMap.SimpleEntry<>("text/csv", ".csv"),
+            new AbstractMap.SimpleEntry<>("text/x-nh", ".newick"),
             new AbstractMap.SimpleEntry<>("application/octet-stream", "")
     );
 

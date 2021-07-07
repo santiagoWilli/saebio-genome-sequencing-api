@@ -426,6 +426,11 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
+    public String getReportFileId(String id, String filename) {
+        return null;
+    }
+
+    @Override
     public String getReportLogId(String id) {
         MongoCollection<Document> collection = database.getCollection("reports");
         final Document report = collection.find(eq("_id", new ObjectId(id))).first();

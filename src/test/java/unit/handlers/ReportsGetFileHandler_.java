@@ -18,9 +18,6 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 
 public class ReportsGetFileHandler_ {
-    private static final Map<String, String> PARAMS = Map.ofEntries(
-            new AbstractMap.SimpleEntry<>(":id", "1"));
-
     private ReportsGetFileHandler handler;
     private DataAccess dataAccess;
 
@@ -32,23 +29,28 @@ public class ReportsGetFileHandler_ {
 
     @Test
     public void ifReportNotFound_returnHttpNotFound() {
-        when(dataAccess.getReport(PARAMS.get(":id"))).thenReturn("");
-        assertThat(handler.process(new EmptyPayload(), new RequestParams(PARAMS, null))).isEqualTo(Answer.notFound());
-        verify(dataAccess, times(1)).getReport(PARAMS.get(":id"));
+        final Map<String, String> params = Map.ofEntries(new AbstractMap.SimpleEntry<>(":id", "1"));
+        when(dataAccess.getReport(params.get(":id"))).thenReturn("");
+        assertThat(handler.process(new EmptyPayload(), new RequestParams(params, null))).isEqualTo(Answer.notFound());
+        verify(dataAccess, times(1)).getReport(params.get(":id"));
     }
 
     @Test
-    public void ifReportFound_and_fileExists_returnHttpOk_and_file() throws IOException {
+    public void ifReportFound_and_fileReportExists_returnHttpOk_and_HTMLFile() throws IOException {
         String fileId = "6075d6a71a62381d13c70a6f";
-        when(dataAccess.getReport(PARAMS.get(":id"))).thenReturn("json");
-        when(dataAccess.getReportHTMLFileId(PARAMS.get(":id"))).thenReturn(fileId);
+        final Map<String, String> params = Map.ofEntries(
+                new AbstractMap.SimpleEntry<>(":id", "1"),
+                new AbstractMap.SimpleEntry<>(":file", "report"));
+        when(dataAccess.getReport(params.get(":id"))).thenReturn("json");
+        when(dataAccess.getReportHTMLFileId(params.get(":id"))).thenReturn(fileId);
         when(dataAccess.getFileStream(fileId)).thenReturn(new FileInputStream("test/resources/sequences/informe.html"));
 
-        Answer answer = handler.process(new EmptyPayload(), new RequestParams(PARAMS, null));
+        Answer answer = handler.process(new EmptyPayload(), new RequestParams(params, null));
 
-        verify(dataAccess, times(1)).getReport(PARAMS.get(":id"));
-        verify(dataAccess, times(1)).getReportHTMLFileId(PARAMS.get(":id"));
+        verify(dataAccess, times(1)).getReport(params.get(":id"));
+        verify(dataAccess, times(1)).getReportHTMLFileId(params.get(":id"));
         verify(dataAccess, times(1)).getFileStream(fileId);
+        verifyNoMoreInteractions(dataAccess);
 
         assertThat(answer.getCode()).isEqualTo(200);
         assertThat(answer.hasFile()).isTrue();
@@ -56,14 +58,54 @@ public class ReportsGetFileHandler_ {
     }
 
     @Test
+    public void ifReportFound_and_fileAskedForExists_returnHttpOk_and_file() throws IOException {
+        String fileId = "6075d6a71a62381d13c70a6f";
+        final Map<String, String> params = Map.ofEntries(
+                new AbstractMap.SimpleEntry<>(":id", "1"),
+                new AbstractMap.SimpleEntry<>(":file", "resistomecsv"));
+        when(dataAccess.getReport(params.get(":id"))).thenReturn("json");
+        when(dataAccess.getReportFileId(params.get(":id"), params.get(":file"))).thenReturn(fileId);
+        when(dataAccess.getFileStream(fileId)).thenReturn(new FileInputStream("test/resources/sequences/report/resistome.csv"));
+
+        Answer answer = handler.process(new EmptyPayload(), new RequestParams(params, null));
+
+        verify(dataAccess, times(1)).getReport(params.get(":id"));
+        verify(dataAccess, times(1)).getReportFileId(params.get(":id"), params.get(":file"));
+        verify(dataAccess, times(1)).getFileStream(fileId);
+        verifyNoMoreInteractions(dataAccess);
+
+        assertThat(answer.getCode()).isEqualTo(200);
+        assertThat(answer.hasFile()).isTrue();
+        assertThat(answer.getFile().getMimeType()).isEqualTo("text/csv");
+    }
+
+    @Test
+    public void ifReportFound_and_HTMLFileDoesNotExists_returnHttpNotFound() {
+        final Map<String, String> params = Map.ofEntries(
+                new AbstractMap.SimpleEntry<>(":id", "1"),
+                new AbstractMap.SimpleEntry<>(":file", "report"));
+        when(dataAccess.getReport(params.get(":id"))).thenReturn("json}");
+        when(dataAccess.getReportHTMLFileId(params.get(":id"))).thenReturn(null);
+
+        assertThat(handler.process(new EmptyPayload(), new RequestParams(params, null)).getCode()).isEqualTo(404);
+
+        verify(dataAccess, times(1)).getReport(params.get(":id"));
+        verify(dataAccess, times(1)).getReportHTMLFileId(params.get(":id"));
+        verifyNoMoreInteractions(dataAccess);
+    }
+
+    @Test
     public void ifReportFound_and_fileDoesNotExists_returnHttpNotFound() {
-        when(dataAccess.getReport(PARAMS.get(":id"))).thenReturn("json}");
-        when(dataAccess.getReportHTMLFileId(PARAMS.get(":id"))).thenReturn(null);
+        final Map<String, String> params = Map.ofEntries(
+                new AbstractMap.SimpleEntry<>(":id", "1"),
+                new AbstractMap.SimpleEntry<>(":file", "nocsv"));
+        when(dataAccess.getReport(params.get(":id"))).thenReturn("json}");
+        when(dataAccess.getReportFileId(params.get(":id"), params.get(":file"))).thenReturn(null);
 
-        assertThat(handler.process(new EmptyPayload(), new RequestParams(PARAMS, null)).getCode()).isEqualTo(404);
+        assertThat(handler.process(new EmptyPayload(), new RequestParams(params, null)).getCode()).isEqualTo(404);
 
-        verify(dataAccess, times(1)).getReport(PARAMS.get(":id"));
-        verify(dataAccess, times(1)).getReportHTMLFileId(PARAMS.get(":id"));
+        verify(dataAccess, times(1)).getReport(params.get(":id"));
+        verify(dataAccess, times(1)).getReportFileId(params.get(":id"), params.get(":file"));
         verifyNoMoreInteractions(dataAccess);
     }
 }
