@@ -194,6 +194,18 @@ public class MongoDB implements Database {
     }
 
     @Override
+    public String insertFakeReportWithFilesSetToFalse(String token, String strainId) {
+        MongoCollection<Document> collection = database.getCollection("reports");
+        Document document = new Document()
+                .append("name", "Fake report")
+                .append("strain", new ObjectId(strainId))
+                .append("genomeToolToken", token)
+                .append("files", false);
+        collection.insertOne(document);
+        return document.getObjectId("_id").toString();
+    }
+
+    @Override
     public String insertFakeReportWithFile(String field, File file) throws FileNotFoundException {
         GridFSBucket gridFSBucket = GridFSBuckets.create(database);
         ObjectId id = gridFSBucket.uploadFromStream(file.getName(), new FileInputStream(file));

@@ -33,6 +33,7 @@ public interface Database {
     boolean strainExists(String id);
 
     String insertFakeReport(String token, String strainId);
+    String insertFakeReportWithFilesSetToFalse(String token, String strainId);
     String insertFakeReportWithFile(String field, File file) throws FileNotFoundException;
     String insertFakeReportWithLog(File file) throws FileNotFoundException;
 

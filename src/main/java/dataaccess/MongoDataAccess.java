@@ -425,7 +425,8 @@ public class MongoDataAccess implements DataAccess {
     public String getReportFileId(String id, String filename) {
         MongoCollection<Document> collection = database.getCollection("reports");
         final Document document = collection.find(eq("_id", new ObjectId(id))).first();
-        final Document filesDoc = document != null ? document.get("files", Document.class) : null;
+        final Document filesDoc = (document == null || document.get("files") instanceof Boolean) ?
+                null : document.get("files", Document.class);
         final ObjectId fileId = filesDoc != null ? filesDoc.getObjectId(filename) : null;
         return fileId == null ? null : fileId.toString();
     }

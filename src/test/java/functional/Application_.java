@@ -1010,6 +1010,14 @@ public class Application_ {
                 get("/api/reports/" + id + "/report").
         then().
                 statusCode(404);
+
+        id = db.insertFakeReportWithFilesSetToFalse(token(), db.insertFakeStrain("kp"));
+        given().
+                spec(requestSpec).
+        when().
+                get("/api/reports/" + id + "/report").
+        then().
+                statusCode(404);
     }
 
     @Test
