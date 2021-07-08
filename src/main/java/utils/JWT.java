@@ -8,7 +8,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import java.util.Date;
 
 public class JWT {
-    public static final int LEEWAY = 3600 * 2; // 2 hours
+    public static final int LEEWAY = 3600 * 12; // 12 hours
     private static final String SECRET = "$mB+fCrO.-XsOIk:|?OhZHR/%./%)YVpSvyq;qD~8E$r.O-;Vuds);$JJd|jny.";
 
     private JWT() {}
