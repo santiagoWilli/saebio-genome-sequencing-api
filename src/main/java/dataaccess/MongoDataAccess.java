@@ -5,6 +5,7 @@ import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Sorts;
 import dataaccess.exceptions.*;
 import org.apache.commons.io.FileUtils;
 import org.bson.Document;
@@ -45,7 +46,7 @@ public class MongoDataAccess implements DataAccess {
                 .append("code", sequence.getIsolateCode())
                 .append("originalFilenames", sequence.getOriginalFileNames())
                 .append("genomeToolToken", genomeToolToken)
-                .append("trimRequestDate", formatDate(LocalDateTime.now(ZoneOffset.UTC), "yyyy-MM-dd HH:mm:ss.SSS"));
+                .append("uploadDate", getCurrentDate());
         collection.insertOne(document);
         return document.getObjectId("_id").toString();
     }
@@ -56,7 +57,9 @@ public class MongoDataAccess implements DataAccess {
         Document document = new Document("sequenceDate", formatDate(sequence.getDate()))
                 .append("strain", getStrain(sequence.getStrainKey()).getObjectId("_id"))
                 .append("code", sequence.getIsolateCode())
-                .append("originalFilenames", sequence.getOriginalFileNames());
+                .append("originalFilenames", sequence.getOriginalFileNames())
+                .append("uploadDate", getCurrentDate());
+
         collection.insertOne(document);
 
         GridFSBucket gridFSBucket = GridFSBuckets.create(database);
@@ -108,7 +111,7 @@ public class MongoDataAccess implements DataAccess {
 
     @Override
     public String getAllSequences() {
-        return findAllFromCollection("sequences");
+        return findAllFromCollection("sequences", "uploadDate");
     }
 
     @Override
@@ -171,6 +174,7 @@ public class MongoDataAccess implements DataAccess {
         Document document = new Document()
                 .append("strain", getStrain(reference.getStrainKey()).getObjectId("_id"))
                 .append("code", reference.getIsolateCode())
+                .append("createdAt", getCurrentDate())
                 .append("file", id);
         collection.insertOne(document);
         return document.getObjectId("_id").toString();
@@ -178,7 +182,7 @@ public class MongoDataAccess implements DataAccess {
 
     @Override
     public String getAllReferences() {
-        return findAllFromCollection("references");
+        return findAllFromCollection("references", "createdAt");
     }
 
     @Override
@@ -280,8 +284,6 @@ public class MongoDataAccess implements DataAccess {
 
     @Override
     public String createReport(ReportRequest reportRequest, String token) {
-        String date = formatDate(LocalDateTime.now(ZoneOffset.UTC), "dd/MM/yyyy HH:mm");
-
         MongoCollection<Document> collection = database.getCollection("references");
         Document strain = collection.aggregate(Arrays.asList(
                 match(eq("_id", new ObjectId(reportRequest.getReference()))),
@@ -292,12 +294,12 @@ public class MongoDataAccess implements DataAccess {
 
         collection = database.getCollection("reports");
         Document document = new Document()
-                .append("name", strain.getString("name") + " " + date)
+                .append("name", strain.getString("name") + " " + formatDate(LocalDateTime.now(ZoneOffset.UTC), "dd/MM/yyyy HH:mm"))
                 .append("strain", strain.getObjectId("_id"))
                 .append("sequences", reportRequest.getSequences().stream().map(ObjectId::new).collect(Collectors.toList()))
                 .append("reference", new ObjectId(reportRequest.getReference()))
                 .append("genomeToolToken", token)
-                .append("requestDate", date);
+                .append("requestDate", getCurrentDate());
         collection.insertOne(document);
         return document.getObjectId("_id").toString();
     }
@@ -342,6 +344,7 @@ public class MongoDataAccess implements DataAccess {
         Document reference = new Document()
                 .append("strain", report.getObjectId("strain"))
                 .append("reportName", report.getString("name"))
+                .append("createdAt", getCurrentDate())
                 .append("file", referenceFileId);
         collection.insertOne(reference);
 
@@ -405,7 +408,7 @@ public class MongoDataAccess implements DataAccess {
 
     @Override
     public String getAllReports() {
-        return findAllFromCollection("reports");
+        return findAllFromCollection("reports", "requestDate");
     }
 
     @Override
@@ -461,13 +464,19 @@ public class MongoDataAccess implements DataAccess {
     }
 
     private String findAllFromCollection(String collectionName) {
-        return findAllFromCollection(collectionName, null);
+        return findAllFromCollection(collectionName, null, null);
     }
 
-    private String findAllFromCollection(String collectionName, Bson filter) {
+    private String findAllFromCollection(String collectionName, String orderBy) {
+        return findAllFromCollection(collectionName, orderBy, null);
+    }
+
+    private String findAllFromCollection(String collectionName, String orderBy, Bson filter) {
         MongoCollection<Document> collection = database.getCollection(collectionName);
         List<String> documents = new ArrayList<>();
-        try (MongoCursor<Document> cursor = collection.find(filter == null ? new Document() : filter).iterator()) {
+        FindIterable<Document> findResult = collection.find(filter == null ? new Document() : filter);
+        if (orderBy != null) findResult = findResult.sort(Sorts.descending(orderBy));
+        try (MongoCursor<Document> cursor = findResult.iterator()) {
             while (cursor.hasNext()) {
                 documents.add(cursor.next().toJson());
             }
@@ -477,7 +486,7 @@ public class MongoDataAccess implements DataAccess {
 
     private String findAllFromCollectionWithGivenStrain(String collectionName, String strainId) {
         if (!ObjectId.isValid(strainId)) return "[]";
-        return findAllFromCollection(collectionName, eq("strain", new ObjectId(strainId)));
+        return findAllFromCollection(collectionName, null, eq("strain", new ObjectId(strainId)));
     }
 
     private static String formatDate(LocalDate date) {
@@ -488,6 +497,10 @@ public class MongoDataAccess implements DataAccess {
     private static String formatDate(LocalDateTime date, String pattern) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
         return date.format(formatter);
+    }
+
+    private static String getCurrentDate() {
+        return formatDate(LocalDateTime.now(ZoneOffset.UTC), "yyyy-MM-dd HH:mm:ss.SSS");
     }
 
     /**

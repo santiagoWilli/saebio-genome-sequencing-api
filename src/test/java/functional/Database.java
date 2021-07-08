@@ -12,6 +12,7 @@ public interface Database {
 
     void insertFakeSequence(String token);
     void insertFakeSequence(String token, String strainId);
+    void insertFakeSequenceWithDate(String token, String date);
 
     void insertFakeRepeatedSequence(String strainId, String code, String date);
 

@@ -16,6 +16,10 @@ import utils.EncryptedPassword;
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -53,7 +57,9 @@ public class MongoDB implements Database {
     @Override
     public void insertFakeSequence(String token) {
         MongoCollection<Document> collection = database.getCollection("sequences");
-        collection.insertOne(new Document("genomeToolToken", token));
+        collection.insertOne(new Document()
+                .append("genomeToolToken", token)
+        );
     }
 
     @Override
@@ -62,6 +68,15 @@ public class MongoDB implements Database {
         collection.insertOne(new Document()
                 .append("genomeToolToken", token)
                 .append("strain", new ObjectId(strainId))
+        );
+    }
+
+    @Override
+    public void insertFakeSequenceWithDate(String token, String date) {
+        MongoCollection<Document> collection = database.getCollection("sequences");
+        collection.insertOne(new Document()
+                .append("genomeToolToken", token)
+                .append("uploadDate", formatDate(date, "yyyy-MM-dd HH:mm:ss.SSS"))
         );
     }
 
@@ -197,7 +212,7 @@ public class MongoDB implements Database {
     public String insertFakeReportWithFilesSetToFalse(String token, String strainId) {
         MongoCollection<Document> collection = database.getCollection("reports");
         Document document = new Document()
-                .append("name", "Fake report")
+                .append("name", "Another fake report")
                 .append("strain", new ObjectId(strainId))
                 .append("genomeToolToken", token)
                 .append("files", false);
@@ -246,5 +261,13 @@ public class MongoDB implements Database {
                 .append("password", password.getHash())
                 .append("salt", password.getSalt());
         collection.insertOne(document);
+    }
+
+    private static String formatDate(String date, String pattern) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+        String[] dateFields = date.split("/");
+        LocalDateTime dateTime = LocalDateTime.of(
+                Integer.parseInt(dateFields[0]), Integer.parseInt(dateFields[1]), Integer.parseInt(dateFields[2]), 0, 0);
+        return dateTime.format(formatter);
     }
 }

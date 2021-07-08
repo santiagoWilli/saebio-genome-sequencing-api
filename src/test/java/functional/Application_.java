@@ -83,7 +83,7 @@ public class Application_ {
         assertThat(sequence.get("genomeToolToken")).isEqualTo(token);
         assertThat(sequence.get("sequenceDate").toString())
                 .isEqualTo(dateFormat(date(23, 11, 2020), "yyyy-MM-dd"));
-        assertThat(sequence.get("trimRequestDate").toString())
+        assertThat(sequence.get("uploadDate").toString())
                 .startsWith(dateFormat(Calendar.getInstance().getTime(), "yyyy-MM-dd HH:mm"));
         assertThat(sequence.get("trimmedPair")).isNull();
     }
@@ -120,7 +120,7 @@ public class Application_ {
         assertThat(sequence.get("genomeToolToken")).isNull();
         assertThat(sequence.get("sequenceDate").toString())
                 .isEqualTo(dateFormat(date(23, 11, 2020), "yyyy-MM-dd"));
-        assertThat(sequence.get("trimRequestDate")).isNull();
+        assertThat(sequence.get("uploadDate")).isNotNull();
         assertThat(sequence.get("trimmedPair")).isOfAnyClassIn(ArrayList.class);
 
         ArrayList<Map<String, String>> trimmedPair = (ArrayList<Map<String, String>>) sequence.get("trimmedPair");
@@ -267,7 +267,7 @@ public class Application_ {
     }
 
     @Test
-    public void when_getToSequences_then_returnAJsonOfAllSequences() throws IOException {
+    public void when_getToSequences_then_returnAJsonOfAllSequences_and_orderedByDateDesc() throws IOException {
         int amount = 5;
         insertFakeSequences(amount);
 
@@ -280,8 +280,16 @@ public class Application_ {
                     statusCode(200).
                     extract().asString();
 
+        System.out.println(response);
+
         List<Object> sequences = Arrays.asList(new ObjectMapper().readValue(response, Object[].class));
         assertThat(sequences.size()).isEqualTo(amount);
+        int i = 0;
+        while (i < sequences.size() - 1) {
+            String currentUploadDate = (String) ((HashMap<String,Object>) sequences.get(i)).get("uploadDate");
+            String nextUploadDate = (String) ((HashMap<String,Object>) sequences.get(++i)).get("uploadDate");
+            assertThat(currentUploadDate).isGreaterThan(nextUploadDate);
+        }
     }
 
     @Test
@@ -811,9 +819,7 @@ public class Application_ {
         Map<String, Object> report = db.get("reports", id);
         Map<String, Object> strain = db.get("strains", "keys", "kp");
 
-        String date = dateFormat(Calendar.getInstance().getTime(), "dd/MM/yyyy HH:mm");
-
-        assertThat(report.get("name")).isEqualTo(strain.get("name") + " " + date);
+        assertThat(report.get("name")).isEqualTo(strain.get("name") + " " + dateFormat(Calendar.getInstance().getTime(), "dd/MM/yyyy HH:mm"));
         assertThat(report.get("strain")).isEqualTo(strain.get("_id"));
 
         assertThat(report.get("sequences")).isOfAnyClassIn(ArrayList.class);
@@ -828,7 +834,7 @@ public class Application_ {
         LinkedHashMap<String, String> reference = (LinkedHashMap<String, String>) report.get("reference");
         assertThat(reference.get("$oid")).isEqualTo(referenceId);
         assertThat(report.get("genomeToolToken")).isEqualTo(token);
-        assertThat(report.get("requestDate").toString()).isEqualTo(date);
+        assertThat(report.get("requestDate").toString().split(" ")[0]).isEqualTo(dateFormat(Calendar.getInstance().getTime(), "yyyy-MM-dd"));
         assertThat(report.get("files")).isNull();
     }
 
@@ -1003,7 +1009,8 @@ public class Application_ {
 
     @Test
     public void when_getToReportsIdFile_and_fileDoesNotExist_then_returnHttp404() {
-        String id = db.insertFakeReport(token(), db.insertFakeStrain("kp"));
+        String strainId = db.insertFakeStrain("kp");
+        String id = db.insertFakeReport(token(), strainId);
         given().
                 spec(requestSpec).
         when().
@@ -1011,7 +1018,7 @@ public class Application_ {
         then().
                 statusCode(404);
 
-        id = db.insertFakeReportWithFilesSetToFalse(token(), db.insertFakeStrain("kp"));
+        id = db.insertFakeReportWithFilesSetToFalse(token(), strainId);
         given().
                 spec(requestSpec).
         when().
@@ -1147,7 +1154,7 @@ public class Application_ {
     }
 
     private void insertFakeSequences(int amount) {
-        for (int i = 0; i < amount; i++) db.insertFakeSequence(token());
+        for (int i = 1; i <= amount; i++) db.insertFakeSequenceWithDate(token(), "2021/07/" + i);
     }
 
     private void insertFakeSequences(int amount, String strainId) {
