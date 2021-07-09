@@ -24,8 +24,8 @@ public interface Database {
     void empty(String collection);
 
     boolean referenceExists(String id);
-    void insertFakeReference();
     void insertFakeReference(String strainId);
+    void insertFakeReferenceWithDate(String date);
     String insertFakeReferenceWithFile(File file) throws FileNotFoundException;
 
     String insertFakeReferenceWithFile(File file, String strainId) throws FileNotFoundException;
@@ -35,6 +35,7 @@ public interface Database {
     boolean strainExists(String id);
 
     String insertFakeReport(String token, String strainId);
+    String insertFakeReportWithDate(String token, String strainId, String date);
     String insertFakeReportWithFilesSetToFalse(String token, String strainId);
     String insertFakeReportWithFile(String field, File file) throws FileNotFoundException;
     String insertFakeReportWithLog(File file) throws FileNotFoundException;

@@ -16,6 +16,9 @@ public class ReportsGetAllHandler extends AbstractHandler<EmptyPayload> {
 
     @Override
     protected Answer processRequest(EmptyPayload payload, RequestParams requestParams) {
-        return new Answer(200, dataAccess.getAllReports());
+        if (requestParams.query().get("month") == null || requestParams.query().get("year") == null) {
+            return Answer.badRequest("You must specify month and year");
+        }
+        return new Answer(200, dataAccess.getAllReports(requestParams.query().get("year")[0], requestParams.query().get("month")[0]));
     }
 }

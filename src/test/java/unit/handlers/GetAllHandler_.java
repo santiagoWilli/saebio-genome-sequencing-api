@@ -41,18 +41,18 @@ public class GetAllHandler_ {
 
     @Test
     public void alwaysReturnHttp200_and_callDataAccessMethodOnce_forReferences() {
-        when(dataAccess.getAllReferences()).thenReturn("abc");
+        when(dataAccess.getAllReferences("1", "1")).thenReturn("abc");
         assertThat(new ReferencesGetAllHandler(dataAccess).process(new EmptyPayload(), requestParams))
                 .isEqualTo(new Answer(200, "abc"));
-        verify(dataAccess, times(1)).getAllReferences();
+        verify(dataAccess, times(1)).getAllReferences("1", "1");
     }
 
     @Test
     public void alwaysReturnHttp200_and_callDataAccessMethodOnce_forReports() {
-        when(dataAccess.getAllReports()).thenReturn("abc");
+        when(dataAccess.getAllReports("1", "1")).thenReturn("abc");
         assertThat(new ReportsGetAllHandler(dataAccess).process(new EmptyPayload(), requestParams))
                 .isEqualTo(new Answer(200, "abc"));
-        verify(dataAccess, times(1)).getAllReports();
+        verify(dataAccess, times(1)).getAllReports("1", "1");
     }
 
     @Test

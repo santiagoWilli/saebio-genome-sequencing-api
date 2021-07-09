@@ -273,8 +273,7 @@ public class Application_ {
         when().
                 get("/api/sequences").
         then().
-                statusCode(400).
-                extract().asString();
+                statusCode(400);
     }
 
     @Test
@@ -297,8 +296,6 @@ public class Application_ {
             then().
                     statusCode(200).
                     extract().asString();
-
-        System.out.println(response);
 
         List<Object> sequences = Arrays.asList(new ObjectMapper().readValue(response, Object[].class));
         assertThat(sequences.size()).isEqualTo(amount);
@@ -332,8 +329,6 @@ public class Application_ {
                     statusCode(200).
                     extract().asString();
 
-        System.out.println(response);
-
         List<Object> sequences = Arrays.asList(new ObjectMapper().readValue(response, Object[].class));
         assertThat(sequences.size()).isEqualTo(amount);
         int i = 0;
@@ -365,8 +360,6 @@ public class Application_ {
                 then().
                         statusCode(200).
                         extract().asString();
-
-        System.out.println(response);
 
         List<Object> sequences = Arrays.asList(new ObjectMapper().readValue(response, Object[].class));
         assertThat(sequences.size()).isEqualTo(amount);
@@ -540,13 +533,29 @@ public class Application_ {
     }
 
     @Test
-    public void when_getToReferences_then_returnAJsonOfAllReferences() throws IOException {
+    public void given_noYearOrMonth_when_getToReferences_then_returnHttp400() {
+        given().
+                spec(requestSpec).
+        when().
+                get("/api/references").
+        then().
+                statusCode(400);
+    }
+
+    @Test
+    public void given_yearAndMonth_when_getToReferences_then_returnAJsonOfAllReferencesForGivenDate_and_orderedByDateDesc() throws IOException {
         int amount = 5;
-        insertFakeReferences(amount);
+        int month = 8;
+        for (int i = 1; i <= amount; i++) db.insertFakeReferenceWithDate("2020/" + month + "/" + i);
+        for (int i = 1; i <= amount; i++) db.insertFakeReferenceWithDate("2021/01/" + i);
+        for (int i = 1; i <= amount; i++) db.insertFakeReferenceWithDate("2020/" + (month-1) + "/" + i);
+        for (int i = 1; i <= amount; i++) db.insertFakeReferenceWithDate("2020/" + (month+1) + "/" + i);
 
         String response =
                 given().
                         spec(requestSpec).
+                        queryParam("year", "2020").
+                        queryParam("month", String.valueOf(month)).
                 when().
                         get("/api/references").
                 then().
@@ -555,6 +564,12 @@ public class Application_ {
 
         List<Object> references = Arrays.asList(new ObjectMapper().readValue(response, Object[].class));
         assertThat(references.size()).isEqualTo(amount);
+        int i = 0;
+        while (i < references.size() - 1) {
+            String currentUploadDate = (String) ((HashMap<String,Object>) references.get(i)).get("createdAt");
+            String nextUploadDate = (String) ((HashMap<String,Object>) references.get(++i)).get("createdAt");
+            assertThat(currentUploadDate).isGreaterThan(nextUploadDate);
+        }
     }
 
     @Test
@@ -1013,14 +1028,33 @@ public class Application_ {
     }
 
     @Test
-    public void when_getToReports_then_returnAJsonOfAllReports() throws IOException {
+    public void given_noYearOrDate_when_getToReports_then_returHttp400() throws IOException {
+
+        given().
+                spec(requestSpec).
+        when().
+                get("/api/reports").
+        then().
+                statusCode(400);
+    }
+
+    @Test
+    public void given_monthAndYear_when_getToReports_then_returnAJsonOfAllReportsForGivenDate_and_orderedByDateDesc() throws IOException {
         final String strainId = db.insertFakeStrain("kp");
         final int amount = 5;
-        for (int i = 0; i < amount; i++) db.insertFakeReport(token(), strainId);
+        int month = 8;
+        for (int i = 1; i <= amount; i++) db.insertFakeReportWithDate(token(), strainId, "2020/" + month + "/" + i);
+
+        for (int i = 1; i <= 5; i++) db.insertFakeReportWithDate(token(), strainId, "2021/01/" + i);
+        for (int i = 1; i <= 5; i++) db.insertFakeReportWithDate(token(), strainId, "2019/01/" + i);
+        for (int i = 1; i <= 2; i++) db.insertFakeReportWithDate(token(), strainId, "2020/" + (month-1) + "/" + i);
+        for (int i = 1; i <= 2; i++) db.insertFakeReportWithDate(token(), strainId, "2020/" + (month+1) + "/" + i);
 
         String response =
                 given().
                         spec(requestSpec).
+                        queryParam("year", "2020").
+                        queryParam("month", String.valueOf(month)).
                 when().
                         get("/api/reports").
                 then().
@@ -1029,6 +1063,12 @@ public class Application_ {
 
         List<Object> reports = Arrays.asList(new ObjectMapper().readValue(response, Object[].class));
         assertThat(reports.size()).isEqualTo(amount);
+        int i = 0;
+        while (i < reports.size() - 1) {
+            String currentUploadDate = (String) ((HashMap<String,Object>) reports.get(i)).get("requestDate");
+            String nextUploadDate = (String) ((HashMap<String,Object>) reports.get(++i)).get("requestDate");
+            assertThat(currentUploadDate).isGreaterThan(nextUploadDate);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -1239,16 +1279,8 @@ public class Application_ {
         return UUID.randomUUID().toString();
     }
 
-    private void insertFakeSequences(int amount) {
-        for (int i = 1; i <= amount; i++) db.insertFakeSequenceWithSequenceDate(token(), "2021/07/" + i);
-    }
-
     private void insertFakeSequences(int amount, String strainId) {
         for (int i = 0; i < amount; i++) db.insertFakeSequence(token(), strainId);
-    }
-
-    private void insertFakeReferences(int amount) {
-        for (int i = 0; i < amount; i++) db.insertFakeReference();
     }
 
     private void insertFakeReferences(int amount, String strainId) {

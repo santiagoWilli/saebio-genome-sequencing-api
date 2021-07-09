@@ -16,9 +16,7 @@ import utils.EncryptedPassword;
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -143,16 +141,18 @@ public class MongoDB implements Database {
     }
 
     @Override
-    public void insertFakeReference() {
-        MongoCollection<Document> collection = database.getCollection("references");
-        collection.insertOne(new Document());
-    }
-
-    @Override
     public void insertFakeReference(String strainId) {
         MongoCollection<Document> collection = database.getCollection("references");
         collection.insertOne(new Document()
                 .append("strain", new ObjectId(strainId)));
+    }
+
+    @Override
+    public void insertFakeReferenceWithDate(String date) {
+        MongoCollection<Document> collection = database.getCollection("references");
+        collection.insertOne(new Document()
+                .append("createdAt", formatDate(date, "yyyy-MM-dd HH:mm:ss.SSS"))
+        );
     }
 
     @Override
@@ -213,6 +213,18 @@ public class MongoDB implements Database {
                 .append("name", "Fake report")
                 .append("strain", new ObjectId(strainId))
                 .append("genomeToolToken", token);
+        collection.insertOne(document);
+        return document.getObjectId("_id").toString();
+    }
+
+    @Override
+    public String insertFakeReportWithDate(String token, String strainId, String date) {
+        MongoCollection<Document> collection = database.getCollection("reports");
+        Document document = new Document()
+                .append("name", "Fake report")
+                .append("strain", new ObjectId(strainId))
+                .append("genomeToolToken", token)
+                .append("requestDate", formatDate(date, "yyyy-MM-dd HH:mm:ss.SSS"));
         collection.insertOne(document);
         return document.getObjectId("_id").toString();
     }

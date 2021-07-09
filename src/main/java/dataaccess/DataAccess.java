@@ -23,7 +23,7 @@ public interface DataAccess {
     InputStream getFileStream(String id) throws IOException;
 
     String uploadReference(Reference reference) throws IOException;
-    String getAllReferences();
+    String getAllReferences(String year, String month);
     String getAllReferences(String strainId);
     String getReference(String id);
     boolean referenceAlreadyExists(Reference reference);
@@ -42,7 +42,7 @@ public interface DataAccess {
 
     UploadCode uploadReportFiles(ReportRequestResult reportResult) throws IOException;
     boolean setReportFileToFalse(ReportRequestResult reportResult);
-    String getAllReports();
+    String getAllReports(String year, String month);
     String getReport(String id);
     String getReportHTMLFileId(String id);
     String getReportFileId(String id, String filename);

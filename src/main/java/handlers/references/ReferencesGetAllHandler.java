@@ -16,8 +16,12 @@ public class ReferencesGetAllHandler extends AbstractHandler<EmptyPayload> {
 
     @Override
     protected Answer processRequest(EmptyPayload payload, RequestParams requestParams) {
-        return new Answer(200, requestParams.query().get("strain") == null ?
-                dataAccess.getAllReferences() :
-                dataAccess.getAllReferences(requestParams.query().get("strain")[0]));
+        if (requestParams.query().get("strain") != null) {
+            return new Answer(200, dataAccess.getAllReferences(requestParams.query().get("strain")[0]));
+        }
+        if (requestParams.query().get("month") == null || requestParams.query().get("year") == null) {
+            return Answer.badRequest("You must specify month and year");
+        }
+        return new Answer(200, dataAccess.getAllReferences(requestParams.query().get("year")[0], requestParams.query().get("month")[0]));
     }
 }

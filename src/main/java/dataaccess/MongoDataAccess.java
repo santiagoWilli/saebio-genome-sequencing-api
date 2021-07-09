@@ -9,7 +9,6 @@ import com.mongodb.client.model.Sorts;
 import dataaccess.exceptions.*;
 import org.apache.commons.io.FileUtils;
 import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import payloads.*;
 import utils.EncryptedPassword;
@@ -119,22 +118,7 @@ public class MongoDataAccess implements DataAccess {
     }
 
     private String getAllSequences(int year, int month, String field) {
-        String lowestDate = formatDate(LocalDate.of(year, month, 1));
-        String greatestDate = (month == 12) ?
-                formatDate(LocalDate.of(year + 1, 1, 1)) :
-                formatDate(LocalDate.of(year, month + 1, 1));
-
-        MongoCollection<Document> collection = database.getCollection("sequences");
-        List<String> documents = new ArrayList<>();
-        FindIterable<Document> findResult = collection
-                .find(and(gte(field, lowestDate), lt(field, greatestDate)))
-                .sort(Sorts.descending(field));
-        try (MongoCursor<Document> cursor = findResult.iterator()) {
-            while (cursor.hasNext()) {
-                documents.add(cursor.next().toJson());
-            }
-        }
-        return "[" + String.join(", ", documents) + "]";
+        return findAllFromCollectionByDate("sequences", year, month, field);
     }
 
     @Override
@@ -204,8 +188,8 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
-    public String getAllReferences() {
-        return findAllFromCollection("references", "createdAt");
+    public String getAllReferences(String year, String month) {
+        return findAllFromCollectionByDate("references", Integer.parseInt(year), Integer.parseInt(month), "createdAt");
     }
 
     @Override
@@ -236,7 +220,14 @@ public class MongoDataAccess implements DataAccess {
 
     @Override
     public String getAllStrains() {
-        return findAllFromCollection("strains");
+        MongoCollection<Document> collection = database.getCollection("strains");
+        List<String> documents = new ArrayList<>();
+        try (MongoCursor<Document> cursor = collection.find(new Document()).iterator()) {
+            while (cursor.hasNext()) {
+                documents.add(cursor.next().toJson());
+            }
+        }
+        return "[" + String.join(", ", documents) + "]";
     }
 
     @Override
@@ -430,8 +421,8 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
-    public String getAllReports() {
-        return findAllFromCollection("reports", "requestDate");
+    public String getAllReports(String year, String month) {
+        return findAllFromCollectionByDate("reports", Integer.parseInt(year), Integer.parseInt(month), "requestDate");
     }
 
     @Override
@@ -486,19 +477,17 @@ public class MongoDataAccess implements DataAccess {
         return collection.find(eq("keys", key)).first();
     }
 
-    private String findAllFromCollection(String collectionName) {
-        return findAllFromCollection(collectionName, null, null);
-    }
+    private String findAllFromCollectionByDate(String collectionName, int year, int month, String field) {
+        String lowestDate = formatDate(LocalDate.of(year, month, 1));
+        String greatestDate = (month == 12) ?
+                formatDate(LocalDate.of(year + 1, 1, 1)) :
+                formatDate(LocalDate.of(year, month + 1, 1));
 
-    private String findAllFromCollection(String collectionName, String orderBy) {
-        return findAllFromCollection(collectionName, orderBy, null);
-    }
-
-    private String findAllFromCollection(String collectionName, String orderBy, Bson filter) {
         MongoCollection<Document> collection = database.getCollection(collectionName);
         List<String> documents = new ArrayList<>();
-        FindIterable<Document> findResult = collection.find(filter == null ? new Document() : filter);
-        if (orderBy != null) findResult = findResult.sort(Sorts.descending(orderBy));
+        FindIterable<Document> findResult = collection
+                .find(and(gte(field, lowestDate), lt(field, greatestDate)))
+                .sort(Sorts.descending(field));
         try (MongoCursor<Document> cursor = findResult.iterator()) {
             while (cursor.hasNext()) {
                 documents.add(cursor.next().toJson());
@@ -509,7 +498,16 @@ public class MongoDataAccess implements DataAccess {
 
     private String findAllFromCollectionWithGivenStrain(String collectionName, String strainId) {
         if (!ObjectId.isValid(strainId)) return "[]";
-        return findAllFromCollection(collectionName, null, eq("strain", new ObjectId(strainId)));
+
+        MongoCollection<Document> collection = database.getCollection(collectionName);
+        List<String> documents = new ArrayList<>();
+        FindIterable<Document> findResult = collection.find(eq("strain", new ObjectId(strainId)));
+        try (MongoCursor<Document> cursor = findResult.iterator()) {
+            while (cursor.hasNext()) {
+                documents.add(cursor.next().toJson());
+            }
+        }
+        return "[" + String.join(", ", documents) + "]";
     }
 
     private static String formatDate(LocalDate date) {
