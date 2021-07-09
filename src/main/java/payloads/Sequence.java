@@ -47,7 +47,7 @@ public class Sequence extends Isolate implements Validable {
     }
 
     private static String fileNameRegex() {
-        return "[a-zA-Z]+[0-9]{1,6}_((0[1-9])|([1-2][1-9])|(3[0-1]))((0[1-9])|(1[0-2]))[0-9]{2}_R(1|2)(_trimmed)?.(fq|fastq).gz";
+        return "[a-zA-Z]+[0-9]{1,6}_((0[1-9])|([1-2][0-9])|(3[0-1]))((0[1-9])|(1[0-2]))[0-9]{2}_R(1|2)(_trimmed)?.(fq|fastq).gz";
     }
 
     private final class FileNameDate {
