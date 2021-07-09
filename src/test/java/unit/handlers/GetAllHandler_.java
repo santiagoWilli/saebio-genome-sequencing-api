@@ -11,7 +11,8 @@ import payloads.EmptyPayload;
 import utils.Answer;
 import utils.RequestParams;
 
-import java.util.HashMap;
+import java.util.AbstractMap;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -24,15 +25,18 @@ public class GetAllHandler_ {
     public void setUp() {
         dataAccess = mock(DataAccess.class);
         requestParams = mock(RequestParams.class);
-        when(requestParams.query()).thenReturn(new HashMap<>());
+        when(requestParams.query()).thenReturn(Map.ofEntries(
+                new AbstractMap.SimpleEntry<>("month", new String[]{"1"}),
+                new AbstractMap.SimpleEntry<>("year", new String[]{"1"})
+        ));
     }
 
     @Test
     public void alwaysReturnHttp200_and_callDataAccessMethodOnce_forSequences() {
-        when(dataAccess.getAllSequences()).thenReturn("abc");
+        when(dataAccess.getAllSequencesBySequenceDate("1", "1")).thenReturn("abc");
         assertThat(new SequencesGetAllHandler(dataAccess).process(new EmptyPayload(), requestParams))
                 .isEqualTo(new Answer(200, "abc"));
-        verify(dataAccess, times(1)).getAllSequences();
+        verify(dataAccess, times(1)).getAllSequencesBySequenceDate("1", "1");
     }
 
     @Test

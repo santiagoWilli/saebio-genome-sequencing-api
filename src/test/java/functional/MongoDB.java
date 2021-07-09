@@ -72,7 +72,16 @@ public class MongoDB implements Database {
     }
 
     @Override
-    public void insertFakeSequenceWithDate(String token, String date) {
+    public void insertFakeSequenceWithSequenceDate(String token, String date) {
+        MongoCollection<Document> collection = database.getCollection("sequences");
+        collection.insertOne(new Document()
+                .append("genomeToolToken", token)
+                .append("sequenceDate", formatDate(date, "yyyy-MM-dd"))
+        );
+    }
+
+    @Override
+    public void insertFakeSequenceWithUploadDate(String token, String date) {
         MongoCollection<Document> collection = database.getCollection("sequences");
         collection.insertOne(new Document()
                 .append("genomeToolToken", token)

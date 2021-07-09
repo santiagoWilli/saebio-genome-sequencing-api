@@ -16,8 +16,14 @@ public class SequencesGetAllHandler extends AbstractHandler<EmptyPayload> {
 
     @Override
     protected Answer processRequest(EmptyPayload payload, RequestParams requestParams) {
-        return new Answer(200, requestParams.query().get("strain") == null ?
-                dataAccess.getAllSequences() :
-                dataAccess.getAllSequences(requestParams.query().get("strain")[0]));
+        if (requestParams.query().get("strain") != null) {
+            return new Answer(200, dataAccess.getAllSequences(requestParams.query().get("strain")[0]));
+        }
+        if (requestParams.query().get("month") == null || requestParams.query().get("year") == null) {
+            return Answer.badRequest("You must specify month and year");
+        }
+        return new Answer(200, requestParams.query().get("field") == null ?
+                dataAccess.getAllSequencesBySequenceDate(requestParams.query().get("year")[0], requestParams.query().get("month")[0]) :
+                dataAccess.getAllSequencesByUploadDate(requestParams.query().get("year")[0], requestParams.query().get("month")[0]));
     }
 }

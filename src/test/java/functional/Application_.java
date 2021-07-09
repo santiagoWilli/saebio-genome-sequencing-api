@@ -267,18 +267,104 @@ public class Application_ {
     }
 
     @Test
-    public void when_getToSequences_then_returnAJsonOfAllSequences_and_orderedByDateDesc() throws IOException {
+    public void given_noMonthOrYear_when_getToSequences_then_return_http400() {
+        given().
+                spec(requestSpec).
+        when().
+                get("/api/sequences").
+        then().
+                statusCode(400).
+                extract().asString();
+    }
+
+    @Test
+    public void given_monthAndYear_when_getToSequences_then_returnAJsonOfAllSequencesForGivenDate_and_orderedBySequenceDateDesc_CASE1() throws IOException {
+        int month = 8;
         int amount = 5;
-        insertFakeSequences(amount);
+        for (int i = 1; i <= amount; i++) db.insertFakeSequenceWithSequenceDate(token(), "2020/" + month + "/" + i);
+        for (int i = 1; i <= 5; i++) db.insertFakeSequenceWithSequenceDate(token(), "2021/01/" + i);
+        for (int i = 1; i <= 5; i++) db.insertFakeSequenceWithSequenceDate(token(), "2019/01/" + i);
+        for (int i = 1; i <= 2; i++) db.insertFakeSequenceWithSequenceDate(token(), "2020/" + (month-1) + "/" + i);
+        for (int i = 1; i <= 2; i++) db.insertFakeSequenceWithSequenceDate(token(), "2020/" + (month+1) + "/" + i);
 
         String response =
             given().
                     spec(requestSpec).
+                    queryParam("year", "2020").
+                    queryParam("month", String.valueOf(month)).
             when().
                     get("/api/sequences").
             then().
                     statusCode(200).
                     extract().asString();
+
+        System.out.println(response);
+
+        List<Object> sequences = Arrays.asList(new ObjectMapper().readValue(response, Object[].class));
+        assertThat(sequences.size()).isEqualTo(amount);
+        int i = 0;
+        while (i < sequences.size() - 1) {
+            String currentUploadDate = (String) ((HashMap<String,Object>) sequences.get(i)).get("sequenceDate");
+            String nextUploadDate = (String) ((HashMap<String,Object>) sequences.get(++i)).get("sequenceDate");
+            assertThat(currentUploadDate).isGreaterThan(nextUploadDate);
+        }
+    }
+
+    @Test
+    public void given_monthAndYear_when_getToSequences_then_returnAJsonOfAllSequencesForGivenDate_and_orderedBySequenceDateDesc_CASE2() throws IOException {
+        int month = 12;
+        int amount = 5;
+        for (int i = 1; i <= amount; i++) db.insertFakeSequenceWithSequenceDate(token(), "2020/" + month + "/" + i);
+        for (int i = 1; i <= 5; i++) db.insertFakeSequenceWithSequenceDate(token(), "2021/01/" + i);
+        for (int i = 1; i <= 5; i++) db.insertFakeSequenceWithSequenceDate(token(), "2019/01/" + i);
+        for (int i = 1; i <= 2; i++) db.insertFakeSequenceWithSequenceDate(token(), "2020/" + (month-1) + "/" + i);
+        db.insertFakeSequenceWithSequenceDate(token(), "2020/" + (month-1) + "/30");
+        for (int i = 1; i <= 2; i++) db.insertFakeSequenceWithSequenceDate(token(), "2021/01/" + i);
+
+        String response =
+            given().
+                    spec(requestSpec).
+                    queryParam("year", "2020").
+                    queryParam("month", String.valueOf(month)).
+            when().
+                    get("/api/sequences").
+            then().
+                    statusCode(200).
+                    extract().asString();
+
+        System.out.println(response);
+
+        List<Object> sequences = Arrays.asList(new ObjectMapper().readValue(response, Object[].class));
+        assertThat(sequences.size()).isEqualTo(amount);
+        int i = 0;
+        while (i < sequences.size() - 1) {
+            String currentUploadDate = (String) ((HashMap<String,Object>) sequences.get(i)).get("sequenceDate");
+            String nextUploadDate = (String) ((HashMap<String,Object>) sequences.get(++i)).get("sequenceDate");
+            assertThat(currentUploadDate).isGreaterThan(nextUploadDate);
+        }
+    }
+
+    @Test
+    public void given_monthAndYearAndField_when_getToSequences_then_returnAJsonOfAllSequencesForGivenDate_and_orderedByUploadDesc() throws IOException {
+        int month = 8;
+        int amount = 5;
+        for (int i = 1; i <= amount; i++) db.insertFakeSequenceWithUploadDate(token(), "2020/" + month + "/" + i);
+        for (int i = 1; i <= 5; i++) db.insertFakeSequenceWithUploadDate(token(), "2021/01/" + i);
+        for (int i = 1; i <= 5; i++) db.insertFakeSequenceWithUploadDate(token(), "2019/01/" + i);
+        for (int i = 1; i <= 2; i++) db.insertFakeSequenceWithUploadDate(token(), "2020/" + (month-1) + "/" + i);
+        for (int i = 1; i <= 2; i++) db.insertFakeSequenceWithUploadDate(token(), "2020/" + (month+1) + "/" + i);
+
+        String response =
+                given().
+                        spec(requestSpec).
+                        queryParam("year", "2020").
+                        queryParam("month", String.valueOf(month)).
+                        queryParam("field", "uploadDate").
+                when().
+                        get("/api/sequences").
+                then().
+                        statusCode(200).
+                        extract().asString();
 
         System.out.println(response);
 
@@ -1154,7 +1240,7 @@ public class Application_ {
     }
 
     private void insertFakeSequences(int amount) {
-        for (int i = 1; i <= amount; i++) db.insertFakeSequenceWithDate(token(), "2021/07/" + i);
+        for (int i = 1; i <= amount; i++) db.insertFakeSequenceWithSequenceDate(token(), "2021/07/" + i);
     }
 
     private void insertFakeSequences(int amount, String strainId) {

@@ -13,7 +13,8 @@ public interface DataAccess {
     String createSequenceAlreadyTrimmed(Sequence sequence);
     UploadCode uploadTrimmedFiles(TrimRequestResult trimResult);
     boolean setSequenceTrimToFalse(String token);
-    String getAllSequences();
+    String getAllSequencesBySequenceDate(String year, String month);
+    String getAllSequencesByUploadDate(String year, String month);
     String getAllSequences(String strainId);
     String getSequence(String id);
     boolean sequenceAlreadyExists(Sequence sequence);

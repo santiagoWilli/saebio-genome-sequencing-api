@@ -25,8 +25,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import static com.mongodb.client.model.Aggregates.*;
-import static com.mongodb.client.model.Filters.and;
-import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Projections.*;
 import static com.mongodb.client.model.Updates.*;
 
@@ -110,8 +109,32 @@ public class MongoDataAccess implements DataAccess {
     }
 
     @Override
-    public String getAllSequences() {
-        return findAllFromCollection("sequences", "uploadDate");
+    public String getAllSequencesBySequenceDate(String year, String month) {
+        return getAllSequences(Integer.parseInt(year), Integer.parseInt(month), "sequenceDate");
+    }
+
+    @Override
+    public String getAllSequencesByUploadDate(String year, String month) {
+        return getAllSequences(Integer.parseInt(year), Integer.parseInt(month), "uploadDate");
+    }
+
+    private String getAllSequences(int year, int month, String field) {
+        String lowestDate = formatDate(LocalDate.of(year, month, 1));
+        String greatestDate = (month == 12) ?
+                formatDate(LocalDate.of(year + 1, 1, 1)) :
+                formatDate(LocalDate.of(year, month + 1, 1));
+
+        MongoCollection<Document> collection = database.getCollection("sequences");
+        List<String> documents = new ArrayList<>();
+        FindIterable<Document> findResult = collection
+                .find(and(gte(field, lowestDate), lt(field, greatestDate)))
+                .sort(Sorts.descending(field));
+        try (MongoCursor<Document> cursor = findResult.iterator()) {
+            while (cursor.hasNext()) {
+                documents.add(cursor.next().toJson());
+            }
+        }
+        return "[" + String.join(", ", documents) + "]";
     }
 
     @Override
