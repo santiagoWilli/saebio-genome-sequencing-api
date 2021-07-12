@@ -5,11 +5,29 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Date;
 
 public class JWT {
     public static final int LEEWAY = 3600 * 12; // 12 hours
-    private static final String SECRET = "$mB+fCrO.-XsOIk:|?OhZHR/%./%)YVpSvyq;qD~8E$r.O-;Vuds);$JJd|jny.";
+    private static final String SECRET;
+
+    static {
+        String secret;
+        final String path = new File("secret.txt").exists() ?
+                "secret.txt" :
+                System.getProperty("user.home") + "/data/secret.txt";
+        try {
+            secret = Files.readString(Path.of(path));
+        } catch (IOException e) {
+            System.out.println(e.getMessage());;
+            secret = null;
+        }
+        SECRET = secret;
+    }
 
     private JWT() {}
 

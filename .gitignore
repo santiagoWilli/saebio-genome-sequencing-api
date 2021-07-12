@@ -48,3 +48,4 @@ java/build/**
 /temp/
 /log/
 /mvn-exe
+/secret.txt
